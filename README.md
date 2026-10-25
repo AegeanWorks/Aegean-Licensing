@@ -2,7 +2,9 @@
 
 [![Built with AIKit](https://img.shields.io/badge/built%20with-AIKit-6f42c1)](https://github.com/AegeanWorks/AIKit)
 
-Official dual-licensing framework, commercial agreements, and certificate verification tooling for **AegeanWorks**.
+**Status: Draft repository proposal. The custom license text in this repository is not yet final or operative.**
+
+A central home for the licensing terms, license-version history, commercial licensing process, certificate tooling, and backward-compatibility policy for projects published under the Aegean brand.
 
 ---
 
@@ -24,27 +26,30 @@ Official dual-licensing framework, commercial agreements, and certificate verifi
 
 ---
 
-## 🎯 Purpose & Dual-Licensing Architecture
+## 📜 Intended Policy & Licensing Model
 
-AegeanWorks authors high-performance software, developer tools, and machine intelligence runtimes. `aegean-licensing` establishes the canonical legal framework and automated compliance tooling across the entire AegeanWorks portfolio.
+- **Personal Use**: Personal, non-commercial use is intended to be free under the eventual Aegean Licensing Personal Use License (`AL-PU-1.0-DRAFT.md`).
+- **Commercial & Organizational Use**: Commercial and organizational use requires separate prior written authorization from the rights holder (`aegean-licensing@proton.me`).
+- **Explicit Versioning**: Each release must identify its governing license and version.
+- **Older Versions & Reissuance**: Older versions may be reissued under the current Aegean license only where the rights holder controls the necessary rights and the release is clearly marked as such.
+- **Backward Compatibility & Non-Retroactivity**: Existing permissions granted under prior licenses—including AGPL-3.0—are not retroactively revoked. The new license cannot force existing recipients to give up a valid earlier grant. See [BACKWARD-COMPATIBILITY-DRAFT.md](policies/BACKWARD-COMPATIBILITY-DRAFT.md).
 
-### The Two Tracks
+> **Operational Notice**: Do not place a draft custom license in the root as if it were the final operative `LICENSE`. When the terms are approved, publish the final text with a clear effective date and add the exact license text to every repository/release it governs. Add a `LICENSE` file only when the applicable terms have been finalized for that project.
 
-1. **Track A — Open-Source Community Track (GNU AGPL-3.0-or-later)**:
-   - Free for developers, students, researchers, and commercial organizations.
-   - Preserves open source freedom: any distribution or network-hosted modified service triggers complete corresponding source code disclosure under AGPL-3.0 Section 13.
-2. **Track B — Commercial License Track (Aegean-E Commercial License - AECL-1.0)**:
-   - Designed for enterprises and startups requiring closed-source operations, proprietary cloud SaaS deployments, and closed redistribution.
-   - Completely waives AGPL copyleft obligations.
-   - Pure copyright grant sold **"AS-IS"** with zero warranty, zero support SLAs, and zero corporate procurement bureaucracy.
+### Pre-Release Checklist
+
+1. Replace all placeholders with the actual rights holder and contact details.
+2. Confirm copyright ownership and contributor rights for every project.
+3. Decide the migration plan for each repository, including Chronos's prior AGPL-licensed releases.
+4. Obtain legal review for the final custom license and commercial agreement.
 
 ---
 
-## 💻 CLI Usage
+## 💻 CLI & Verification Tooling
 
-The package exposes a fast, standalone CLI (`aegean-license` or `python -m aegean_licensing`):
+The repository includes pure standard-library tooling (`aegean-license` or `python -m aegean_licensing`):
 
-### 1. Issue a License Grant Certificate
+### 1. Issue a Commercial License Certificate
 ```bash
 python -m aegean_licensing issue \
   --licensee "Acme Corp" \
@@ -53,25 +58,18 @@ python -m aegean_licensing issue \
   --scope "proprietary-saas-and-redistribution" \
   --output-dir ./certs
 ```
-Generates a tamper-evident `.json` certificate and human-readable `.md` certificate with a canonical SHA-256 integrity digest and optional HMAC signature.
 
 ### 2. Verify an Authentic Certificate
 ```bash
 python -m aegean_licensing verify ./certs/license_certificate_*.json --project chronos
 ```
-Validates SHA-256 payload integrity, checks expiration date, and confirms whether a specific project is authorized.
 
 ### 3. Audit a Repository for Compliance
 ```bash
 python -m aegean_licensing audit /path/to/project --strict
 ```
-Inspects `LICENSE`, `COMMERCIAL.md`, and `pyproject.toml` to ensure:
-- GNU AGPL-3.0 base license is present.
-- Dual-Licensing Notice rider is attached.
-- `COMMERCIAL.md` correctly specifies AECL terms and Exhibit A without obsolete corporate bureaucracy.
-- Package metadata names `AegeanWorks` and `aegean-licensing@proton.me`.
 
-### 4. Generate Canonical Licensing Templates
+### 4. Output Boilerplate Licensing Templates
 ```bash
 python -m aegean_licensing template all --output-dir ./licensing_boilerplate
 ```
@@ -83,6 +81,7 @@ python -m aegean_licensing template all --output-dir ./licensing_boilerplate
 ```text
 aegean-licensing/
 ├── .gitignore                <- transient AIKit state excluded
+├── CHANGELOG.md              <- version and draft change history
 ├── LICENSE                   <- GNU AGPL-3.0 with AegeanWorks dual-licensing rider
 ├── COMMERCIAL.md             <- Commercial licensing terms & Exhibit A
 ├── README.md                 <- Architecture, quickstart, and commands
@@ -93,12 +92,17 @@ aegean-licensing/
 │   ├── decisions.md
 │   ├── guidelines.md
 │   └── codebase_map.md
+├── policies/                 <- Licensing and governance policies
+│   └── BACKWARD-COMPATIBILITY-DRAFT.md <- Older versions and non-retroactivity policy
 ├── licenses/                 <- Canonical legal agreements & policies
 │   ├── AECL-1.0.md           <- Full binding Aegean-E Commercial License agreement
-│   ├── DUAL_LICENSE_NOTICE.txt <- Standard repo and file header notice
+│   ├── AL-PU-1.0-DRAFT.md    <- Draft Aegean Licensing Personal Use License
 │   ├── ASSET_POLICY.md       <- Delineation between source code and creative/domain assets
+│   ├── COMMERCIAL_FAQ.md     <- Plain-English customer FAQ
 │   ├── CONTRIBUTING_CLA.md   <- Contributor License Agreement for dual-licensing rights
-│   └── COMMERCIAL_FAQ.md     <- Plain-English customer FAQ
+│   ├── DUAL_LICENSE_NOTICE.txt <- Standard repo and file header notice
+│   └── commercial/
+│       └── COMMERCIAL-LICENSE-TEMPLATE-DRAFT.md <- Commercial agreement draft placeholder
 ├── aegean_licensing/         <- Core Python package (Pure Standard Library)
 │   ├── __init__.py
 │   ├── __main__.py
@@ -122,4 +126,4 @@ aegean-licensing/
 
 ## 📜 License
 
-GNU Affero General Public License v3.0; see [LICENSE](LICENSE). For commercial licensing and proprietary rights, see [COMMERCIAL.md](COMMERCIAL.md).
+GNU Affero General Public License v3.0; see [LICENSE](LICENSE). For commercial licensing and proprietary rights, see [COMMERCIAL.md](COMMERCIAL.md). Draft custom terms are located in [licenses/](licenses/).
