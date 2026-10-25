@@ -27,3 +27,11 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Context**: AegeanWorks is evaluating a transition toward a custom source-available model where personal non-commercial use is free under the Aegean Licensing Personal Use License (AL-PU 1.0), while commercial and organizational use requires prior written authorization. Crucially, earlier releases (e.g., under AGPL-3.0) and third-party contributions cannot be retroactively modified without legal authority.
 - **Decision**: Draft `AL-PU-1.0-DRAFT.md`, `COMMERCIAL-LICENSE-TEMPLATE-DRAFT.md`, and establish `BACKWARD-COMPATIBILITY-DRAFT.md` affirming that: (1) existing AGPL-3.0 grants are preserved and cannot be retroactively revoked, (2) older versions reissued by AegeanWorks adopt new terms only when authorized, and (3) a clear migration and legal checklist precedes any operative transition.
 - **Consequences**: Provides transparency for future licensing evolution while legally protecting existing community users and open source integrity.
+
+
+### ADR-003: Optimization of AL-PU 1.0 Draft for Maximum Commercial Conversion & Personal Protection
+- **Date**: 2026-10-25
+- **Status**: Accepted
+- **Context**: The initial AL-PU v0.2 draft had commercial leakage points (unclear startup transitions, freelancer ambiguity, and contributor IP bottlenecks) while risking chilling individual students. Additionally, it lacked a structured commercial agreement draft and a non-litigious conversion ramp for unauthorized commercial users.
+- **Decision**: Update `AL-PU-1.0-DRAFT.md` (to v0.3) and `COMMERCIAL-LICENSE-TEMPLATE-DRAFT.md` to: (1) carve out free self-study for enrolled students, (2) define explicit commercialization triggers (first revenue, third-party deployment, client delivery), (3) mandate commercial licensing for billable freelance/consulting work, (4) bind public PRs to the inbound CLA, (5) introduce a Commercial Cure Ramp in Section 9.1 to monetize infringers directly, and (6) establish a 3-tier commercial framework backed by cryptographic License Grant Certificates.
+- **Consequences**: Protects grassroots student and developer adoption while maximizing commercial conversion and revenue capture from startups, consulting firms, and enterprise cloud operators.

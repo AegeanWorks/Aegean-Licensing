@@ -21,3 +21,4 @@ Aegean Licensing aims to keep licensing consistent across current releases and o
 “Older versions are subject to current licensing” can apply to older copies newly reissued by the rights holder under the current license, where the necessary rights are controlled. It cannot universally override permissions previously granted under AGPL-3.0 or any other valid prior license.
 
 For a project such as Chronos that has already been released under AGPL-3.0, a transition plan must preserve the existing AGPL grants and assess contributions and dependencies before any version is reissued under different terms.
+
