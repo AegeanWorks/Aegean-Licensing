@@ -13,8 +13,13 @@ from aegean_licensing.auditor import audit_repository
 from aegean_licensing.cert import cert_to_dict, cert_to_markdown
 from aegean_licensing.issuer import issue_certificate
 from aegean_licensing.templates import (
+    get_asset_policy,
+    get_backward_compatibility_policy,
+    get_commercial_agreement_template,
     get_commercial_md,
+    get_contributor_cla,
     get_dual_license_rider,
+    get_personal_use_license,
     get_pyproject_snippet,
 )
 from aegean_licensing.verifier import verify_certificate
@@ -33,6 +38,12 @@ def _build_parser() -> argparse.ArgumentParser:
     p_issue = subparsers.add_parser("issue", help="Generate a commercial license certificate.")
     p_issue.add_argument("--licensee", required=True, help="Legal name of licensee individual or organization.")
     p_issue.add_argument("--contact", required=True, help="Contact email of licensee.")
+    p_issue.add_argument(
+        "--type",
+        dest="license_type",
+        default="AECL-1.0",
+        help="License agreement type (default: 'AECL-1.0', or e.g. 'ACLA-1.0-Tier1', 'ACLA-1.0-Enterprise').",
+    )
     p_issue.add_argument(
         "--projects",
         default="*",
@@ -60,13 +71,28 @@ def _build_parser() -> argparse.ArgumentParser:
     p_audit = subparsers.add_parser("audit", help="Audit repository for dual-licensing compliance.")
     p_audit.add_argument("path", nargs="?", default=".", help="Repository root directory (default: current directory).")
     p_audit.add_argument("--strict", action="store_true", help="Treat warnings as failures.")
+    p_audit.add_argument(
+        "--check-policies",
+        action="store_true",
+        help="Also verify presence of CLA, asset policy, and backward-compat policy.",
+    )
 
     # 4. Template
     p_template = subparsers.add_parser("template", help="Output or write standard licensing templates.")
     p_template.add_argument(
         "kind",
-        choices=["rider", "commercial", "pyproject", "all"],
-        help="Template to generate: 'rider', 'commercial', 'pyproject', or 'all'.",
+        choices=[
+            "rider",
+            "commercial",
+            "pyproject",
+            "al-pu",
+            "acla",
+            "cla",
+            "asset-policy",
+            "backward-compat",
+            "all",
+        ],
+        help="Template to generate: 'rider', 'commercial', 'pyproject', 'al-pu', 'acla', 'cla', 'asset-policy', 'backward-compat', or 'all'.",
     )
     p_template.add_argument(
         "--output-dir",
@@ -85,6 +111,7 @@ def _handle_issue(args: argparse.Namespace) -> int:
         cert = issue_certificate(
             licensee_name=args.licensee,
             licensee_contact=args.contact,
+            license_type=args.license_type,
             projects=projects_list,
             scope=args.scope,
             is_perpetual=is_perpetual,
@@ -148,7 +175,7 @@ def _handle_verify(args: argparse.Namespace) -> int:
 
 
 def _handle_audit(args: argparse.Namespace) -> int:
-    report = audit_repository(args.path)
+    report = audit_repository(args.path, check_policies=args.check_policies)
 
     print("==========================================================")
     print(f"AEGEANWORKS DUAL-LICENSING AUDIT: {report.repo_path}")
@@ -185,6 +212,11 @@ def _handle_template(args: argparse.Namespace) -> int:
         "rider": ("DUAL_LICENSE_NOTICE.txt", get_dual_license_rider()),
         "commercial": ("COMMERCIAL.md", get_commercial_md()),
         "pyproject": ("pyproject_snippet.toml", get_pyproject_snippet()),
+        "al-pu": ("AL-PU-1.0-DRAFT.md", get_personal_use_license()),
+        "acla": ("COMMERCIAL-LICENSE-TEMPLATE-DRAFT.md", get_commercial_agreement_template()),
+        "cla": ("CONTRIBUTING_CLA.md", get_contributor_cla()),
+        "asset-policy": ("ASSET_POLICY.md", get_asset_policy()),
+        "backward-compat": ("BACKWARD-COMPATIBILITY-DRAFT.md", get_backward_compatibility_policy()),
     }
 
     if args.kind in templates_map:

@@ -43,6 +43,7 @@ def _write_atomic(path: Path, content: str) -> None:
 def issue_certificate(
     licensee_name: str,
     licensee_contact: str,
+    license_type: str = "AECL-1.0",
     projects: Sequence[str] = ("*",),
     scope: str = "proprietary-saas-and-redistribution",
     is_perpetual: bool = True,
@@ -68,7 +69,7 @@ def issue_certificate(
         "licensee_contact": licensee_contact.strip(),
         "issuer": "AegeanWorks",
         "issuer_contact": "aegean-licensing@proton.me",
-        "license_type": "AECL-1.0",
+        "license_type": license_type.strip() or "AECL-1.0",
         "projects": list(projects) if projects else ["*"],
         "scope": scope.strip(),
         "issued_at": actual_date,

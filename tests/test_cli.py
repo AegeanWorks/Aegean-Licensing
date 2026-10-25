@@ -63,6 +63,22 @@ class TestCLI(unittest.TestCase):
         self.assertTrue((Path(self.temp_dir) / "DUAL_LICENSE_NOTICE.txt").exists())
         self.assertTrue((Path(self.temp_dir) / "COMMERCIAL.md").exists())
         self.assertTrue((Path(self.temp_dir) / "pyproject_snippet.toml").exists())
+        self.assertTrue((Path(self.temp_dir) / "AL-PU-1.0-DRAFT.md").exists())
+        self.assertTrue((Path(self.temp_dir) / "CONTRIBUTING_CLA.md").exists())
+
+    def test_issue_with_type_cli(self):
+        exit_code = main([
+            "issue",
+            "--licensee", "Tier Tech",
+            "--contact", "tier@tech.com",
+            "--type", "ACLA-1.0-Tier1",
+            "--output-dir", self.temp_dir,
+        ])
+        self.assertEqual(exit_code, 0)
+        json_files = list(Path(self.temp_dir).glob("*.json"))
+        with open(json_files[0], "r", encoding="utf-8") as f:
+            data = json.load(f)
+        self.assertEqual(data["license_type"], "ACLA-1.0-Tier1")
 
 
 if __name__ == "__main__":

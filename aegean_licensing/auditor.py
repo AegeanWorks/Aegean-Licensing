@@ -19,7 +19,7 @@ class AuditReport:
     fixes: tuple[str, ...]
 
 
-def audit_repository(repo_dir: Union[str, Path]) -> AuditReport:
+def audit_repository(repo_dir: Union[str, Path], check_policies: bool = False) -> AuditReport:
     """Inspect repository files for compliance with AegeanWorks dual-licensing standards."""
     target = Path(repo_dir).resolve()
     if not target.exists() or not target.is_dir():
@@ -41,23 +41,32 @@ def audit_repository(repo_dir: Union[str, Path]) -> AuditReport:
     license_file = target / "LICENSE"
     if not license_file.exists():
         failed.append("Missing LICENSE file.")
-        fixes.append("Add GNU AGPL-3.0 LICENSE with AegeanWorks Dual-Licensing rider.")
+        fixes.append("Add GNU AGPL-3.0 or AL-PU-1.0 LICENSE with AegeanWorks Dual-Licensing rider.")
     else:
         try:
             with open(license_file, "r", encoding="utf-8", errors="replace") as f:
                 license_content = f.read()
 
-            if "GNU AFFERO GENERAL PUBLIC LICENSE" not in license_content:
-                failed.append("LICENSE file is missing standard GNU AGPL-3.0 terms.")
-                fixes.append("Ensure LICENSE begins with full GNU AGPL-3.0 license text.")
-            else:
-                passed.append("LICENSE contains GNU AGPL-3.0 base.")
+            is_agpl = "GNU AFFERO GENERAL PUBLIC LICENSE" in license_content
+            is_alpu = "PERSONAL USE LICENSE" in license_content.upper() or "AL-PU" in license_content.upper()
 
-            if "dual-licensing notice" not in license_content.lower() or "aegean-licensing@proton.me" not in license_content.lower():
-                failed.append("LICENSE is missing AegeanWorks Dual-Licensing notice rider.")
-                fixes.append("Append AegeanWorks Dual-Licensing Notice to bottom of LICENSE.")
+            if is_agpl:
+                passed.append("LICENSE contains GNU AGPL-3.0 base.")
+                if "dual-licensing notice" not in license_content.lower() or "aegean-licensing@proton.me" not in license_content.lower():
+                    failed.append("LICENSE is missing AegeanWorks Dual-Licensing notice rider.")
+                    fixes.append("Append AegeanWorks Dual-Licensing Notice to bottom of LICENSE.")
+                else:
+                    passed.append("LICENSE contains valid Dual-Licensing rider.")
+            elif is_alpu:
+                passed.append("LICENSE contains Aegean Licensing Personal Use (AL-PU) base.")
+                if "aegean-licensing@proton.me" not in license_content.lower():
+                    warnings.append("AL-PU LICENSE does not list 'aegean-licensing@proton.me' contact.")
+                    fixes.append("Ensure commercial licensing contact 'aegean-licensing@proton.me' is listed in LICENSE.")
+                else:
+                    passed.append("AL-PU LICENSE contains commercial licensing contact.")
             else:
-                passed.append("LICENSE contains valid Dual-Licensing rider.")
+                failed.append("LICENSE file is missing an approved AegeanWorks license base (AGPL-3.0 or AL-PU).")
+                fixes.append("Ensure LICENSE begins with full GNU AGPL-3.0 or AL-PU-1.0 license text.")
         except Exception as exc:
             failed.append(f"Failed to read LICENSE file: {exc}")
 
@@ -123,6 +132,29 @@ def audit_repository(repo_dir: Union[str, Path]) -> AuditReport:
                 passed.append("pyproject.toml specifies AGPL-3.0 license.")
         except Exception as exc:
             failed.append(f"Failed to read pyproject.toml: {exc}")
+
+    # 4. Check policies if requested
+    if check_policies:
+        cla_found = (target / "licenses" / "CONTRIBUTING_CLA.md").exists() or (target / "CONTRIBUTING_CLA.md").exists()
+        if cla_found:
+            passed.append("Contributor License Agreement (CLA) found.")
+        else:
+            warnings.append("Missing Contributor License Agreement (CONTRIBUTING_CLA.md).")
+            fixes.append("Add CONTRIBUTING_CLA.md to establish clear inbound licensing rights.")
+
+        asset_found = (target / "licenses" / "ASSET_POLICY.md").exists() or (target / "ASSET_POLICY.md").exists()
+        if asset_found:
+            passed.append("Asset Separation Policy (ASSET_POLICY.md) found.")
+        else:
+            warnings.append("Missing Asset Separation Policy (ASSET_POLICY.md).")
+            fixes.append("Add ASSET_POLICY.md to demarcate code from creative/clinical assets.")
+
+        backward_found = (target / "policies" / "BACKWARD-COMPATIBILITY-DRAFT.md").exists() or (target / "BACKWARD-COMPATIBILITY-DRAFT.md").exists()
+        if backward_found:
+            passed.append("Backward Compatibility Policy found.")
+        else:
+            warnings.append("Missing Backward Compatibility Policy (BACKWARD-COMPATIBILITY-DRAFT.md).")
+            fixes.append("Add BACKWARD-COMPATIBILITY-DRAFT.md to clarify non-retroactivity of license updates.")
 
     is_compliant = len(failed) == 0
 

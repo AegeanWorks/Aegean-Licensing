@@ -35,3 +35,11 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Context**: The initial AL-PU v0.2 draft had commercial leakage points (unclear startup transitions, freelancer ambiguity, and contributor IP bottlenecks) while risking chilling individual students. Additionally, it lacked a structured commercial agreement draft and a non-litigious conversion ramp for unauthorized commercial users.
 - **Decision**: Update `AL-PU-1.0-DRAFT.md` (to v0.3) and `COMMERCIAL-LICENSE-TEMPLATE-DRAFT.md` to: (1) carve out free self-study for enrolled students, (2) define explicit commercialization triggers (first revenue, third-party deployment, client delivery), (3) mandate commercial licensing for billable freelance/consulting work, (4) bind public PRs to the inbound CLA, (5) introduce a Commercial Cure Ramp in Section 9.1 to monetize infringers directly, and (6) establish a 3-tier commercial framework backed by cryptographic License Grant Certificates.
 - **Consequences**: Protects grassroots student and developer adoption while maximizing commercial conversion and revenue capture from startups, consulting firms, and enterprise cloud operators.
+
+
+### ADR-004: Configurable License Types, Multi-Model Auditor and Expanded Template Suite
+- **Date**: 2026-10-25
+- **Status**: Accepted
+- **Context**: The `aegean-license` CLI was hardcoded to `AECL-1.0` and its template generator only produced basic AGPL boilerplate. Furthermore, the repository auditor rejected any repository not starting with AGPL-3.0, preventing future verification of projects adopting AL-PU 1.0 or checking for required policies.
+- **Decision**: (1) Add `--type` argument to `issue` enabling tiered certificates (e.g. `ACLA-1.0-Tier1`, `ACLA-1.0-Enterprise`), (2) expand `templates.py` and `template` command with `al-pu`, `acla`, `cla`, `asset-policy`, and `backward-compat`, and (3) update `auditor.py` to recognize both AGPL-3.0 and AL-PU-1.0 bases, with an optional `--check-policies` verification flag.
+- **Consequences**: Provides end-to-end tooling for both the present dual-licensing setup and future custom license transitions with 36 passing unit tests.

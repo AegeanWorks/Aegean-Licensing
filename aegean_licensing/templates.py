@@ -2,6 +2,22 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+from typing import Optional
+
+
+def _read_file_or_fallback(rel_path: str, fallback: str) -> str:
+    """Read template file relative to repository root, falling back to static string."""
+    try:
+        root_dir = Path(__file__).resolve().parent.parent
+        target = root_dir / rel_path
+        if target.is_file():
+            with open(target, "r", encoding="utf-8") as f:
+                return f.read().strip() + "\n"
+    except OSError:  # hygiene: allow fallback to static template string if file not found
+        pass
+    return fallback.strip() + "\n"
+
 STANDARD_DUAL_LICENSE_RIDER = """---
 
 ### Dual-Licensing Notice
@@ -90,3 +106,32 @@ def get_commercial_md() -> str:
 def get_pyproject_snippet() -> str:
     """Return pyproject.toml licensing snippet."""
     return PYPROJECT_SNIPPET.strip() + "\n"
+
+
+def get_personal_use_license() -> str:
+    """Return draft Aegean Licensing Personal Use License (AL-PU 1.0)."""
+    return _read_file_or_fallback("licenses/AL-PU-1.0-DRAFT.md", "# AL-PU 1.0 DRAFT\n")
+
+
+def get_commercial_agreement_template() -> str:
+    """Return draft Aegean Commercial License Agreement (ACLA 1.0)."""
+    return _read_file_or_fallback(
+        "licenses/commercial/COMMERCIAL-LICENSE-TEMPLATE-DRAFT.md",
+        "# ACLA 1.0 DRAFT\n",
+    )
+
+
+def get_backward_compatibility_policy() -> str:
+    """Return draft Backward Compatibility Policy."""
+    return _read_file_or_fallback("policies/BACKWARD-COMPATIBILITY-DRAFT.md", "# Backward Compatibility Policy\n")
+
+
+def get_contributor_cla() -> str:
+    """Return AegeanWorks Contributor License Agreement."""
+    return _read_file_or_fallback("licenses/CONTRIBUTING_CLA.md", "# Contributor License Agreement\n")
+
+
+def get_asset_policy() -> str:
+    """Return AegeanWorks Asset Separation & Licensing Policy."""
+    return _read_file_or_fallback("licenses/ASSET_POLICY.md", "# Asset Separation Policy\n")
+

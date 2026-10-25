@@ -32,6 +32,16 @@ class TestIssuer(unittest.TestCase):
         self.assertEqual(len(cert.digest), 64)
         self.assertEqual(cert.signature, "")
 
+    def test_issue_with_custom_license_type(self):
+        cert = issue_certificate(
+            licensee_name="Indie Studio",
+            licensee_contact="hi@indiestudio.game",
+            license_type="ACLA-1.0-Tier1",
+            projects=["voidfarer"],
+        )
+        self.assertEqual(cert.license_type, "ACLA-1.0-Tier1")
+        self.assertEqual(cert.licensee_name, "Indie Studio")
+
     def test_issue_with_hmac_signature(self):
         cert = issue_certificate(
             licensee_name="Secure Co",

@@ -8,9 +8,9 @@
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `15`
 - **Total Classes**: `9`
-- **Total Top-Level Functions**: `19`
-- **Total Class Methods**: `32`
-- **Total Source Lines**: `1415`
+- **Total Top-Level Functions**: `25`
+- **Total Class Methods**: `41`
+- **Total Source Lines**: `1624`
 
 ---
 
@@ -33,13 +33,13 @@
 ### [`aegean_licensing/auditor.py`](aegean_licensing/auditor.py)
 > *Repository Dual-Licensing Compliance Auditor.*
 
-**Size**: `136` lines (`6111` bytes)
+**Size**: `168` lines (`8254` bytes)
 
 **Classes:**
 - `class AuditReport` - *Detailed compliance report for an audited repository.*
 
 **Functions:**
-- `def audit_repository(repo_dir)` - *Inspect repository files for compliance with AegeanWorks dual-licensing standards.*
+- `def audit_repository(repo_dir, check_policies)` - *Inspect repository files for compliance with AegeanWorks dual-licensing standards.*
 
 ---
 
@@ -65,7 +65,7 @@
 ### [`aegean_licensing/cli.py`](aegean_licensing/cli.py)
 > *AegeanWorks Licensing Command-Line Interface.*
 
-**Size**: `232` lines (`9070` bytes)
+**Size**: `264` lines (`10329` bytes)
 
 **Functions:**
 - `def _build_parser()`
@@ -80,23 +80,29 @@
 ### [`aegean_licensing/issuer.py`](aegean_licensing/issuer.py)
 > *Commercial License Certificate Issuance Module.*
 
-**Size**: `102` lines (`3248` bytes)
+**Size**: `103` lines (`3308` bytes)
 
 **Functions:**
 - `def _write_atomic(path, content)` - *Write text to destination atomically using temp file, fsync, and replace.*
-- `def issue_certificate(licensee_name, licensee_contact, projects, scope, is_perpetual, expires_at, notes, secret_key, cert_id, issued_at, output_dir)` - *Generate and return an authentic LicenseCertificate, optionally saving to disk.*
+- `def issue_certificate(licensee_name, licensee_contact, license_type, projects, scope, is_perpetual, expires_at, notes, secret_key, cert_id, issued_at, output_dir)` - *Generate and return an authentic LicenseCertificate, optionally saving to disk.*
 
 ---
 
 ### [`aegean_licensing/templates.py`](aegean_licensing/templates.py)
 > *Canonical Licensing Templates and Boilerplate Generators.*
 
-**Size**: `92` lines (`4164` bytes)
+**Size**: `137` lines (`5826` bytes)
 
 **Functions:**
+- `def _read_file_or_fallback(rel_path, fallback)` - *Read template file relative to repository root, falling back to static string.*
 - `def get_dual_license_rider()` - *Return canonical dual-licensing rider for LICENSE files.*
 - `def get_commercial_md()` - *Return standard COMMERCIAL.md content.*
 - `def get_pyproject_snippet()` - *Return pyproject.toml licensing snippet.*
+- `def get_personal_use_license()` - *Return draft Aegean Licensing Personal Use License (AL-PU 1.0).*
+- `def get_commercial_agreement_template()` - *Return draft Aegean Commercial License Agreement (ACLA 1.0).*
+- `def get_backward_compatibility_policy()` - *Return draft Backward Compatibility Policy.*
+- `def get_contributor_cla()` - *Return AegeanWorks Contributor License Agreement.*
+- `def get_asset_policy()` - *Return AegeanWorks Asset Separation & Licensing Policy.*
 
 ---
 
@@ -123,7 +129,7 @@
 ### [`tests/test_auditor.py`](tests/test_auditor.py)
 > *Unit tests for repository compliance auditor.*
 
-**Size**: `77` lines (`2906` bytes)
+**Size**: `120` lines (`4929` bytes)
 
 **Classes:**
 - `class TestAuditor` - *Test repository licensing audit checks and warnings.*
@@ -132,6 +138,8 @@
   - Method `.test_missing_license_fails()`
   - Method `.test_missing_commercial_md_fails()`
   - Method `.test_detects_obsolete_enterprise_bureaucracy()`
+  - Method `.test_alpu_compliant_repository()`
+  - Method `.test_audit_with_policies_check()`
 
 ---
 
@@ -154,7 +162,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for aegean-licensing CLI.*
 
-**Size**: `69` lines (`2259` bytes)
+**Size**: `85` lines (`2942` bytes)
 
 **Classes:**
 - `class TestCLI` - *Test CLI commands, argument handling, and exit codes.*
@@ -162,18 +170,20 @@
   - Method `.test_version_output()`
   - Method `.test_issue_and_verify_roundtrip_cli()`
   - Method `.test_template_generation_cli()`
+  - Method `.test_issue_with_type_cli()`
 
 ---
 
 ### [`tests/test_issuer.py`](tests/test_issuer.py)
 > *Unit tests for commercial license certificate issuer.*
 
-**Size**: `71` lines (`2580` bytes)
+**Size**: `81` lines (`2972` bytes)
 
 **Classes:**
 - `class TestIssuer` - *Test certificate creation and disk serialization.*
   - Method `.setUp()`
   - Method `.test_issue_valid_perpetual_certificate()`
+  - Method `.test_issue_with_custom_license_type()`
   - Method `.test_issue_with_hmac_signature()`
   - Method `.test_validation_errors()`
   - Method `.test_issue_writes_atomic_files()`
@@ -183,13 +193,18 @@
 ### [`tests/test_templates.py`](tests/test_templates.py)
 > *Unit tests for licensing template generation.*
 
-**Size**: `40` lines (`1303` bytes)
+**Size**: `70` lines (`2473` bytes)
 
 **Classes:**
 - `class TestTemplates` - *Test standard licensing templates.*
   - Method `.test_dual_license_rider_content()`
   - Method `.test_commercial_md_content()`
   - Method `.test_pyproject_snippet_content()`
+  - Method `.test_personal_use_license_content()`
+  - Method `.test_commercial_agreement_template_content()`
+  - Method `.test_backward_compatibility_policy_content()`
+  - Method `.test_contributor_cla_content()`
+  - Method `.test_asset_policy_content()`
 
 ---
 
