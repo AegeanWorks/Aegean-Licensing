@@ -6,6 +6,7 @@ built here is not in the public register, which is the whole point of the regist
 """
 
 import json
+import secrets
 import uuid
 from pathlib import Path
 
@@ -37,6 +38,8 @@ def issue_certificate(licensee_name, licensee_contact, license_type="ACL-1.0", p
         "licensee_registration": "",
         "licensee_country": "",
         "allowances": sorted(allowances),
+        "format": 2,
+        "serial": secrets.token_hex(32),
     }
     data["digest"] = compute_digest(data)
     data["signature"] = compute_signature(data, secret_key) if secret_key else ""

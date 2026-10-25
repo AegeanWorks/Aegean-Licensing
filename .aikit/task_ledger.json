@@ -1,62 +1,23 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "licensing-automation",
-    "last_phase": "phase 2",
+    "task_id": "certificate-format-2",
+    "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1792955457.6578162,
+    "updated_at": 1792956805.6889565,
     "owner": "claude-code:c74fca42",
-    "started_by": "Antigravity",
-    "continuations": [
-      {
-        "agent": "kilo:main",
-        "from": "Antigravity",
-        "at": 1792927631.3172839
-      },
-      {
-        "agent": "claude-code:c74fca42",
-        "from": "kilo:main",
-        "at": 1792952329.4002697
-      }
-    ],
+    "started_by": "claude-code:c74fca42",
+    "continuations": [],
     "impact_assessment": {
-      "why": "User decided issuing and operations tooling should not be given to others, while buyers still verify certificates publicly",
-      "benefits": "Public repo exposes only what verification needs; operations stay private",
-      "risks": "contract: public CLI loses issue/revoke/audit/template; dependency: ops depends on aegean_licensing (editable install locally); concurrency: none; state: tool versions already pushed stay in public history",
-      "mitigation": "Ops tests prove issue-then-verify across both packages; public tests verify fixtures built with the public digest"
+      "why": "User asked that older certificates stop working and verification need both repos",
+      "benefits": "Old public issuer output never verifies",
+      "risks": "contract: certificate gains format and serial; public verify loses --key; dependency: none; concurrency: none; state: no certificate issued yet",
+      "mitigation": "Failing-first tests; ops verify carries the key check"
     },
-    "completed_at": 1792955996.2463665
+    "completed_at": 1792956840.809038
   },
   "checkpoints": [
-    {
-      "task_id": "license-refinement",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/3] AL-PU v0.3, commercial agreement template, changelog, and ADR-003 completed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792926394.8273532,
-      "timestamp_str": "2026-10-25 14:06:34",
-      "agent": "Antigravity",
-      "handoff": {
-        "state": "4/4 gates pass",
-        "next": "complete and commit",
-        "failed": "none",
-        "open": "none",
-        "evidence": "check passes"
-      }
-    },
-    {
-      "task_id": "license-refinement",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'license-refinement' completed successfully.",
-      "status": "completed",
-      "timestamp": 1792926400.178721,
-      "timestamp_str": "2026-10-25 14:06:40",
-      "agent": "Antigravity"
-    },
     {
       "task_id": "tooling-enhancements",
       "phase": "phase 2",
@@ -338,6 +299,33 @@
       "status": "completed",
       "timestamp": 1792955996.2463675,
       "timestamp_str": "2026-10-25 22:19:56",
+      "agent": "claude-code:c74fca42"
+    },
+    {
+      "task_id": "certificate-format-2",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Format 2: random 256-bit serial, domain-bound digest and signature, UNSUPPORTED_FORMAT for format 1, public CLI without key options; ADR-018; 47 tests; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792956805.6889565,
+      "timestamp_str": "2026-10-25 22:33:25",
+      "agent": "claude-code:c74fca42",
+      "impact_assessment": {
+        "why": "User asked that older certificates stop working and verification need both repos",
+        "benefits": "Old public issuer output never verifies",
+        "risks": "contract: certificate gains format and serial; public verify loses --key; dependency: none; concurrency: none; state: no certificate issued yet",
+        "mitigation": "Failing-first tests; ops verify carries the key check"
+      }
+    },
+    {
+      "task_id": "certificate-format-2",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'certificate-format-2' completed successfully.",
+      "status": "completed",
+      "timestamp": 1792956840.8090394,
+      "timestamp_str": "2026-10-25 22:34:00",
       "agent": "claude-code:c74fca42"
     }
   ]

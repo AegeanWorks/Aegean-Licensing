@@ -4,6 +4,7 @@ All notable changes to Aegean Licensing documents are recorded here.
 
 ## Unreleased — Draft v0.3
 
+- **Certificate format 2**: certificates carry a random 256-bit `serial` and a format-bound digest; format-1 certificates are rejected as `UNSUPPORTED_FORMAT`, and the public CLI no longer checks signatures, which need AegeanWorks' key (ADR-018).
 - **Verification-only public package**: issuing, registering, revoking, audits and templates move to AegeanWorks' private operations tooling; this package keeps the certificate model, license registry, register reading and `verify` (ADR-017).
 - **Review fixes**: the CLA check sets an `AegeanWorks CLA` commit status that a `/agree-cla` comment turns green and exempts organization members; CRLF notes, string allowances, malformed registers and repeated revocations are handled (ADR-016).
 - **Company evaluation and KVKK notice**: AL-1.0 Section 4.3 allows one 28-day, non-production evaluation per company group; `licenses/PRIVACY.md` is the KVKK Article 10 privacy notice, emitted by `template privacy` (ADR-015).

@@ -66,18 +66,12 @@ class TestCLI(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("UNREGISTERED", out)
 
-    def test_verify_with_a_key_file(self):
-        key_file = self.temp_dir / "signing.key"
-        key_file.write_text("file-held-key\n", encoding="utf-8")
-        cert = issue_certificate(licensee_name="Key Corp", licensee_contact="k@example.com",
-                                 secret_key="file-held-key")
-        code, out, _ = self.run_cli("verify", str(self.write_cert(cert)), "--key-file", str(key_file))
-        self.assertEqual(code, 0)
-        self.assertIn("verified with the supplied key", out)
-        code, _, err = self.run_cli("verify", str(self.write_cert(cert)), "--key-file",
-                                    str(self.temp_dir / "absent.key"))
-        self.assertEqual(code, 1)
-        self.assertIn("key file", err)
+    def test_the_public_cli_has_no_signing_key_option(self):
+        # The HMAC check needs AegeanWorks' secret, so it lives in `aegean-ops verify` (ADR-018).
+        for option in ("--key", "--key-file"):
+            with self.subTest(option=option), self.assertRaises(SystemExit), \
+                    contextlib.redirect_stderr(io.StringIO()):
+                main(["verify", "cert.json", option, "x"])
 
 
 if __name__ == "__main__":

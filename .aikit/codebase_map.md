@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `18`
-- **Total Classes**: `13`
+- **Total Classes**: `14`
 - **Total Top-Level Functions**: `26`
-- **Total Class Methods**: `53`
-- **Total Source Lines**: `1461`
+- **Total Class Methods**: `58`
+- **Total Source Lines**: `1526`
 
 ---
 
@@ -44,7 +44,7 @@
 ### [`aegean_licensing/cert.py`](aegean_licensing/cert.py)
 > *License Certificate Data Model and Cryptographic Hashing.*
 
-**Size**: `121` lines (`4724` bytes)
+**Size**: `140` lines (`5604` bytes)
 
 **Classes:**
 - `class LicenseCertificate` - *Immutable data transfer object representing a granted commercial license.*
@@ -52,10 +52,11 @@
 
 **Functions:**
 - `def compute_canonical_payload(data)` - *Serialize dictionary excluding digest and signature into deterministic UTF-8 bytes.*
-- `def compute_digest(data)` - *Compute SHA-256 digest of canonical license payload.*
-- `def compute_signature(data, secret_key)` - *Compute HMAC-SHA256 signature of canonical license payload using secret key.*
+- `def compute_digest(data)` - *SHA-256 of the format-2 digest domain and the canonical license payload.*
+- `def compute_signature(data, secret_key)` - *HMAC-SHA256 of the format-2 signature domain and the canonical payload, keyed by the licensor.*
 - `def cert_to_dict(cert)` - *Convert LicenseCertificate to dictionary representation.*
 - `def _allowance_tuple(raw)` - *Allowances as a tuple; a lone string is one allowance, not a sequence of characters.*
+- `def _format_number(raw)` - *The certificate format as an int; anything unreadable is format 0, which never verifies.*
 - `def cert_from_dict(data)` - *Construct LicenseCertificate from raw dictionary data.*
 
 ---
@@ -63,11 +64,10 @@
 ### [`aegean_licensing/cli.py`](aegean_licensing/cli.py)
 > *Aegean License Certificate verification command line (`aegean-license verify`).*
 
-**Size**: `112` lines (`4678` bytes)
+**Size**: `91` lines (`3752` bytes)
 
 **Functions:**
 - `def _build_parser()`
-- `def _signing_key(args)` - *The key from --key-file (preferred, never in shell history) or --key.*
 - `def _handle_verify(args)`
 - `def main(argv)`
 
@@ -111,7 +111,7 @@
 ### [`aegean_licensing/verifier.py`](aegean_licensing/verifier.py)
 > *Commercial License Certificate Verification Module.*
 
-**Size**: `257` lines (`10068` bytes)
+**Size**: `276` lines (`10965` bytes)
 
 **Classes:**
 - `class VerificationResult` - *Outcome of validating a License Grant Certificate.*
@@ -145,7 +145,7 @@
 ### [`tests/fixtures.py`](tests/fixtures.py)
 > *Test-only certificate builder (ADR-017).*
 
-**Size**: `55` lines (`2357` bytes)
+**Size**: `58` lines (`2434` bytes)
 
 **Functions:**
 - `def issue_certificate(licensee_name, licensee_contact, license_type, projects, scope, is_perpetual, expires_at, notes, secret_key, cert_id, issued_at, tier, allowances)`
@@ -169,13 +169,14 @@
 ### [`tests/test_cert.py`](tests/test_cert.py)
 > *Unit tests for LicenseCertificate and cryptographic utilities.*
 
-**Size**: `76` lines (`2322` bytes)
+**Size**: `89` lines (`3005` bytes)
 
 **Classes:**
 - `class TestLicenseCertificate` - *Test certificate data transfer object and canonical hashing.*
   - Method `.test_cert_is_frozen()`
   - Method `.test_canonical_payload_is_deterministic()`
   - Method `.test_digest_computation()`
+  - Method `.test_format_2_binds_digest_and_signature_to_their_own_domains()`
   - Method `.test_signature_computation()`
   - Method `.test_to_and_from_dict_roundtrip()`
 
@@ -184,7 +185,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for the public verification command line.*
 
-**Size**: `84` lines (`3583` bytes)
+**Size**: `78` lines (`3249` bytes)
 
 **Classes:**
 - `class TestCLI` - *The public CLI verifies; issuing and revoking are private (ADR-017).*
@@ -195,7 +196,7 @@
   - Method `.test_only_verify_is_public()`
   - Method `.test_verify_against_the_register()`
   - Method `.test_unregistered_certificate_fails_with_the_register()`
-  - Method `.test_verify_with_a_key_file()`
+  - Method `.test_the_public_cli_has_no_signing_key_option()`
 
 ---
 
@@ -236,7 +237,7 @@
 ### [`tests/test_verifier.py`](tests/test_verifier.py)
 > *Unit tests for commercial license certificate verifier.*
 
-**Size**: `205` lines (`8031` bytes)
+**Size**: `243` lines (`9960` bytes)
 
 **Classes:**
 - `class TestVerifier` - *Test certificate verification, tamper detection, terms, and scope checking.*
@@ -256,6 +257,11 @@
   - Method `._payload(**overrides)`
   - Method `.test_perpetual_certificate_with_expiry_is_rejected()`
   - Method `.test_term_limited_certificate_without_expiry_is_rejected()`
+- `class TestCertificateFormat` - *Only format-2 certificates, each with a random 256-bit serial, verify (ADR-018).*
+  - Method `.test_a_fresh_certificate_is_format_2_with_a_serial()`
+  - Method `.test_a_format_1_certificate_is_rejected_even_when_self_consistent()`
+  - Method `.test_a_relabelled_format_1_certificate_is_tampered()`
+  - Method `.test_a_bad_serial_is_invalid()`
 
 ---
 

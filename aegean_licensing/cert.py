@@ -8,6 +8,14 @@ import hmac
 import json
 from typing import Any, Dict, List, Optional
 
+# Format 2 (ADR-018): every certificate carries `format` and a random 256-bit `serial`, and its
+# digest and signature hash the payload under their own domain prefixes, so no format-1
+# certificate, including any made with the issuer published before this change, verifies.
+CERT_FORMAT = 2
+SERIAL_HEX_LENGTH = 64
+_DIGEST_DOMAIN = b"aegean-certificate/2\n"
+_SIGNATURE_DOMAIN = b"aegean-signature/2\n"
+
 
 @dataclasses.dataclass(frozen=True)
 class LicenseCertificate:
@@ -34,6 +42,9 @@ class LicenseCertificate:
     licensee_country: str = ""
     # Exceptions the agreement grants only by certificate, e.g. ai-training (ADR-014).
     allowances: tuple[str, ...] = ()
+    # A certificate without `format` is format 1, which is no longer accepted (ADR-018).
+    format: int = 1
+    serial: str = ""
 
     def __post_init__(self) -> None:
         if isinstance(self.projects, (list, tuple)):
@@ -56,16 +67,14 @@ def compute_canonical_payload(data: Dict[str, Any]) -> bytes:
 
 
 def compute_digest(data: Dict[str, Any]) -> str:
-    """Compute SHA-256 digest of canonical license payload."""
-    payload = compute_canonical_payload(data)
-    return hashlib.sha256(payload).hexdigest()
+    """SHA-256 of the format-2 digest domain and the canonical license payload."""
+    return hashlib.sha256(_DIGEST_DOMAIN + compute_canonical_payload(data)).hexdigest()
 
 
 def compute_signature(data: Dict[str, Any], secret_key: str) -> str:
-    """Compute HMAC-SHA256 signature of canonical license payload using secret key."""
-    payload = compute_canonical_payload(data)
-    key_bytes = secret_key.encode("utf-8")
-    return hmac.new(key_bytes, payload, hashlib.sha256).hexdigest()
+    """HMAC-SHA256 of the format-2 signature domain and the canonical payload, keyed by the licensor."""
+    payload = _SIGNATURE_DOMAIN + compute_canonical_payload(data)
+    return hmac.new(secret_key.encode("utf-8"), payload, hashlib.sha256).hexdigest()
 
 
 def cert_to_dict(cert: LicenseCertificate) -> Dict[str, Any]:
@@ -83,6 +92,14 @@ def _allowance_tuple(raw: Any) -> tuple:
     if isinstance(raw, str):
         return (raw,)
     return tuple(str(a) for a in raw)
+
+
+def _format_number(raw: Any) -> int:
+    """The certificate format as an int; anything unreadable is format 0, which never verifies."""
+    try:
+        return int(raw)
+    except (TypeError, ValueError):
+        return 0
 
 
 def cert_from_dict(data: Dict[str, Any]) -> LicenseCertificate:
@@ -118,4 +135,6 @@ def cert_from_dict(data: Dict[str, Any]) -> LicenseCertificate:
         licensee_registration=str(data.get("licensee_registration", "")),
         licensee_country=str(data.get("licensee_country", "")),
         allowances=_allowance_tuple(data.get("allowances")),
+        format=_format_number(data.get("format", 1)),
+        serial=str(data.get("serial", "")),
     )

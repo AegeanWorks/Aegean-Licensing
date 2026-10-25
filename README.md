@@ -68,6 +68,11 @@ can be checked only with the signing key, which is never published (ADR-013). A 
 missing from the register is `UNREGISTERED`; a revoked one is `REVOKED`. Always use the register
 from this repository, not a copy supplied with the certificate.
 
+Only **format 2** certificates verify: each carries a random 256-bit `serial`, and its digest
+is bound to the format-2 domain. Any format-1 certificate, including one made with the issuer
+this repository published before ADR-018, is `UNSUPPORTED_FORMAT`. Checking the issuer's HMAC
+signature needs AegeanWorks' secret key, so that step is private.
+
 ### 2. Allowances
 A certificate lists the ACL-1.0 exceptions it grants (`ai-training`, `hosted-service`); the
 vocabulary lives in `licenses/terms.json`, and `verify` rejects any other value.

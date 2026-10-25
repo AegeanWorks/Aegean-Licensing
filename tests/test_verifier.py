@@ -61,6 +61,8 @@ class TestVerifier(unittest.TestCase):
             "licensee_address": "",
             "licensee_registration": "",
             "licensee_country": "",
+            "format": 2,
+            "serial": "f" * 64,
             "signature": "",
         }
         forged["digest"] = compute_digest(forged)
@@ -182,6 +184,8 @@ class TestVerifier(unittest.TestCase):
             "expires_at": None,
             "is_perpetual": True,
             "notes": "",
+            "format": 2,
+            "serial": "e" * 64,
         }
         data.update(overrides)
         data["digest"] = compute_digest(data)
@@ -199,6 +203,40 @@ class TestVerifier(unittest.TestCase):
         res = verify_certificate(data)
         self.assertFalse(res.is_valid)
         self.assertEqual(res.status, "INVALID_FORMAT")
+
+
+class TestCertificateFormat(unittest.TestCase):
+    """Only format-2 certificates, each with a random 256-bit serial, verify (ADR-018)."""
+
+    def test_a_fresh_certificate_is_format_2_with_a_serial(self):
+        cert = issue_certificate(licensee_name="Format", licensee_contact="f@example.com")
+        self.assertEqual(cert.format, 2)
+        self.assertRegex(cert.serial, r"^[0-9a-f]{64}$")
+        self.assertTrue(verify_certificate(cert_to_dict(cert)).is_valid)
+
+    def test_a_format_1_certificate_is_rejected_even_when_self_consistent(self):
+        # What the issuer published before ADR-018 produced: no format, no serial, plain digest.
+        import hashlib
+        from aegean_licensing.cert import compute_canonical_payload
+        data = cert_to_dict(issue_certificate(licensee_name="Old", licensee_contact="o@example.com"))
+        del data["format"], data["serial"]
+        data["digest"] = hashlib.sha256(compute_canonical_payload(data)).hexdigest()
+        result = verify_certificate(data)
+        self.assertFalse(result.is_valid)
+        self.assertEqual(result.status, "UNSUPPORTED_FORMAT")
+
+    def test_a_relabelled_format_1_certificate_is_tampered(self):
+        data = cert_to_dict(issue_certificate(licensee_name="Old", licensee_contact="o@example.com"))
+        data["format"] = 1
+        self.assertEqual(verify_certificate(data).status, "UNSUPPORTED_FORMAT")
+
+    def test_a_bad_serial_is_invalid(self):
+        for serial in ("", "1234", "Z" * 64):
+            with self.subTest(serial=serial):
+                data = cert_to_dict(issue_certificate(licensee_name="S", licensee_contact="s@example.com"))
+                data["serial"] = serial
+                data["digest"] = compute_digest(data)
+                self.assertEqual(verify_certificate(data).status, "INVALID_FORMAT")
 
 
 if __name__ == "__main__":

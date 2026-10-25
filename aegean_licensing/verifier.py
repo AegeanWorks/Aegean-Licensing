@@ -6,10 +6,13 @@ import dataclasses
 import datetime
 import hmac
 import json
+import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 from aegean_licensing.cert import (
+    CERT_FORMAT,
+    SERIAL_HEX_LENGTH,
     LicenseCertificate,
     cert_from_dict,
     compute_digest,
@@ -18,6 +21,8 @@ from aegean_licensing.cert import (
 from aegean_licensing.license_terms import resolve_license, terms_digest
 from aegean_licensing.register import STATUS_REVOKED, load_register
 
+_SERIAL = re.compile(rf"[0-9a-f]{{{SERIAL_HEX_LENGTH}}}")
+
 
 @dataclasses.dataclass(frozen=True)
 class VerificationResult:
@@ -25,7 +30,7 @@ class VerificationResult:
 
     is_valid: bool
     # "VALID", "VALID_UNVERIFIED", "TAMPERED", "EXPIRED", "SCOPE_MISMATCH", "INVALID_FORMAT",
-    # "UNREGISTERED", "REVOKED"
+    # "UNREGISTERED", "REVOKED", "UNSUPPORTED_FORMAT"
     status: str
     reasons: tuple[str, ...]
     cert: Optional[LicenseCertificate] = None
@@ -75,6 +80,16 @@ def verify_certificate(
             reasons=("Target must be a dictionary or path to a JSON file.",),
         )
 
+    # 0. Format: only format 2 verifies; format 1, from the issuer published before ADR-018, never does
+    certificate_format = data.get("format", 1)
+    if certificate_format != CERT_FORMAT:
+        return VerificationResult(
+            is_valid=False,
+            status="UNSUPPORTED_FORMAT",
+            reasons=(f"Certificate format {certificate_format!r} is not accepted; only format "
+                     f"{CERT_FORMAT} certificates are valid (ADR-018).",),
+        )
+
     # 1. Structural checks
     recorded_digest = str(data.get("digest", "")).strip()
     if not recorded_digest:
@@ -99,6 +114,10 @@ def verify_certificate(
 
     # Construct typed certificate
     cert = cert_from_dict(data)
+    if not _SERIAL.fullmatch(cert.serial):
+        reasons.append(f"Certificate serial must be {SERIAL_HEX_LENGTH} lowercase hex characters.")
+        return VerificationResult(is_valid=False, status="INVALID_FORMAT",
+                                  reasons=tuple(reasons), cert=cert)
 
     # 3. Terms check: the certificate must cite an operative agreement whose bundled text matches
     terms_verified = False

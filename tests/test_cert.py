@@ -4,6 +4,7 @@ import dataclasses
 import unittest
 
 from aegean_licensing.cert import (
+    CERT_FORMAT,
     LicenseCertificate,
     cert_from_dict,
     cert_to_dict,
@@ -46,6 +47,18 @@ class TestLicenseCertificate(unittest.TestCase):
         digest2 = compute_digest(d)
         self.assertEqual(digest1, digest2)
         self.assertEqual(len(digest1), 64)
+
+    def test_format_2_binds_digest_and_signature_to_their_own_domains(self):
+        # ADR-018: a format-1 digest (plain SHA-256 of the payload) never equals a format-2 one,
+        # and the digest and the signature never hash the same bytes.
+        import hashlib
+        import hmac
+        d = {"cert_id": "test", "licensee_name": "Acme", "format": 2}
+        payload = compute_canonical_payload(d)
+        self.assertNotEqual(compute_digest(d), hashlib.sha256(payload).hexdigest())
+        self.assertNotEqual(compute_signature(d, "k"),
+                            hmac.new(b"k", payload, hashlib.sha256).hexdigest())
+        self.assertEqual(CERT_FORMAT, 2)
 
     def test_signature_computation(self):
         d = {"cert_id": "test", "licensee_name": "Acme"}
