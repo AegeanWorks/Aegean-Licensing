@@ -145,6 +145,7 @@ aegean-licensing/
 ├── licenses/                 <- Canonical legal agreements & policies
 │   ├── ACL-1.0.md            <- Full binding Aegean Commercial License agreement
 │   ├── issued.json           <- Public register of issued certificates (no personal data)
+│   ├── terms.json            <- License registry: scopes, tiers, allowances, pinned ACL-1.0 digest
 │   ├── AL-1.0.md             <- Aegean License 1.0: free personal use
 │   ├── RESTRICTED-NOTICE.md  <- All Rights Reserved notice for the restricted tier
 │   ├── PRIVACY.md            <- KVKK Article 10 privacy notice (Turkish controls)

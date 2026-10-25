@@ -63,7 +63,7 @@
 ### [`aegean_licensing/cli.py`](aegean_licensing/cli.py)
 > *Aegean License Certificate verification command line (`aegean-license verify`).*
 
-**Size**: `112` lines (`4672` bytes)
+**Size**: `112` lines (`4678` bytes)
 
 **Functions:**
 - `def _build_parser()`
