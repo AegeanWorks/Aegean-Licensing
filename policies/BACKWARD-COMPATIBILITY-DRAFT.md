@@ -9,7 +9,7 @@ Aegean Licensing aims to keep licensing consistent across current releases and o
 ## Policy
 
 1. **Explicit license per release.** Every official release must identify the exact license name and version that applies to that release.
-2. **Current terms for new releases.** After the Aegean Licensing Personal Use License is finalized, new releases will use the license identified in the release notice.
+2. **Current terms for new releases.** After the Aegean License 1.0 is finalized, new releases will use the license identified in the release notice.
 3. **Older versions offered again.** The rights holder may reissue an older version under the current Aegean license only if it owns or has obtained permission to license all relevant material under those terms. The download page and archive must explicitly say that the copy is offered under the current license.
 4. **No retroactive cancellation.** A new license does not cancel or narrow a valid license already granted for an existing copy. Recipients of copies already released under AGPL-3.0 or another license may continue to rely on that license according to its terms.
 5. **Third-party material.** Dependencies, assets, and contributions remain governed by their own licenses unless the rights holder has the legal authority and permission needed to change those terms.

@@ -7,7 +7,6 @@ from aegean_licensing.cert import (
     LicenseCertificate,
     cert_from_dict,
     cert_to_dict,
-    cert_to_markdown,
     compute_canonical_payload,
     compute_digest,
     compute_signature,
@@ -71,19 +70,6 @@ class TestLicenseCertificate(unittest.TestCase):
         reconstructed = cert_from_dict(d)
         self.assertEqual(cert, reconstructed)
 
-    def test_markdown_rendering(self):
-        cert = LicenseCertificate(
-            cert_id="id-markdown",
-            licensee_name="Doc Corp",
-            licensee_contact="doc@corp.com",
-            projects=("chronos",),
-            digest="dummy-digest",
-        )
-        md = cert_to_markdown(cert)
-        self.assertIn("AegeanWorks Commercial License Certificate", md)
-        self.assertIn("Doc Corp", md)
-        self.assertIn("`chronos`", md)
-        self.assertIn("dummy-digest", md)
 
 
 if __name__ == "__main__":

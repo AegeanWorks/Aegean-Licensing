@@ -1,179 +1,34 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "tooling-enhancements",
-    "last_phase": "phase 4",
+    "task_id": "licensing-automation",
+    "last_phase": "phase 2",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1792926802.7082326,
-    "owner": "Antigravity",
+    "updated_at": 1792955457.6578162,
+    "owner": "claude-code:c74fca42",
     "started_by": "Antigravity",
-    "continuations": [],
-    "completed_at": 1792926807.751761
+    "continuations": [
+      {
+        "agent": "kilo:main",
+        "from": "Antigravity",
+        "at": 1792927631.3172839
+      },
+      {
+        "agent": "claude-code:c74fca42",
+        "from": "kilo:main",
+        "at": 1792952329.4002697
+      }
+    ],
+    "impact_assessment": {
+      "why": "User decided issuing and operations tooling should not be given to others, while buyers still verify certificates publicly",
+      "benefits": "Public repo exposes only what verification needs; operations stay private",
+      "risks": "contract: public CLI loses issue/revoke/audit/template; dependency: ops depends on aegean_licensing (editable install locally); concurrency: none; state: tool versions already pushed stay in public history",
+      "mitigation": "Ops tests prove issue-then-verify across both packages; public tests verify fixtures built with the public digest"
+    },
+    "completed_at": 1792955996.2463665
   },
   "checkpoints": [
-    {
-      "task_id": "licensing-core",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/6] Author Canonical Legal & Policy Documents",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792924225.2403805,
-      "timestamp_str": "2026-10-25 13:30:25",
-      "agent": "Antigravity",
-      "impact_assessment": {
-        "why": "Establish AegeanWorks official standalone commercial licensing text, contributor CLA, asset separation policies, and verification/issuance CLI tooling",
-        "benefits": "Full legal clarity for AegeanWorks dual licensing (AGPL-3.0 + AECL-1.0), solves audit issues, and provides crypto certificate tooling",
-        "risks": "contract: none, purely additive standalone framework; dependency: none, pure Python standard library; concurrency: none, stateless CLI and certificate verification; state: none, writes atomic certificate files only",
-        "mitigation": "Pure standard library implementation, strict AS-IS disclaimers, zero support obligations, fast tests"
-      }
-    },
-    {
-      "task_id": "licensing-core",
-      "phase": "phase 3",
-      "phase_num": 3,
-      "description": "[1/6] Canonical Legal & Policy Documents authored in licenses/",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792924281.3205543,
-      "timestamp_str": "2026-10-25 13:31:21",
-      "agent": "Antigravity"
-    },
-    {
-      "task_id": "licensing-core",
-      "phase": "phase 3",
-      "phase_num": 3,
-      "description": "[2/6] Core Data Model and Crypto Certificate Tooling built (cert, issuer, verifier)",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792924333.1453688,
-      "timestamp_str": "2026-10-25 13:32:13",
-      "agent": "Antigravity"
-    },
-    {
-      "task_id": "licensing-core",
-      "phase": "phase 3",
-      "phase_num": 3,
-      "description": "[3/6] Repository compliance auditor and template generator built",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792924365.649944,
-      "timestamp_str": "2026-10-25 13:32:45",
-      "agent": "Antigravity"
-    },
-    {
-      "task_id": "licensing-core",
-      "phase": "phase 3",
-      "phase_num": 3,
-      "description": "[4/6] CLI interface, entrypoints, and pyproject.toml built",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792924418.9836938,
-      "timestamp_str": "2026-10-25 13:33:38",
-      "agent": "Antigravity"
-    },
-    {
-      "task_id": "licensing-core",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[5/6] Comprehensive test suite authored and passing (27 tests, 100% pass, ~2ms/test)",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792924542.3108907,
-      "timestamp_str": "2026-10-25 13:35:42",
-      "agent": "Antigravity"
-    },
-    {
-      "task_id": "licensing-core",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[6/6] Pass all AIKit gates, record ADR-001, and finalize aegean-licensing",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792924642.6305566,
-      "timestamp_str": "2026-10-25 13:37:22",
-      "agent": "Antigravity",
-      "handoff": {
-        "state": "all 4 gates pass, 27 tests pass",
-        "next": "commit and publish",
-        "failed": "none",
-        "open": "none",
-        "evidence": "4/4 gates"
-      }
-    },
-    {
-      "task_id": "licensing-core",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'licensing-core' completed successfully.",
-      "status": "completed",
-      "timestamp": 1792924650.0160928,
-      "timestamp_str": "2026-10-25 13:37:30",
-      "agent": "Antigravity"
-    },
-    {
-      "task_id": "draft-custom-licenses",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/3] Integrate draft custom licenses, backward compatibility policy, and changelog",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792925756.6209073,
-      "timestamp_str": "2026-10-25 13:55:56",
-      "agent": "Antigravity",
-      "impact_assessment": {
-        "why": "Incorporate Aegean Licensing Personal Use License (AL-PU 1.0 draft v0.2), backward-compatibility policy, commercial agreement template, and changelog",
-        "benefits": "Full legal clarity on draft non-commercial source-available model, non-retroactive AGPL preservation, and clear migration roadmap",
-        "risks": "contract: none, non-operative draft documents; dependency: none, pure markdown; concurrency: none, static documents; state: none, purely additive files",
-        "mitigation": "Clear draft disclaimers, maintain AGPL preservation, update README tree"
-      }
-    },
-    {
-      "task_id": "draft-custom-licenses",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/3] Draft custom licenses, backward-compatibility policy, changelog, and ADR-002 integrated",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792925851.4215832,
-      "timestamp_str": "2026-10-25 13:57:31",
-      "agent": "Antigravity",
-      "handoff": {
-        "state": "4/4 gates pass",
-        "next": "complete and commit",
-        "failed": "none",
-        "open": "none",
-        "evidence": "check passes"
-      }
-    },
-    {
-      "task_id": "draft-custom-licenses",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'draft-custom-licenses' completed successfully.",
-      "status": "completed",
-      "timestamp": 1792925855.7616448,
-      "timestamp_str": "2026-10-25 13:57:35",
-      "agent": "Antigravity"
-    },
-    {
-      "task_id": "license-refinement",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/3] Optimize AL-PU-1.0 and commercial template for maximum profitability",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792926325.3174288,
-      "timestamp_str": "2026-10-25 14:05:25",
-      "agent": "Antigravity",
-      "impact_assessment": {
-        "why": "Address legal and revenue leakage in AL-PU draft, clarify student/personal use protections, close freelancer/startup loopholes, and add commercial cure mechanism",
-        "benefits": "Maximum commercial conversion rate, automated monetization paths, legal clarity for corporate counsel, zero friction for personal users",
-        "risks": "contract: none, non-operative draft updates; dependency: none, pure markdown; concurrency: none, static documents; state: none, purely additive",
-        "mitigation": "Rigorous legal framing, maintain AGPL preservation, full AIKit gate verification"
-      }
-    },
     {
       "task_id": "license-refinement",
       "phase": "phase 4",
@@ -246,6 +101,244 @@
       "timestamp": 1792926807.7517622,
       "timestamp_str": "2026-10-25 14:13:27",
       "agent": "Antigravity"
+    },
+    {
+      "task_id": "licensing-automation",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[5/5] Monero order flow complete: pricing, orders, RPC client, watcher, CLI, docs, ADR-009; stray root test removed and root suite green; 164 tests, 4/4 gates, live fake-wallet smoke passes, checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792936269.4270847,
+      "timestamp_str": "2026-10-25 16:51:09",
+      "agent": "kilo:main",
+      "handoff": {
+        "state": "16 modified, 24 untracked, HEAD==origin/master",
+        "next": "paste your Monero wallet RPC details and tier prices into pricing.json, then run payments create/watch",
+        "evidence": "164 tests, 4/4 gates, 553 root tests OK, live create->watch->verify over HTTP, cold start ~178ms"
+      }
+    },
+    {
+      "task_id": "licensing-automation",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/5] Payment operations: advisory state locks, watcher fault isolation, cancel/grant/issue commands",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792938955.715917,
+      "timestamp_str": "2026-10-25 17:35:55",
+      "agent": "kilo:main",
+      "impact_assessment": {
+        "why": "The order flow lacks concurrency protection, has no recovery when issuance fails mid-pass, and offers no way to close an abandoned or manually settled order",
+        "benefits": "One watcher per state directory, per-order fault isolation, and operator commands for cancellation and manual settlement",
+        "risks": "contract: new payments subcommands and cancelled status; dependency: stdlib only (os, time, contextlib); concurrency: O_EXCL lock files with stale recovery; state: optional reason field on orders, store version unchanged",
+        "mitigation": "Failing-first tests for lock contention, stale locks, cancelled orders and issuance failure, plus atomic writes"
+      }
+    },
+    {
+      "task_id": "licensing-automation",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[4/5] Payment operations: advisory locks, watcher fault isolation, cancel/grant/issue commands, Windows CI; 189 tests, 4/4 gates, ops smoke passes, checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792940341.46349,
+      "timestamp_str": "2026-10-25 17:59:01",
+      "agent": "kilo:main",
+      "handoff": {
+        "state": "16 modified, 25 untracked, HEAD==origin/master",
+        "next": "supply wallet RPC credentials and prices",
+        "evidence": "189 project tests, 556 root tests, 4/4 gates, live lock refusal + grant + cancel + settle + verify"
+      }
+    },
+    {
+      "task_id": "licensing-automation",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/4] Payment accounting: append-only event audit log, revenue report/CSV export, expiry report",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792941033.6265078,
+      "timestamp_str": "2026-10-25 18:10:33",
+      "agent": "kilo:main",
+      "impact_assessment": {
+        "why": "Operators need a durable record of every order transition and a way to reconcile revenue and upcoming license expiries without reading JSON by hand",
+        "benefits": "Dispute-ready event history, revenue totals per tier, CSV for accounting, and a renewal list derived from issued certificates",
+        "risks": "contract: new payments report/expiring commands and issued_at field; dependency: stdlib only (json, csv, datetime); concurrency: audit appends happen under the existing order lock; state: events.jsonl grows append-only, issued_at defaults empty for old orders",
+        "mitigation": "Append-only JSONL with fsync, status-diff detection in one place, tolerant reads for legacy orders"
+      }
+    },
+    {
+      "task_id": "licensing-automation",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[4/4] License/commercial review: unified AECL-1.0, registry-validated tiers/scopes, terms digest, legal identity fields, authenticity states, email-only licensing with no rail/prices; 196 tests, 4/4 gates, checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792950530.625984,
+      "timestamp_str": "2026-10-25 20:48:50",
+      "agent": "kilo:main",
+      "handoff": {
+        "state": "20 modified, 26 untracked, HEAD==origin/master",
+        "next": "counsel review (governing law, liability cap, refunds) and AL-PU placeholders",
+        "evidence": "196 tests, 4/4 gates, registry+digest verification tests"
+      }
+    },
+    {
+      "task_id": "licensing-automation",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/5] Re-plan after take-over from kilo:main (kept all its uncommitted work, 4/4 gates green): (1) rename AL-PU->Aegean License 1.0 (AL-1.0), AECL->Aegean Commercial License 1.0 (ACL-1.0), AECL-1.0 kept as accepted legacy ID; (2) strengthen AL-1.0 + ACL-1.0 with conditions, your-company/control, patent defense, required notices, single cure then permanent termination, per-version licensing, no SaaS/no circumvention, AI training ban, severability, governing law placeholder; (3) restricted-tier text; (4) tests; (5) AIKit pinned licenses/ copy",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792952329.4002697,
+      "timestamp_str": "2026-10-25 21:18:49",
+      "agent": "claude-code:c74fca42",
+      "impact_assessment": {
+        "why": "User renamed the licenses to Aegean, asked to strengthen them from open-source/source-available research, and to integrate this folder into AIKit",
+        "benefits": "One canonical license set; stronger, enforceable-by-design terms; issued certificates keep validating",
+        "risks": "contract: license IDs in terms.json, certificates and verifier change; dependency: none; concurrency: took over kilo:main task, its files unchanged until edited here; state: terms.json gains AL-1.0 and alias",
+        "mitigation": "Legacy AECL-1.0 alias with tests; failing-first tests for rename; nothing committed without user authorization"
+      },
+      "continued_from": "kilo:main"
+    },
+    {
+      "task_id": "licensing-automation",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[5/5] AL-1.0 + ACL-1.0 renamed and strengthened, RESTRICTED-NOTICE.md, AGPL track removed (LICENSE, templates, auditor, pyproject, CLA, policies, README), ADR-012; 199 tests, 4/4 gates; checklists: passed; uncommitted, awaiting user authorization",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792953191.032928,
+      "timestamp_str": "2026-10-25 21:33:11",
+      "agent": "claude-code:c74fca42",
+      "handoff": {
+        "state": "uncommitted, includes kilo:main's earlier work",
+        "next": "commit on user approval"
+      }
+    },
+    {
+      "task_id": "licensing-automation",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/4] Re-plan: (1) remove Monero payment stack, issuance server, rate limiter, their CLI commands and tests (email-only licensing, ADR-011); (2) public certificate register licenses/issued.json (id, digest, status, no PII): issue appends, new revoke command, verify reports registered/revoked/unregistered; (3) license gaps: outputs clause, notice method, version identification, survival, export in AL; AI-assistant carve-out, compliance certification, register-based verification and revocation in ACL; docs under AL-1.0 in ASSET_POLICY; (4) re-pin AIKit licenses/ copies",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792953440.0619302,
+      "timestamp_str": "2026-10-25 21:37:20",
+      "agent": "claude-code:c74fca42",
+      "impact_assessment": {
+        "why": "User asked to remove unnecessary py code and keep closing license gaps; HMAC verification with a published key would allow forged certificates",
+        "benefits": "~3,000 fewer lines and no online signing key; third parties can verify and see revocations; fewer ambiguities in AL/ACL",
+        "risks": "contract: CLI loses serve and payments commands, verify output gains register status; dependency: none; concurrency: register writes atomic under lock; state: new licenses/issued.json, payment_state/ no longer read",
+        "mitigation": "Failing-first tests for register and revoke; removed code was never committed, deletion recorded in ADR-013"
+      }
+    },
+    {
+      "task_id": "licensing-automation",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[4/4] Removed payment stack + issuance server (~3,000 lines), public register (issue --register, revoke, verify --register), --key-file, ACL-1.0 frozen via terms.json sha256, AL/ACL gaps closed, docs under AL-1.0, ADR-013; 97 tests, 4/4 gates, lifecycle dogfooded; checklists: passed; uncommitted, awaiting user authorization",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792954017.72485,
+      "timestamp_str": "2026-10-25 21:46:57",
+      "agent": "claude-code:c74fca42",
+      "handoff": {
+        "state": "uncommitted",
+        "next": "commit on user approval"
+      }
+    },
+    {
+      "task_id": "licensing-automation",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/4] Re-plan round 3: (1) certificate allowances: controlled vocabulary in terms.json (ai-training, hosted-service), cert field, issue --allow, verifier check, markdown; (2) ACL-1.0: Competing Product definition (PolyForm Shield), personnel and contractors, end-user flow-down, ownership of modifications and feedback, tier eligibility changes, fees for use beyond scope, allowances, English-text-controls; AL-1.0 language clause; restricted notice confidentiality; re-pin; (3) order form and CLA fixes, FAQ data notice; remove dead operative_license_keys; (4) re-pin AIKit copies",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792954358.2708557,
+      "timestamp_str": "2026-10-25 21:52:38",
+      "agent": "claude-code:c74fca42",
+      "impact_assessment": {
+        "why": "User asked to keep analysing licenses and the whole repo and to strengthen from other licenses (PolyForm Shield, Prosperity, Sustainable Use License, commercial EULA practice)",
+        "benefits": "Exceptions become verifiable certificate data instead of free text; downstream users and contractors covered; growth past a tier handled; stale key-based verification text removed",
+        "risks": "contract: certificate gains allowances field (digest changes for new certs only, none issued); dependency: none; concurrency: none; state: terms.json gains allowances and new ACL sha256",
+        "mitigation": "Failing-first tests for allowances; ACL re-pinned before any issuance; nothing committed without user authorization"
+      }
+    },
+    {
+      "task_id": "licensing-automation",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[4/4] Allowances (terms.json vocabulary, issue --allow, verifier), ACL-1.0 Competing Product/Personnel/customers/modifications/tier/use-beyond/language, AL-1.0 language, restricted notice confidentiality, order form + CLA + FAQ fixes, dead operative_license_keys removed, ADR-014; 103 tests, 4/4 gates, CLI dogfooded; checklists: passed; uncommitted, awaiting user authorization",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792954673.8087878,
+      "timestamp_str": "2026-10-25 21:57:53",
+      "agent": "claude-code:c74fca42",
+      "handoff": {
+        "state": "uncommitted",
+        "next": "commit on user approval"
+      }
+    },
+    {
+      "task_id": "licensing-automation",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/3] Re-plan round 4: (1) AL-1.0 Section 4.3 company evaluation: 28 days, once per Your Company (all Personnel and affiliates share one), non-production, ends at ACL purchase; failing-first template test; summaries in COMMERCIAL.md, FAQ, notice, templates, AIKit COMMERCIAL.md; (2) licenses/PRIVACY.md: KVKK Art. 10 information notice (Turkish controls, English convenience) covering licensees, inquirers and CLA signers; linked from FAQ, COMMERCIAL.md, order form; (3) re-pin AIKit copies",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792954786.3308866,
+      "timestamp_str": "2026-10-25 21:59:46",
+      "agent": "claude-code:c74fca42",
+      "impact_assessment": {
+        "why": "User chose a 28-day company trial and a KVKK notice, and fixed the licensor name as AegeanWorks",
+        "benefits": "Companies can evaluate before buying; personal data processing disclosed as KVKK Art. 10 requires",
+        "risks": "contract: AL-1.0 grants a limited license to organizations for the first time; dependency: none; concurrency: none; state: none",
+        "mitigation": "Trial bounded by days, once-per-company, non-production and no third-party access; tests pin the wording"
+      }
+    },
+    {
+      "task_id": "licensing-automation",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[3/3] AL-1.0 4.3 28-day once-per-company non-production evaluation; licenses/PRIVACY.md KVKK Art. 10 notice (TR controls, EN translation) + template privacy; summaries in COMMERCIAL.md, FAQ, notice, templates, README, order form, CI wheel check; guideline G-001 licensor AegeanWorks; ADR-015; 105 tests, 4/4 gates; checklists: passed; uncommitted, awaiting user authorization",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792955034.6631188,
+      "timestamp_str": "2026-10-25 22:03:54",
+      "agent": "claude-code:c74fca42",
+      "handoff": {
+        "state": "uncommitted",
+        "next": "commit on user approval"
+      }
+    },
+    {
+      "task_id": "licensing-automation",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/5] Re-plan round 5 (user chose split): (1) fixes so far kept: CLA commit status, author_association, CRLF notes, register robustness, string allowances, AIKit restricted push needs private remote; (2) new private AIKit project aegean-licensing-ops (restricted tier): issuer, register writes, auditor, templates, storage, sanitize, markdown, normalize helpers, CLI issue/revoke/audit/template + their tests, depends on public aegean_licensing; (3) public keeps cert model/digest, license_terms registry, register read, verifier, verify CLI, bundler; tests rebuilt on a test-only fixture; (4) docs, ADR-016/017, CHANGELOG; (5) gates, commit, push both public repos and create the private ops repo",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792955457.6578162,
+      "timestamp_str": "2026-10-25 22:10:57",
+      "agent": "claude-code:c74fca42",
+      "impact_assessment": {
+        "why": "User decided issuing and operations tooling should not be given to others, while buyers still verify certificates publicly",
+        "benefits": "Public repo exposes only what verification needs; operations stay private",
+        "risks": "contract: public CLI loses issue/revoke/audit/template; dependency: ops depends on aegean_licensing (editable install locally); concurrency: none; state: tool versions already pushed stay in public history",
+        "mitigation": "Ops tests prove issue-then-verify across both packages; public tests verify fixtures built with the public digest"
+      }
+    },
+    {
+      "task_id": "licensing-automation",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'licensing-automation' completed successfully.",
+      "status": "completed",
+      "timestamp": 1792955996.2463675,
+      "timestamp_str": "2026-10-25 22:19:56",
+      "agent": "claude-code:c74fca42"
     }
   ]
 }

@@ -1,84 +1,83 @@
-"""Unit tests for aegean-licensing CLI."""
+"""Unit tests for the public verification command line."""
 
+import contextlib
 import io
 import json
 import shutil
-import sys
 import tempfile
 import unittest
 from pathlib import Path
 
+from aegean_licensing.cert import cert_to_dict
 from aegean_licensing.cli import main
+from tests.fixtures import issue_certificate, write_register
 
 
 class TestCLI(unittest.TestCase):
-    """Test CLI commands, argument handling, and exit codes."""
+    """The public CLI verifies; issuing and revoking are private (ADR-017)."""
 
     def setUp(self):
-        self.temp_dir = tempfile.mkdtemp(prefix="test_cli_")
+        self.temp_dir = Path(tempfile.mkdtemp(prefix="test_cli_"))
         self.addCleanup(shutil.rmtree, self.temp_dir, ignore_errors=True)
 
+    def write_cert(self, cert):
+        path = self.temp_dir / f"license_certificate_{cert.cert_id}.json"
+        path.write_text(json.dumps(cert_to_dict(cert)), encoding="utf-8")
+        return path
+
+    def run_cli(self, *argv):
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = main(list(argv))
+        return code, out.getvalue(), err.getvalue()
+
     def test_version_output(self):
-        buf = io.StringIO()
-        old_stdout = sys.stdout
-        try:
-            sys.stdout = buf
-            with self.assertRaises(SystemExit) as cm:
-                main(["--version"])
-            self.assertEqual(cm.exception.code, 0)
-            self.assertIn("aegean-license", buf.getvalue())
-        finally:
-            sys.stdout = old_stdout
+        with self.assertRaises(SystemExit) as caught, contextlib.redirect_stdout(io.StringIO()) as out:
+            main(["--version"])
+        self.assertEqual(caught.exception.code, 0)
+        self.assertIn("aegean-license", out.getvalue())
 
-    def test_issue_and_verify_roundtrip_cli(self):
-        # 1. Issue certificate to temp_dir
-        exit_code = main([
-            "issue",
-            "--licensee", "Alpha Tech",
-            "--contact", "alpha@tech.io",
-            "--projects", "chronos,AIKit",
-            "--output-dir", self.temp_dir,
-        ])
-        self.assertEqual(exit_code, 0)
+    def test_only_verify_is_public(self):
+        for command in ("issue", "revoke", "audit", "template"):
+            with self.subTest(command=command), self.assertRaises(SystemExit), \
+                    contextlib.redirect_stderr(io.StringIO()):
+                main([command])
 
-        # Locate generated JSON
-        json_files = list(Path(self.temp_dir).glob("*.json"))
-        self.assertEqual(len(json_files), 1)
-        cert_path = str(json_files[0])
+    def test_verify_against_the_register(self):
+        cert = issue_certificate(licensee_name="Cli Corp", licensee_contact="c@example.com",
+                                 allowances=["ai-training"])
+        register = self.temp_dir / "issued.json"
+        write_register(register, cert)
+        code, out, _ = self.run_cli("verify", str(self.write_cert(cert)), "--register", str(register))
+        self.assertEqual(code, 0)
+        self.assertIn("Status : VALID", out)
+        self.assertIn("Allow  : ai-training", out)
 
-        # 2. Verify certificate
-        exit_code = main(["verify", cert_path])
-        self.assertEqual(exit_code, 0)
+        write_register(register, cert, revoked={cert.cert_id})
+        code, out, _ = self.run_cli("verify", str(self.write_cert(cert)), "--register", str(register))
+        self.assertEqual(code, 1)
+        self.assertIn("REVOKED", out)
 
-        # 3. Verify scope check (chronos -> OK, other -> fail)
-        exit_code_ok = main(["verify", cert_path, "--project", "chronos"])
-        self.assertEqual(exit_code_ok, 0)
+    def test_unregistered_certificate_fails_with_the_register(self):
+        cert = issue_certificate(licensee_name="Forger", licensee_contact="f@example.com")
+        register = self.temp_dir / "issued.json"
+        write_register(register)
+        code, out, _ = self.run_cli("verify", str(self.write_cert(cert)), "--register", str(register))
+        self.assertEqual(code, 1)
+        self.assertIn("UNREGISTERED", out)
 
-        exit_code_bad = main(["verify", cert_path, "--project", "unlicensed-project"])
-        self.assertEqual(exit_code_bad, 1)
-
-    def test_template_generation_cli(self):
-        exit_code = main(["template", "all", "--output-dir", self.temp_dir])
-        self.assertEqual(exit_code, 0)
-        self.assertTrue((Path(self.temp_dir) / "DUAL_LICENSE_NOTICE.txt").exists())
-        self.assertTrue((Path(self.temp_dir) / "COMMERCIAL.md").exists())
-        self.assertTrue((Path(self.temp_dir) / "pyproject_snippet.toml").exists())
-        self.assertTrue((Path(self.temp_dir) / "AL-PU-1.0-DRAFT.md").exists())
-        self.assertTrue((Path(self.temp_dir) / "CONTRIBUTING_CLA.md").exists())
-
-    def test_issue_with_type_cli(self):
-        exit_code = main([
-            "issue",
-            "--licensee", "Tier Tech",
-            "--contact", "tier@tech.com",
-            "--type", "ACLA-1.0-Tier1",
-            "--output-dir", self.temp_dir,
-        ])
-        self.assertEqual(exit_code, 0)
-        json_files = list(Path(self.temp_dir).glob("*.json"))
-        with open(json_files[0], "r", encoding="utf-8") as f:
-            data = json.load(f)
-        self.assertEqual(data["license_type"], "ACLA-1.0-Tier1")
+    def test_verify_with_a_key_file(self):
+        key_file = self.temp_dir / "signing.key"
+        key_file.write_text("file-held-key\n", encoding="utf-8")
+        cert = issue_certificate(licensee_name="Key Corp", licensee_contact="k@example.com",
+                                 secret_key="file-held-key")
+        code, out, _ = self.run_cli("verify", str(self.write_cert(cert)), "--key-file", str(key_file))
+        self.assertEqual(code, 0)
+        self.assertIn("verified with the supplied key", out)
+        code, _, err = self.run_cli("verify", str(self.write_cert(cert)), "--key-file",
+                                    str(self.temp_dir / "absent.key"))
+        self.assertEqual(code, 1)
+        self.assertIn("key file", err)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,219 @@
+name: Contributor License Agreement (CLA) Check
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, labeled]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  statuses: write
+
+concurrency:
+  group: cla-${{ github.repository }}-${{ github.event.pull_request.number || github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  cla-verification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Contributor License Agreement
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const REGISTER_PATH = '.github/cla-signatures.json';
+            const REGISTER_MESSAGE = 'chore(cla): record contributor license acceptance';
+
+            const isPR = !!context.payload.pull_request;
+            const pr = isPR ? context.payload.pull_request : null;
+            if (!isPR && !context.payload.issue?.pull_request) return;
+
+            const prNumber = isPR ? pr.number : context.payload.issue.number;
+            // A comment run carries no head sha, so the pull request is read for it: the verdict
+            // is a commit status on the head, which every run can update (ADR-016).
+            const pull = isPR ? pr : (await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+            })).data;
+            const author = pull.user.login;
+            const headSha = pull.head.sha;
+
+            async function setStatus(state, description) {
+              await github.rest.repos.createCommitStatus({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                sha: headSha,
+                state,
+                context: 'AegeanWorks CLA',
+                description: description.slice(0, 140),
+              });
+            }
+
+            // Organization owners and members, and bots, do not need a CLA check
+            const association = String(pull.author_association || '');
+            if (['OWNER', 'MEMBER'].includes(association) || author.endsWith('[bot]')) {
+              console.log(`Author ${author} is a maintainer (${association}) or bot; CLA check passed.`);
+              await setStatus('success', 'Maintainer or bot: no CLA needed');
+              return;
+            }
+
+            async function loadRegister() {
+              try {
+                const response = await github.rest.repos.getContent({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  path: REGISTER_PATH,
+                });
+                const text = Buffer.from(response.data.content, 'base64').toString('utf8').trim();
+                const parsed = text ? JSON.parse(text) : {};
+                return {
+                  signatures: Array.isArray(parsed.signatures) ? parsed.signatures : [],
+                  revoked: Array.isArray(parsed.revoked) ? parsed.revoked : [],
+                  sha: response.data.sha,
+                };
+              } catch (error) {
+                if (error.status === 404) return { signatures: [], revoked: [], sha: null };
+                throw error;
+              }
+            }
+
+            function findEntry(entries, login) {
+              const needle = login.toLowerCase();
+              return entries.find(entry => String(entry.login || '').toLowerCase() === needle);
+            }
+
+            let register = await loadRegister();
+
+            // A revocation is maintained by repository maintainers and always wins.
+            const revocation = findEntry(register.revoked, author);
+            if (revocation) {
+              await setStatus('failure', 'CLA acceptance revoked; contact the maintainers');
+              core.setFailed(
+                `Contributor @${author} has a revoked CLA acceptance on record. ` +
+                `Contact the maintainers before contributing.`
+              );
+              return;
+            }
+
+            // 1. A recorded acceptance survives comment edits and deletions.
+            let signed = Boolean(findEntry(register.signatures, author));
+            let evidence = null;
+
+            // 2. Otherwise, look for an explicit agreement comment from the author.
+            if (!signed) {
+              const comments = await github.paginate(github.rest.issues.listComments, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                per_page: 100,
+              });
+              const AGREEMENT = /(^|\n)\s*\/agree-cla\s*($|\n)/i;
+              const agreement = comments.find(c =>
+                c.user.login === author && AGREEMENT.test(c.body || '')
+              );
+              if (agreement) {
+                signed = true;
+                evidence = agreement.html_url;
+              }
+            }
+
+            if (signed) {
+              if (!findEntry(register.signatures, author)) {
+                for (let attempt = 0; attempt < 3; attempt += 1) {
+                  const fresh = await loadRegister();
+                  if (findEntry(fresh.signatures, author)) break;
+                  fresh.signatures.push({
+                    login: author,
+                    signed_at: new Date().toISOString(),
+                    pull_request: prNumber,
+                    evidence: evidence,
+                  });
+                  const body = JSON.stringify(
+                    {
+                      version: 2,
+                      signatures: fresh.signatures
+                        .sort((a, b) => a.login.localeCompare(b.login)),
+                      revoked: fresh.revoked,
+                    },
+                    null,
+                    2,
+                  ) + '\n';
+                  try {
+                    await github.rest.repos.createOrUpdateFileContents({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      path: REGISTER_PATH,
+                      message: REGISTER_MESSAGE,
+                      content: Buffer.from(body, 'utf8').toString('base64'),
+                      ...(fresh.sha ? { sha: fresh.sha } : {}),
+                    });
+                    break;
+                  } catch (error) {
+                    if (error.status !== 409 || attempt === 2) throw error;
+                  }
+                }
+              }
+
+              console.log(`Contributor ${author} has signed the AegeanWorks CLA.`);
+              await setStatus('success', 'AegeanWorks CLA accepted');
+              try {
+                await github.rest.issues.getLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: 'cla-signed',
+                });
+              } catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: 'cla-signed',
+                  color: '0e8a16',
+                  description: 'Contributor has agreed to the AegeanWorks CLA',
+                });
+              }
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                labels: ['cla-signed'],
+              });
+              return;
+            }
+
+            const claUrl = `${context.payload.repository.html_url}/blob/` +
+              `${context.payload.repository.default_branch}/licenses/CONTRIBUTING_CLA.md`;
+            const body = `### 📝 AegeanWorks Contributor License Agreement (CLA) Required\n\n` +
+              `Thank you for your contribution, @${author}!\n\n` +
+              `To allow us to review and merge your pull request, please confirm your acceptance of the ` +
+              `[AegeanWorks Contributor License Agreement (CLA)](${claUrl}).\n\n` +
+              `Simply reply to this PR with the following comment to accept:\n` +
+              `\`\`\`text\n/agree-cla\n\`\`\`\n\n` +
+              `*AegeanWorks offers its software under the Aegean License and sells commercial licenses, ` +
+              `so it must hold the rights to every contribution.*`;
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              per_page: 100,
+            });
+            const botComment = comments.find(c =>
+              c.user.login === 'github-actions[bot]' &&
+              (c.body || '').includes('AegeanWorks Contributor License Agreement')
+            );
+
+            if (!botComment) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: body
+              });
+            }
+            await setStatus('failure', "Comment '/agree-cla' to accept the AegeanWorks CLA");
+            core.setFailed(`Contributor @${author} has not yet agreed to the AegeanWorks CLA. Comment '/agree-cla' to proceed.`);

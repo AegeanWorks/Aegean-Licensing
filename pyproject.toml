@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=77.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -9,16 +9,19 @@ description = "Official licensing framework, commercial agreements, and certific
 authors = [
     { name = "AegeanWorks", email = "aegean-licensing@proton.me" }
 ]
-license = { text = "AGPL-3.0-or-later" }
+license = "LicenseRef-AL-1.0"
+license-files = ["LICENSE"]
 readme = "README.md"
 requires-python = ">=3.10"
-keywords = ["licensing", "agpl", "aecl", "compliance", "certificates"]
+keywords = ["licensing", "source-available", "acl", "compliance", "certificates"]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
     "Operating System :: OS Independent",
 ]
 dependencies = []
 
 [project.scripts]
 aegean-license = "aegean_licensing.cli:main"
+
+[tool.setuptools]
+packages = ["aegean_licensing"]

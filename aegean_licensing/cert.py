@@ -18,7 +18,7 @@ class LicenseCertificate:
     licensee_contact: str
     issuer: str = "AegeanWorks"
     issuer_contact: str = "aegean-licensing@proton.me"
-    license_type: str = "AECL-1.0"
+    license_type: str = "ACL-1.0"
     projects: tuple[str, ...] = ("*",)
     scope: str = "proprietary-saas-and-redistribution"
     issued_at: str = ""
@@ -27,13 +27,20 @@ class LicenseCertificate:
     notes: str = ""
     digest: str = ""
     signature: str = ""
+    tier: str = ""
+    terms_digest: str = ""
+    licensee_address: str = ""
+    licensee_registration: str = ""
+    licensee_country: str = ""
+    # Exceptions the agreement grants only by certificate, e.g. ai-training (ADR-014).
+    allowances: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if isinstance(self.projects, (list, tuple)):
             object.__setattr__(self, "projects", tuple(sorted(self.projects)))
         elif isinstance(self.projects, str):
             object.__setattr__(self, "projects", (self.projects,))
-
+        object.__setattr__(self, "allowances", tuple(sorted(self.allowances)))
 
 
 def compute_canonical_payload(data: Dict[str, Any]) -> bytes:
@@ -65,7 +72,17 @@ def cert_to_dict(cert: LicenseCertificate) -> Dict[str, Any]:
     """Convert LicenseCertificate to dictionary representation."""
     d = dataclasses.asdict(cert)
     d["projects"] = list(cert.projects)
+    d["allowances"] = list(cert.allowances)
     return d
+
+
+def _allowance_tuple(raw: Any) -> tuple:
+    """Allowances as a tuple; a lone string is one allowance, not a sequence of characters."""
+    if not raw:
+        return ()
+    if isinstance(raw, str):
+        return (raw,)
+    return tuple(str(a) for a in raw)
 
 
 def cert_from_dict(data: Dict[str, Any]) -> LicenseCertificate:
@@ -86,7 +103,7 @@ def cert_from_dict(data: Dict[str, Any]) -> LicenseCertificate:
         licensee_contact=str(data.get("licensee_contact", "")),
         issuer=str(data.get("issuer", "AegeanWorks")),
         issuer_contact=str(data.get("issuer_contact", "aegean-licensing@proton.me")),
-        license_type=str(data.get("license_type", "AECL-1.0")),
+        license_type=str(data.get("license_type", "ACL-1.0")),
         projects=projects,
         scope=str(data.get("scope", "proprietary-saas-and-redistribution")),
         issued_at=str(data.get("issued_at", "")),
@@ -95,36 +112,10 @@ def cert_from_dict(data: Dict[str, Any]) -> LicenseCertificate:
         notes=str(data.get("notes", "")),
         digest=str(data.get("digest", "")),
         signature=str(data.get("signature", "")),
+        tier=str(data.get("tier", "")),
+        terms_digest=str(data.get("terms_digest", "")),
+        licensee_address=str(data.get("licensee_address", "")),
+        licensee_registration=str(data.get("licensee_registration", "")),
+        licensee_country=str(data.get("licensee_country", "")),
+        allowances=_allowance_tuple(data.get("allowances")),
     )
-
-
-def cert_to_markdown(cert: LicenseCertificate) -> str:
-    """Render LicenseCertificate as a printable Markdown document."""
-    projects_str = ", ".join(f"`{p}`" for p in cert.projects)
-    expires_str = "Perpetual (No Expiration)" if cert.is_perpetual else (cert.expires_at or "N/A")
-    sig_line = f"- **HMAC Signature**: `{cert.signature}`\n" if cert.signature else ""
-
-    return f"""# AegeanWorks Commercial License Certificate
-
-This certifies that **{cert.licensee_name}** has been granted commercial licensing permissions under the **{cert.license_type}**.
-
----
-
-### Certificate Details
-- **Certificate ID**: `{cert.cert_id}`
-- **Licensee**: {cert.licensee_name} ({cert.licensee_contact})
-- **Issuer**: {cert.issuer} ({cert.issuer_contact})
-- **License Type**: {cert.license_type}
-- **Authorized Projects**: {projects_str}
-- **Commercial Scope**: {cert.scope}
-- **Issue Date**: {cert.issued_at}
-- **Validity**: {expires_str}
-- **Integrity Digest (SHA-256)**: `{cert.digest}`
-{sig_line}
----
-
-### Rights Granted
-Licensee is entitled to integrate, modify, host closed-source SaaS, and redistribute the designated Licensed Software without source disclosure obligations under AGPL-3.0.
-
-*This license is sold AS-IS without warranty, indemnification, or technical support.*
-"""

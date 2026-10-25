@@ -6,20 +6,20 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `15`
-- **Total Classes**: `9`
-- **Total Top-Level Functions**: `25`
-- **Total Class Methods**: `41`
-- **Total Source Lines**: `1624`
+- **Total Python Modules**: `18`
+- **Total Classes**: `13`
+- **Total Top-Level Functions**: `26`
+- **Total Class Methods**: `53`
+- **Total Source Lines**: `1461`
 
 ---
 
 ## 📦 Modules & Exported Symbols
 
 ### [`aegean_licensing/__init__.py`](aegean_licensing/__init__.py)
-> *AegeanWorks Licensing Framework & Verification Tooling.*
+> *Aegean License texts and public certificate verification (issuing is private, ADR-017).*
 
-**Size**: `17` lines (`475` bytes)
+**Size**: `15` lines (`428` bytes)
 
 ---
 
@@ -30,23 +30,21 @@
 
 ---
 
-### [`aegean_licensing/auditor.py`](aegean_licensing/auditor.py)
-> *Repository Dual-Licensing Compliance Auditor.*
+### [`aegean_licensing/bundler.py`](aegean_licensing/bundler.py)
+> *Bundle the repository's licensing documents into the built Python package.*
 
-**Size**: `168` lines (`8254` bytes)
-
-**Classes:**
-- `class AuditReport` - *Detailed compliance report for an audited repository.*
+**Size**: `38` lines (`1391` bytes)
 
 **Functions:**
-- `def audit_repository(repo_dir, check_policies)` - *Inspect repository files for compliance with AegeanWorks dual-licensing standards.*
+- `def bundle_documents(repo_root, destination_root)` - *Copy legal documents under destination_root, returning the number of files copied.*
+- `def _iter_sources(repo_root)`
 
 ---
 
 ### [`aegean_licensing/cert.py`](aegean_licensing/cert.py)
 > *License Certificate Data Model and Cryptographic Hashing.*
 
-**Size**: `130` lines (`4999` bytes)
+**Size**: `121` lines (`4724` bytes)
 
 **Classes:**
 - `class LicenseCertificate` - *Immutable data transfer object representing a granted commercial license.*
@@ -57,65 +55,83 @@
 - `def compute_digest(data)` - *Compute SHA-256 digest of canonical license payload.*
 - `def compute_signature(data, secret_key)` - *Compute HMAC-SHA256 signature of canonical license payload using secret key.*
 - `def cert_to_dict(cert)` - *Convert LicenseCertificate to dictionary representation.*
+- `def _allowance_tuple(raw)` - *Allowances as a tuple; a lone string is one allowance, not a sequence of characters.*
 - `def cert_from_dict(data)` - *Construct LicenseCertificate from raw dictionary data.*
-- `def cert_to_markdown(cert)` - *Render LicenseCertificate as a printable Markdown document.*
 
 ---
 
 ### [`aegean_licensing/cli.py`](aegean_licensing/cli.py)
-> *AegeanWorks Licensing Command-Line Interface.*
+> *Aegean License Certificate verification command line (`aegean-license verify`).*
 
-**Size**: `264` lines (`10329` bytes)
+**Size**: `112` lines (`4672` bytes)
 
 **Functions:**
 - `def _build_parser()`
-- `def _handle_issue(args)`
+- `def _signing_key(args)` - *The key from --key-file (preferred, never in shell history) or --key.*
 - `def _handle_verify(args)`
-- `def _handle_audit(args)`
-- `def _handle_template(args)`
 - `def main(argv)`
 
 ---
 
-### [`aegean_licensing/issuer.py`](aegean_licensing/issuer.py)
-> *Commercial License Certificate Issuance Module.*
+### [`aegean_licensing/license_terms.py`](aegean_licensing/license_terms.py)
+> *Canonical license registry: the types, scopes, tiers, and term digests a certificate may cite.*
 
-**Size**: `103` lines (`3308` bytes)
+**Size**: `152` lines (`6039` bytes)
+
+**Classes:**
+- `class LicenseTerms` - *One operative license agreement and the vocabulary its certificates may use.*
+  - Property `.is_operative`
 
 **Functions:**
-- `def _write_atomic(path, content)` - *Write text to destination atomically using temp file, fsync, and replace.*
-- `def issue_certificate(licensee_name, licensee_contact, license_type, projects, scope, is_perpetual, expires_at, notes, secret_key, cert_id, issued_at, output_dir)` - *Generate and return an authentic LicenseCertificate, optionally saving to disk.*
+- `def _registry_paths()`
+- `def _load_registry_document()`
+- `def load_registry()` - *Return every registered license keyed by its canonical name.*
+- `def resolve_license(key, require_operative)` - *Look up a license key, refusing unknown or non-operative agreements.*
+- `def normalize_document_text(text)` - *Normalize line endings before hashing so a checkout's EOL style cannot change the digest.*
+- `def compute_terms_digest(document_text)` - *Return the SHA-256 of a license document's normalized UTF-8 text.*
+- `def _document_paths(document)`
+- `def read_license_document(terms)` - *Read the operative agreement text from the checkout or the packaged resources.*
+- `def terms_digest(terms)` - *Return the digest of the agreement text a certificate must cite. An agreement whose text no*
 
 ---
 
-### [`aegean_licensing/templates.py`](aegean_licensing/templates.py)
-> *Canonical Licensing Templates and Boilerplate Generators.*
+### [`aegean_licensing/register.py`](aegean_licensing/register.py)
+> *Public certificate register: which certificates AegeanWorks issued, and which it revoked (ADR-013).*
 
-**Size**: `137` lines (`5826` bytes)
+**Size**: `53` lines (`2045` bytes)
+
+**Classes:**
+- `class RegisterEntry` - *One issued certificate, as the public may see it.*
 
 **Functions:**
-- `def _read_file_or_fallback(rel_path, fallback)` - *Read template file relative to repository root, falling back to static string.*
-- `def get_dual_license_rider()` - *Return canonical dual-licensing rider for LICENSE files.*
-- `def get_commercial_md()` - *Return standard COMMERCIAL.md content.*
-- `def get_pyproject_snippet()` - *Return pyproject.toml licensing snippet.*
-- `def get_personal_use_license()` - *Return draft Aegean Licensing Personal Use License (AL-PU 1.0).*
-- `def get_commercial_agreement_template()` - *Return draft Aegean Commercial License Agreement (ACLA 1.0).*
-- `def get_backward_compatibility_policy()` - *Return draft Backward Compatibility Policy.*
-- `def get_contributor_cla()` - *Return AegeanWorks Contributor License Agreement.*
-- `def get_asset_policy()` - *Return AegeanWorks Asset Separation & Licensing Policy.*
+- `def load_register(path)` - *Every entry keyed by certificate id; a missing register is empty.*
 
 ---
 
 ### [`aegean_licensing/verifier.py`](aegean_licensing/verifier.py)
 > *Commercial License Certificate Verification Module.*
 
-**Size**: `152` lines (`5225` bytes)
+**Size**: `257` lines (`10068` bytes)
 
 **Classes:**
 - `class VerificationResult` - *Outcome of validating a License Grant Certificate.*
 
 **Functions:**
-- `def verify_certificate(target, secret_key, check_project, reference_date)` - *Verify authenticity, tamper-resistance, expiration, and scope of a license certificate.*
+- `def verify_certificate(target, secret_key, check_project, reference_date, register_path)` - *Verify authenticity, tamper-resistance, expiration, and scope of a license certificate. With*
+
+---
+
+### [`setup.py`](setup.py)
+> *Build hook that bundles the repository's legal documents into the wheel.*
+
+**Size**: `29` lines (`887` bytes)
+
+**Classes:**
+- `class BundleDocuments` - *Copy licenses, policies, and the CLA workflow into the built package.*
+  - Method `.run()`
+
+**Functions:**
+- `def _load_bundler()`
 
 ---
 
@@ -126,27 +142,34 @@
 
 ---
 
-### [`tests/test_auditor.py`](tests/test_auditor.py)
-> *Unit tests for repository compliance auditor.*
+### [`tests/fixtures.py`](tests/fixtures.py)
+> *Test-only certificate builder (ADR-017).*
 
-**Size**: `120` lines (`4929` bytes)
+**Size**: `55` lines (`2357` bytes)
+
+**Functions:**
+- `def issue_certificate(licensee_name, licensee_contact, license_type, projects, scope, is_perpetual, expires_at, notes, secret_key, cert_id, issued_at, tier, allowances)`
+- `def write_register(path, *certs, revoked)` - *A register file listing `certs`, with the ids in `revoked` marked revoked.*
+
+---
+
+### [`tests/test_bundler.py`](tests/test_bundler.py)
+> *Unit tests for bundling licensing documents into the built package.*
+
+**Size**: `45` lines (`1920` bytes)
 
 **Classes:**
-- `class TestAuditor` - *Test repository licensing audit checks and warnings.*
+- `class TestBundler` - *Test document discovery and copy layout.*
   - Method `.setUp()`
-  - Method `.test_compliant_repository()`
-  - Method `.test_missing_license_fails()`
-  - Method `.test_missing_commercial_md_fails()`
-  - Method `.test_detects_obsolete_enterprise_bureaucracy()`
-  - Method `.test_alpu_compliant_repository()`
-  - Method `.test_audit_with_policies_check()`
+  - Method `.test_documents_are_copied_into_package_resources()`
+  - Method `.test_empty_repository_is_rejected()`
 
 ---
 
 ### [`tests/test_cert.py`](tests/test_cert.py)
 > *Unit tests for LicenseCertificate and cryptographic utilities.*
 
-**Size**: `90` lines (`2843` bytes)
+**Size**: `76` lines (`2322` bytes)
 
 **Classes:**
 - `class TestLicenseCertificate` - *Test certificate data transfer object and canonical hashing.*
@@ -155,73 +178,98 @@
   - Method `.test_digest_computation()`
   - Method `.test_signature_computation()`
   - Method `.test_to_and_from_dict_roundtrip()`
-  - Method `.test_markdown_rendering()`
 
 ---
 
 ### [`tests/test_cli.py`](tests/test_cli.py)
-> *Unit tests for aegean-licensing CLI.*
+> *Unit tests for the public verification command line.*
 
-**Size**: `85` lines (`2942` bytes)
+**Size**: `84` lines (`3583` bytes)
 
 **Classes:**
-- `class TestCLI` - *Test CLI commands, argument handling, and exit codes.*
+- `class TestCLI` - *The public CLI verifies; issuing and revoking are private (ADR-017).*
   - Method `.setUp()`
+  - Method `.write_cert(cert)`
+  - Method `.run_cli(*argv)`
   - Method `.test_version_output()`
-  - Method `.test_issue_and_verify_roundtrip_cli()`
-  - Method `.test_template_generation_cli()`
-  - Method `.test_issue_with_type_cli()`
+  - Method `.test_only_verify_is_public()`
+  - Method `.test_verify_against_the_register()`
+  - Method `.test_unregistered_certificate_fails_with_the_register()`
+  - Method `.test_verify_with_a_key_file()`
 
 ---
 
-### [`tests/test_issuer.py`](tests/test_issuer.py)
-> *Unit tests for commercial license certificate issuer.*
+### [`tests/test_license_terms.py`](tests/test_license_terms.py)
+> *Unit tests for the frozen text of operative agreements (ADR-013).*
 
-**Size**: `81` lines (`2972` bytes)
+**Size**: `48` lines (`2104` bytes)
 
 **Classes:**
-- `class TestIssuer` - *Test certificate creation and disk serialization.*
+- `class TestFrozenTerms` - *A certificate cites an agreement's digest, so an issued agreement's text must never change.*
+  - Method `.test_every_operative_agreement_pins_its_text()`
+  - Method `.test_an_edited_agreement_is_refused_and_fails_verification()`
+  - Method `.test_an_unpinned_agreement_still_yields_its_digest()`
+
+---
+
+### [`tests/test_register.py`](tests/test_register.py)
+> *Unit tests for reading the public certificate register (ADR-013, ADR-017).*
+
+**Size**: `97` lines (`4583` bytes)
+
+**Classes:**
+- `class TestRegister` - *The register is the public proof of issuance and revocation.*
   - Method `.setUp()`
-  - Method `.test_issue_valid_perpetual_certificate()`
-  - Method `.test_issue_with_custom_license_type()`
-  - Method `.test_issue_with_hmac_signature()`
-  - Method `.test_validation_errors()`
-  - Method `.test_issue_writes_atomic_files()`
-
----
-
-### [`tests/test_templates.py`](tests/test_templates.py)
-> *Unit tests for licensing template generation.*
-
-**Size**: `70` lines (`2473` bytes)
-
-**Classes:**
-- `class TestTemplates` - *Test standard licensing templates.*
-  - Method `.test_dual_license_rider_content()`
-  - Method `.test_commercial_md_content()`
-  - Method `.test_pyproject_snippet_content()`
-  - Method `.test_personal_use_license_content()`
-  - Method `.test_commercial_agreement_template_content()`
-  - Method `.test_backward_compatibility_policy_content()`
-  - Method `.test_contributor_cla_content()`
-  - Method `.test_asset_policy_content()`
+  - Method `.issue(name)`
+  - Method `.test_the_published_register_is_valid_and_holds_no_personal_data()`
+  - Method `.test_registered_unregistered_and_revoked()`
+  - Method `.test_a_listed_id_with_another_digest_is_unregistered()`
+  - Method `.test_a_malformed_register_is_reported_not_raised()`
+  - Method `.test_a_missing_register_is_empty()`
+- `class TestAllowances` - *ACL-1.0 exceptions are checked certificate data (ADR-014).*
+  - Method `.test_allowances_verify_and_tampering_is_caught()`
+  - Method `.test_a_self_consistent_unknown_allowance_is_invalid()`
+  - Method `.test_allowances_given_as_a_string_are_one_allowance()`
 
 ---
 
 ### [`tests/test_verifier.py`](tests/test_verifier.py)
 > *Unit tests for commercial license certificate verifier.*
 
-**Size**: `199` lines (`7385` bytes)
+**Size**: `205` lines (`8031` bytes)
 
 **Classes:**
-- `class TestVerifier` - *Test certificate verification, tamper detection, and scope checking.*
+- `class TestVerifier` - *Test certificate verification, tamper detection, terms, and scope checking.*
   - Method `.setUp()`
-  - Method `.test_verify_valid_certificate()`
+  - Method `.test_verify_valid_certificate_without_key_is_tamper_evident_only()`
+  - Method `.test_verify_signed_certificate_with_key_is_authentic()`
+  - Method `.test_self_issued_forgery_passes_digest_but_is_not_authentic()`
   - Method `.test_verify_from_json_file()`
   - Method `.test_verify_detects_tampered_digest()`
   - Method `.test_verify_detects_tampered_payload_field()`
   - Method `.test_verify_hmac_signature()`
   - Method `.test_verify_expired_certificate()`
   - Method `.test_verify_scope_filtering()`
+  - Method `.test_unknown_license_type_is_rejected()`
+  - Method `.test_terms_digest_mismatch_is_rejected()`
+  - Method `.test_unknown_tier_is_rejected()`
+  - Method `._payload(**overrides)`
+  - Method `.test_perpetual_certificate_with_expiry_is_rejected()`
+  - Method `.test_term_limited_certificate_without_expiry_is_rejected()`
+
+---
+
+### [`tests/test_workflow_assets.py`](tests/test_workflow_assets.py)
+> *Asset tests for the CLA workflow, CI workflow, and packaging manifest.*
+
+**Size**: `66` lines (`3095` bytes)
+
+**Classes:**
+- `class TestWorkflowAssets` - *Test the durable CLA register, workflow wiring, and manifest coverage.*
+  - Method `.test_cla_register_is_valid_json()`
+  - Method `.test_workflow_records_evidence_and_honours_revocation()`
+  - Method `.test_cla_result_is_a_commit_status_the_comment_run_can_turn_green()`
+  - Method `.test_ci_workflow_runs_tests_and_checks_the_wheel()`
+  - Method `.test_manifest_covers_legal_documents()`
 
 ---

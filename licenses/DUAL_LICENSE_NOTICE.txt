@@ -1,22 +1,21 @@
-AegeanWorks Dual-Licensing Notice
-=================================
+AegeanWorks Licensing Notice
+============================
 
-This software is dual-licensed by AegeanWorks:
+This software is offered by AegeanWorks under two licenses:
 
-1. Open Source Community Track (Default):
-   Licensed under the GNU Affero General Public License v3.0 (AGPL-3.0-or-later).
-   Free for personal, academic, research, and commercial use under AGPL terms.
-   Redistribution or network deployment of modified versions requires complete
-   corresponding source code disclosure under AGPL-3.0 Section 13.
+1. Personal Use (Default): Aegean License 1.0 (AL-1.0, LicenseRef-AL-1.0).
+   Free for an individual's own private, non-commercial use: learning, study,
+   hobby projects and personal research. No redistribution, no hosted service,
+   no AI model training, no use for or on behalf of any organization.
 
-2. Commercial License Track (AECL-1.0):
-   Designed for organizations requiring closed-source commercial deployment,
-   proprietary SaaS cloud hosting without source code disclosure, or closed
-   redistribution without AGPL copyleft obligations.
+2. Commercial Use: Aegean Commercial License 1.0 (ACL-1.0).
+   Required before any use by or for a company or other organization, in paid
+   or client work, or in a product or service offered to others. Each company
+   may first evaluate for 28 days, once per company group, non-production only.
    Pure copyright grant, sold AS-IS without warranty, indemnification, or support.
 
 For commercial licenses, terms, or certificates, contact:
   AegeanWorks Licensing
   Email: aegean-licensing@proton.me
   Web:   https://github.com/AegeanWorks
-  Terms: COMMERCIAL.md / licenses/AECL-1.0.md
+  Terms: COMMERCIAL.md / licenses/AL-1.0.md / licenses/ACL-1.0.md

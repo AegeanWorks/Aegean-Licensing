@@ -9,3 +9,4 @@ Persisted state carries a format version. A loader refuses a version it does not
 without modifying or quarantining that file; older versions migrate when a migration exists.
 
 ## Rules
+- **G-001** (user): The licensor is named AegeanWorks in every license, notice and certificate; do not ask for or add a personal legal name.

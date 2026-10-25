@@ -1,0 +1,13 @@
+include README.md
+include LICENSE
+include CHANGELOG.md
+include COMMERCIAL.md
+include pyproject.toml
+include setup.py
+recursive-include aegean_licensing *.py
+recursive-include licenses *.md *.txt
+recursive-include policies *.md
+recursive-include tests *.py
+include .github/workflows/cla-check.yml
+include .github/workflows/ci.yml
+include .github/cla-signatures.json

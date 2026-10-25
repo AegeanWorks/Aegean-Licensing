@@ -6,3 +6,15 @@
 __pycache__/
 *.py[cod]
 node_modules/
+
+# Issued customer certificates contain licensee PII; never commit them
+issued_certs/
+
+
+# Python packaging artifacts
+build/
+dist/
+*.egg-info/
+
+# Register write lock (transient)
+licenses/*.lock

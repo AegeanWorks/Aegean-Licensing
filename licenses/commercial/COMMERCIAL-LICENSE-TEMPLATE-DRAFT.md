@@ -1,62 +1,74 @@
-# Aegean Commercial License Agreement (ACLA-1.0-DRAFT)
+# Aegean Commercial License Order Form (ACL-1.0)
 
-**Draft version:** 0.3  
-**Draft date:** 25 October 2026  
-**Status:** DRAFT FOR REVIEW — Operative upon formal release and execution of a License Grant Certificate
+**Template version:** 0.6
+**Template date:** 25 October 2026
+**Status:** template — complete and execute for each commercial order
 
----
-
-## 1. Parties & Commercial Purpose
-
-This Commercial License Agreement (the **"Agreement"**) is entered into by and between:
-- **Licensor**: AegeanWorks (`aegean-licensing@proton.me`), and
-- **Licensee**: The entity or individual designated on an authentic AegeanWorks License Grant Certificate.
-
-This Agreement provides commercial organizations, startups, and developers with binding, proprietary rights to integrate, deploy, host, and redistribute AegeanWorks software without being subject to the source disclosure conditions of the GNU AGPL-3.0 or the non-commercial restrictions of the Aegean Licensing Personal Use License (AL-PU 1.0).
+This Order Form supplements the **Aegean Commercial License 1.0 (ACL-1.0)** and
+incorporates it by reference. Commercial terms are agreed privately by email; nothing is sold
+or paid for through GitHub or this repository. If this form and ACL-1.0 conflict, ACL-1.0
+Section 10 controls.
 
 ---
 
-## 2. Commercial Licensing Tiers
+## 1. Parties
 
-Licensee may obtain commercial permissions under one of three tiers as specified in their License Grant Certificate:
+- **Licensor:** AegeanWorks (`aegean-licensing@proton.me`), Türkiye
+- **Licensee legal name:** ____________________________________
+- **Registration / tax id:** ________________________________
+- **Registered address:** ____________________________________
+- **Country:** ______________________________________________
+- **Licensee contact and notice email:** _____________________
 
-| Tier | Eligibility & Scope | Key Rights |
-|---|---|---|
-| **Tier 1: Indie & Startup** | Revenue < \$250,000/yr OR team size $\le$ 5 | Full commercial deployment, internal automation, closed SaaS |
-| **Tier 2: Enterprise & SaaS** | Revenue $\ge$ \$250,000/yr OR cloud platforms | Unlimited seats, closed SaaS cloud APIs, confidential client deliverables |
-| **Tier 3: OEM & Embedded** | Hardware devices, game engines, retail bundles | Royalty or volume redistribution of embedded binaries |
+## 2. Order Details
 
----
+| Field | Value |
+|---|---|
+| Tier | Tier1 / Tier2 / Tier3 |
+| Projects covered | ____________________________ (or `*` for the portfolio) |
+| Scope | `internal-use`, `proprietary-saas-and-redistribution`, `client-deliverables`, `oem-embedded`, or `enterprise-unrestricted` |
+| Allowances | none / `ai-training` / `hosted-service` (ACL-1.0 Sections 3.9 and 3.10) |
+| Affiliates covered | none / ____________________________ (ACL-1.0 Section 3.12) |
+| Term | 12 months / perpetual |
+| Effective date | ____________________________ |
+| Expiration date | ____________________________ (blank if perpetual) |
+| Certificate id | assigned by the licensor on issuance |
 
-## 3. Grant of Commercial Rights
+## 3. Fees and Payment
 
-Subject to the terms herein and possession of a valid License Grant Certificate, Licensor grants Licensee a worldwide, non-exclusive, non-transferable (except to a corporate successor or affiliate) right to:
+- **Fees:** ________________________________________________
+- **Currency and payment method:** agreed privately by email and recorded here: ____________
+- **Payment schedule:** ____________________________________
+- **Taxes:** fees exclude taxes; the licensee bears applicable taxes and withholdings.
 
-1. **Closed-Source SaaS & Cloud APIs**: Deploy the Licensed Software on cloud servers, private networks, or multi-tenant architectures without disclosing, publishing, or offering backend modifications or source code to network users.
-2. **Proprietary Integration**: Embed, link, and compile the Licensed Software into proprietary, closed-source commercial applications, workflows, or client deliverables.
-3. **Redistribution**: Distribute compiled binaries or bundled packages as part of Licensee's commercial products, keeping proprietary adaptations and modifications confidential.
-4. **Perpetual Production Rights**: All versions released by Licensor during the active term of the License Grant Certificate may be deployed in production by Licensee perpetually.
+Payment is complete only when the licensor confirms receipt in writing. The certificate is
+issued after that confirmation. Fees are non-refundable after issuance. If the licensor cannot
+issue a valid certificate for a settled order, it will refund the amount received by the agreed
+method. No payment details are published in the repository. See ACL-1.0 Section 4.
 
----
+## 4. Acceptance
 
-## 4. Boundaries & Pure License Model
+By signing or accepting this Order Form in writing, the licensee accepts ACL-1.0 and this form,
+and declares that it meets the eligibility of the Tier above. It will tell the licensor within 30
+days if it stops meeting it (ACL-1.0 Section 3.14). The licensee confirms it has received the
+KVKK privacy notice (`licenses/PRIVACY.md`); this is an acknowledgment, not a consent.
+The licensor issues the certificate after confirming the agreed payment.
 
-1. **Pure IP Permissions**: This Agreement is strictly a legal grant of intellectual property permissions and copyleft waiver.
-2. **No Technical Support or SLAs**: Software is provided as self-service tooling. Licensor undertakes no obligation to provide maintenance, bug-fixing, consulting, custom development, or Service Level Agreements (SLAs).
-3. **No Resale as Standalone Code**: Licensee may not resell or broker the unmodified standalone source code in direct competition with Licensor's commercial licensing operations.
-4. **AS-IS Disclaimer**: THE SOFTWARE IS LICENSED AS-IS WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
-5. **Limitation of Liability**: IN NO EVENT SHALL LICENSOR BE LIABLE FOR ANY CONSEQUENTIAL, INDIRECT, INCIDENTAL, OR PUNITIVE DAMAGES ARISING FROM THE USE OF THE SOFTWARE.
+- **Licensee signature / acceptance:** ______________________________
+- **Name and title:** ______________________________________________
+- **Date:** ________________________________________________________
+- **Licensor acceptance:** AegeanWorks, represented by its authorised operator, upon issuance.
 
----
+## 5. Verification
 
-## 5. Digital Verification & Certificate Issuance
+Verify the issued certificate against the licensor's public register:
 
-Commercial permissions under this Agreement become effective immediately upon the issuance of an authentic **AegeanWorks License Grant Certificate** containing a unique Certificate ID, licensee details, and a SHA-256 cryptographic integrity digest.
-
-Authenticity can be verified at any time using the local verification tooling:
 ```bash
-aegean-license verify license_certificate_<id>.json
+python -m aegean_licensing verify license_certificate_<id>.json --register licenses/issued.json
 ```
 
-For custom quotes, multi-project bundles, or enterprise procurement:  
+The SHA-256 digest proves internal consistency only. The certificate is authentic only when the
+public register (`licenses/issued.json` in the aegean-licensing repository) lists it as valid, or
+the licensor confirms it in writing. The licensor never publishes its signing key.
+
 **Contact:** `aegean-licensing@proton.me`

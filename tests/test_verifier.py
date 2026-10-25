@@ -6,103 +6,93 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from aegean_licensing.issuer import issue_certificate
+from aegean_licensing.cert import cert_to_dict, compute_digest
+from tests.fixtures import issue_certificate
 from aegean_licensing.verifier import verify_certificate
 
 
 class TestVerifier(unittest.TestCase):
-    """Test certificate verification, tamper detection, and scope checking."""
+    """Test certificate verification, tamper detection, terms, and scope checking."""
 
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp(prefix="test_verifier_")
         self.addCleanup(shutil.rmtree, self.temp_dir, ignore_errors=True)
 
-    def test_verify_valid_certificate(self):
+    def test_verify_valid_certificate_without_key_is_tamper_evident_only(self):
         cert = issue_certificate(
             licensee_name="Valid Enterprise",
             licensee_contact="legal@enterprise.com",
             projects=["AIKit", "chronos"],
         )
-        res = verify_certificate(
-            target={
-                "cert_id": cert.cert_id,
-                "licensee_name": cert.licensee_name,
-                "licensee_contact": cert.licensee_contact,
-                "issuer": cert.issuer,
-                "issuer_contact": cert.issuer_contact,
-                "license_type": cert.license_type,
-                "projects": list(cert.projects),
-                "scope": cert.scope,
-                "issued_at": cert.issued_at,
-                "expires_at": cert.expires_at,
-                "is_perpetual": cert.is_perpetual,
-                "notes": cert.notes,
-                "digest": cert.digest,
-                "signature": cert.signature,
-            }
+        res = verify_certificate(cert_to_dict(cert))
+        self.assertTrue(res.is_valid)
+        self.assertEqual(res.status, "VALID_UNVERIFIED")
+        self.assertFalse(res.signature_verified)
+        self.assertTrue(res.terms_verified)
+
+    def test_verify_signed_certificate_with_key_is_authentic(self):
+        cert = issue_certificate(
+            licensee_name="Signed Enterprise",
+            licensee_contact="legal@signed.example",
+            secret_key="verify-key",
         )
+        res = verify_certificate(cert_to_dict(cert), secret_key="verify-key")
         self.assertTrue(res.is_valid)
         self.assertEqual(res.status, "VALID")
+        self.assertTrue(res.signature_verified)
+        self.assertTrue(res.terms_verified)
+
+    def test_self_issued_forgery_passes_digest_but_is_not_authentic(self):
+        forged = {
+            "cert_id": "forged-1",
+            "licensee_name": "Forged Corp",
+            "licensee_contact": "forged@example.com",
+            "issuer": "AegeanWorks",
+            "issuer_contact": "aegean-licensing@proton.me",
+            "license_type": "ACL-1.0",
+            "projects": ["chronos"],
+            "scope": "proprietary-saas-and-redistribution",
+            "issued_at": "2026-10-25",
+            "expires_at": None,
+            "is_perpetual": True,
+            "notes": "",
+            "tier": "",
+            "terms_digest": "",
+            "licensee_address": "",
+            "licensee_registration": "",
+            "licensee_country": "",
+            "signature": "",
+        }
+        forged["digest"] = compute_digest(forged)
+        res = verify_certificate(forged)
+        self.assertTrue(res.is_valid)
+        self.assertEqual(res.status, "VALID_UNVERIFIED")
+        self.assertFalse(res.signature_verified)
 
     def test_verify_from_json_file(self):
         cert = issue_certificate(
             licensee_name="File Corp",
             licensee_contact="dev@filecorp.com",
             cert_id="file-cert-001",
-            output_dir=self.temp_dir,
         )
         cert_file = Path(self.temp_dir) / "license_certificate_file-cert-001.json"
+        cert_file.write_text(json.dumps(cert_to_dict(cert)), encoding="utf-8")
         res = verify_certificate(cert_file)
         self.assertTrue(res.is_valid)
-        self.assertEqual(res.status, "VALID")
+        self.assertEqual(res.status, "VALID_UNVERIFIED")
 
     def test_verify_detects_tampered_digest(self):
-        cert = issue_certificate(
-            licensee_name="Tamper Corp",
-            licensee_contact="bad@tamper.com",
-        )
-        data = {
-            "cert_id": cert.cert_id,
-            "licensee_name": cert.licensee_name,
-            "licensee_contact": cert.licensee_contact,
-            "issuer": cert.issuer,
-            "issuer_contact": cert.issuer_contact,
-            "license_type": cert.license_type,
-            "projects": list(cert.projects),
-            "scope": cert.scope,
-            "issued_at": cert.issued_at,
-            "expires_at": cert.expires_at,
-            "is_perpetual": cert.is_perpetual,
-            "notes": cert.notes,
-            "digest": "fake-tampered-digest-00000000000000000000000000000000000000000000000",
-            "signature": cert.signature,
-        }
+        cert = issue_certificate(licensee_name="Tamper Corp", licensee_contact="bad@tamper.com")
+        data = cert_to_dict(cert)
+        data["digest"] = "fake-tampered-digest-00000000000000000000000000000000000000000000000"
         res = verify_certificate(data)
         self.assertFalse(res.is_valid)
         self.assertEqual(res.status, "TAMPERED")
 
     def test_verify_detects_tampered_payload_field(self):
-        cert = issue_certificate(
-            licensee_name="Legit Corp",
-            licensee_contact="good@legit.com",
-        )
-        # Change the licensee name but keep the original digest
-        data = {
-            "cert_id": cert.cert_id,
-            "licensee_name": "Hacker Corp",
-            "licensee_contact": cert.licensee_contact,
-            "issuer": cert.issuer,
-            "issuer_contact": cert.issuer_contact,
-            "license_type": cert.license_type,
-            "projects": list(cert.projects),
-            "scope": cert.scope,
-            "issued_at": cert.issued_at,
-            "expires_at": cert.expires_at,
-            "is_perpetual": cert.is_perpetual,
-            "notes": cert.notes,
-            "digest": cert.digest,
-            "signature": cert.signature,
-        }
+        cert = issue_certificate(licensee_name="Legit Corp", licensee_contact="good@legit.com")
+        data = cert_to_dict(cert)
+        data["licensee_name"] = "Hacker Corp"
         res = verify_certificate(data)
         self.assertFalse(res.is_valid)
         self.assertEqual(res.status, "TAMPERED")
@@ -113,27 +103,11 @@ class TestVerifier(unittest.TestCase):
             licensee_contact="hmac@corp.com",
             secret_key="top-secret",
         )
-        data = {
-            "cert_id": cert.cert_id,
-            "licensee_name": cert.licensee_name,
-            "licensee_contact": cert.licensee_contact,
-            "issuer": cert.issuer,
-            "issuer_contact": cert.issuer_contact,
-            "license_type": cert.license_type,
-            "projects": list(cert.projects),
-            "scope": cert.scope,
-            "issued_at": cert.issued_at,
-            "expires_at": cert.expires_at,
-            "is_perpetual": cert.is_perpetual,
-            "notes": cert.notes,
-            "digest": cert.digest,
-            "signature": cert.signature,
-        }
-        # Correct key
+        data = cert_to_dict(cert)
         res_ok = verify_certificate(data, secret_key="top-secret")
         self.assertTrue(res_ok.is_valid)
+        self.assertEqual(res_ok.status, "VALID")
 
-        # Wrong key
         res_fail = verify_certificate(data, secret_key="wrong-secret")
         self.assertFalse(res_fail.is_valid)
         self.assertEqual(res_fail.status, "TAMPERED")
@@ -145,23 +119,7 @@ class TestVerifier(unittest.TestCase):
             is_perpetual=False,
             expires_at="2025-01-01",
         )
-        data = {
-            "cert_id": cert.cert_id,
-            "licensee_name": cert.licensee_name,
-            "licensee_contact": cert.licensee_contact,
-            "issuer": cert.issuer,
-            "issuer_contact": cert.issuer_contact,
-            "license_type": cert.license_type,
-            "projects": list(cert.projects),
-            "scope": cert.scope,
-            "issued_at": cert.issued_at,
-            "expires_at": cert.expires_at,
-            "is_perpetual": cert.is_perpetual,
-            "notes": cert.notes,
-            "digest": cert.digest,
-            "signature": cert.signature,
-        }
-        res = verify_certificate(data, reference_date="2026-10-25")
+        res = verify_certificate(cert_to_dict(cert), reference_date="2026-10-25")
         self.assertFalse(res.is_valid)
         self.assertEqual(res.status, "EXPIRED")
 
@@ -171,28 +129,76 @@ class TestVerifier(unittest.TestCase):
             licensee_contact="scoped@corp.com",
             projects=["chronos"],
         )
-        data = {
-            "cert_id": cert.cert_id,
-            "licensee_name": cert.licensee_name,
-            "licensee_contact": cert.licensee_contact,
-            "issuer": cert.issuer,
-            "issuer_contact": cert.issuer_contact,
-            "license_type": cert.license_type,
-            "projects": list(cert.projects),
-            "scope": cert.scope,
-            "issued_at": cert.issued_at,
-            "expires_at": cert.expires_at,
-            "is_perpetual": cert.is_perpetual,
-            "notes": cert.notes,
-            "digest": cert.digest,
-            "signature": cert.signature,
-        }
+        data = cert_to_dict(cert)
         res_covered = verify_certificate(data, check_project="chronos")
         self.assertTrue(res_covered.is_valid)
 
         res_uncovered = verify_certificate(data, check_project="cyberpulse")
         self.assertFalse(res_uncovered.is_valid)
         self.assertEqual(res_uncovered.status, "SCOPE_MISMATCH")
+
+    def test_unknown_license_type_is_rejected(self):
+        cert = issue_certificate(licensee_name="Type Corp", licensee_contact="type@corp.com")
+        data = cert_to_dict(cert)
+        data["license_type"] = "ACLA-1.0-Tier1"
+        data["digest"] = compute_digest(data)
+        res = verify_certificate(data)
+        self.assertFalse(res.is_valid)
+        self.assertEqual(res.status, "INVALID_FORMAT")
+
+    def test_terms_digest_mismatch_is_rejected(self):
+        cert = issue_certificate(licensee_name="Terms Corp", licensee_contact="terms@corp.com")
+        data = cert_to_dict(cert)
+        data["terms_digest"] = "0" * 64
+        data["digest"] = compute_digest(data)
+        res = verify_certificate(data)
+        self.assertFalse(res.is_valid)
+        self.assertEqual(res.status, "INVALID_FORMAT")
+
+    def test_unknown_tier_is_rejected(self):
+        cert = issue_certificate(
+            licensee_name="Tier Corp",
+            licensee_contact="tier@corp.com",
+            tier="Tier1",
+        )
+        data = cert_to_dict(cert)
+        data["tier"] = "Gold"
+        data["digest"] = compute_digest(data)
+        res = verify_certificate(data)
+        self.assertFalse(res.is_valid)
+        self.assertEqual(res.status, "INVALID_FORMAT")
+
+    def _payload(self, **overrides):
+        data = {
+            "cert_id": "inconsistent-cert",
+            "licensee_name": "Inconsistent Corp",
+            "licensee_contact": "legal@inconsistent.example",
+            "issuer": "AegeanWorks",
+            "issuer_contact": "aegean-licensing@proton.me",
+            "license_type": "ACL-1.0",
+            "projects": ["chronos"],
+            "scope": "proprietary-saas-and-redistribution",
+            "issued_at": "2026-10-25",
+            "expires_at": None,
+            "is_perpetual": True,
+            "notes": "",
+        }
+        data.update(overrides)
+        data["digest"] = compute_digest(data)
+        data["signature"] = ""
+        return data
+
+    def test_perpetual_certificate_with_expiry_is_rejected(self):
+        data = self._payload(is_perpetual=True, expires_at="2030-01-01")
+        res = verify_certificate(data)
+        self.assertFalse(res.is_valid)
+        self.assertEqual(res.status, "INVALID_FORMAT")
+
+    def test_term_limited_certificate_without_expiry_is_rejected(self):
+        data = self._payload(is_perpetual=False, expires_at=None)
+        res = verify_certificate(data)
+        self.assertFalse(res.is_valid)
+        self.assertEqual(res.status, "INVALID_FORMAT")
 
 
 if __name__ == "__main__":
