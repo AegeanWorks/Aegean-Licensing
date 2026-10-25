@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "name": "aegean-licensing",
+  "test_command": null,
+  "topics": [
+    "aikit",
+    "licensing",
+    "legal",
+    "tools"
+  ],
+  "gates": {},
+  "ui_required": false,
+  "created": "2026-10-25"
+}
