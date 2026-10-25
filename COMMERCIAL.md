@@ -48,7 +48,7 @@ The Aegean-E Commercial License is a **pure copyright and copyleft-waiver grant*
 
 * **No Technical Support or SLA:** The license does not include bug-fixing, consulting, code audits, or ongoing technical support obligations. Software is licensed as self-service tooling.
 * **No Warranty or Indemnification:** The software is provided **"AS IS"** without warranties of any kind. Aegean-E assumes no liability or indemnification obligations for downstream deployment.
-* **No Procurement Bureaucracy:** We do not negotiate lengthy custom corporate Master Service Agreements (MSAs), provide vendor tax withholding certifications, or offer Net-30/60 post-payment invoicing.
+* **No Procurement Bureaucracy:** We do not negotiate lengthy custom corporate Master Service Agreements (MSAs), vendor registration portals, or post-payment invoicing.
 
 ---
 

@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "aegean-licensing",
-  "test_command": null,
+  "test_command": "python -m unittest discover tests",
   "topics": [
     "aikit",
     "licensing",
