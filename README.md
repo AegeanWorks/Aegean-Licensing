@@ -91,7 +91,8 @@ aegean-licensing/
 │   ├── project.json
 │   ├── task_ledger.json
 │   ├── decisions.md
-│   └── guidelines.md
+│   ├── guidelines.md
+│   └── codebase_map.md
 ├── licenses/                 <- Canonical legal agreements & policies
 │   ├── AECL-1.0.md           <- Full binding Aegean-E Commercial License agreement
 │   ├── DUAL_LICENSE_NOTICE.txt <- Standard repo and file header notice
