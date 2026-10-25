@@ -31,7 +31,10 @@ A central home for the licensing terms, license-version history, commercial lice
 ## 📜 Intended Policy & Licensing Model
 
 - **Personal Use**: Free for an individual's own private, non-commercial use under the Aegean License 1.0 ([`licenses/AL-1.0.md`](licenses/AL-1.0.md), `LicenseRef-AL-1.0`).
-- **Commercial & Organizational Use**: Requires the paid Aegean Commercial License 1.0 ([`licenses/ACL-1.0.md`](licenses/ACL-1.0.md)) before the use begins (`aegean-licensing@proton.me`). Each company may first evaluate for 28 days, once per company group, non-production only (AL-1.0 Section 4.3).
+- **Game Use**: Games and interactive works use the Aegean Game License 1.0 ([`licenses/AGL-1.0.md`](licenses/AGL-1.0.md), `LicenseRef-AGL-1.0`): free personal play, streaming, private servers, modding and free mods, with a DRM-free covenant (no mandatory client, account binding or activation) that forbids adding DRM to a permitted mod or patch. Assets are licensed only when the LICENSE or asset manifest lists them.
+- **Science Use**: Non-commercial research and teaching use the Aegean Science License 1.0 ([`licenses/ASL-1.0.md`](licenses/ASL-1.0.md), `LicenseRef-ASL-1.0`): publication, reproducibility sharing, text/data mining and non-commercial ML training. It is non-commercial source-available, not open source.
+- **Which One**: [`licenses/CATALOG.md`](licenses/CATALOG.md) maps each license to the project it fits and lists the gaps still open (trademark, data/model weights, game asset packs, security and support policies).
+- **Commercial & Organizational Use**: Requires the paid Aegean Commercial License 1.0 ([`licenses/ACL-1.0.md`](licenses/ACL-1.0.md)) before the use begins (`aegean-licensing@proton.me`); ACL-1.0 covers code and logic, so art, audio, datasets and model weights need a separate grant under [ASSET_POLICY.md](licenses/ASSET_POLICY.md). Each company may first evaluate for 28 days, once per company group, non-production only (AL-1.0 Section 4.3).
 - **Privacy**: Personal data in licensing is processed as the KVKK notice in [`licenses/PRIVACY.md`](licenses/PRIVACY.md) describes.
 - **Restricted Tier**: A project too valuable to distribute switches to the All Rights Reserved notice in [`licenses/RESTRICTED-NOTICE.md`](licenses/RESTRICTED-NOTICE.md) from a recorded cutoff commit; earlier versions keep their license.
 - **No AGPL**: AegeanWorks makes no new release under AGPL-3.0.
@@ -152,6 +155,9 @@ aegean-licensing/
 │   ├── issued.json           <- Public register of issued certificates (no personal data)
 │   ├── terms.json            <- License registry: scopes, tiers, allowances, pinned ACL-1.0 digest
 │   ├── AL-1.0.md             <- Aegean License 1.0: free personal use
+│   ├── AGL-1.0.md            <- Aegean Game License 1.0: DRM-free personal play
+│   ├── ASL-1.0.md            <- Aegean Science License 1.0: non-commercial research
+│   ├── CATALOG.md            <- Which license to use, what each grants, remaining gaps
 │   ├── RESTRICTED-NOTICE.md  <- All Rights Reserved notice for the restricted tier
 │   ├── PRIVACY.md            <- KVKK Article 10 privacy notice (Turkish controls)
 │   ├── ASSET_POLICY.md       <- Delineation between source code and creative/domain assets

@@ -5,6 +5,10 @@ All notable changes to Aegean Licensing documents are recorded here.
 ## Unreleased — Draft v0.3
 
 - **Certificate format 2**: certificates carry a random 256-bit `serial` and a format-bound digest; format-1 certificates are rejected as `UNSUPPORTED_FORMAT`, and the public CLI no longer checks signatures, which need AegeanWorks' key (ADR-018).
+- **Malformed certificate files**: a JSON file holding a list, string, number or `null` is reported as `INVALID_FORMAT` instead of raising `AttributeError` from the format check.
+- **Unknown register status**: a register entry whose `status` is anything other than `valid` or `revoked` is refused as malformed; it used to fall through as a valid certificate.
+- **Game and science licenses**: added AGL-1.0 (DRM-free personal play, streaming, modding) and ASL-1.0 (non-commercial research, publication, reproducibility, non-commercial ML training), with `licenses/CATALOG.md` mapping each to the project it fits.
+- **License hardening**: AGL-1.0 and ASL-1.0 now grant patents for their rights, AGL-1.0 promises no mandatory client/account and offline survival, and both state the asset/data boundary; the catalog compares the family with CC BY-NC, PolyForm, OpenRAIL, BSL/Elastic/SSPL, MIT/Apache/GPL and GOG's DRM-free model.
 - **Verification-only public package**: issuing, registering, revoking, audits and templates move to AegeanWorks' private operations tooling; this package keeps the certificate model, license registry, register reading and `verify` (ADR-017).
 - **Review fixes**: the CLA check sets an `AegeanWorks CLA` commit status that a `/agree-cla` comment turns green and exempts organization members; CRLF notes, string allowances, malformed registers and repeated revocations are handled (ADR-016).
 - **Company evaluation and KVKK notice**: AL-1.0 Section 4.3 allows one 28-day, non-production evaluation per company group; `licenses/PRIVACY.md` is the KVKK Article 10 privacy notice, emitted by `template privacy` (ADR-015).

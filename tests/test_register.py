@@ -65,6 +65,34 @@ class TestRegister(unittest.TestCase):
         result = verify_certificate(cert_to_dict(self.issue()), register_path=self.register)
         self.assertEqual(result.status, "INVALID_FORMAT")
 
+    def test_an_unknown_status_is_refused_not_treated_as_valid(self):
+        # A register status the package does not know used to fall through as valid, so a
+        # mistyped revocation ("revoked " or "suspended") would not stop a certificate.
+        cert = self.issue()
+        write_register(self.register, cert)
+        data = json.loads(self.register.read_text(encoding="utf-8"))
+        data["certificates"][cert.cert_id]["status"] = "revoked "
+        self.register.write_text(json.dumps(data), encoding="utf-8")
+        with self.assertRaises(ValueError) as caught:
+            load_register(self.register)
+        self.assertIn("unknown status", str(caught.exception))
+        result = verify_certificate(cert_to_dict(cert), register_path=self.register)
+        self.assertFalse(result.is_valid)
+        self.assertEqual(result.status, "INVALID_FORMAT")
+
+    def test_a_non_text_digest_is_refused_instead_of_crashing_compare_digest(self):
+        # hmac.compare_digest(7, "...") raises TypeError, which used to escape `verify`.
+        cert = self.issue()
+        write_register(self.register, cert)
+        data = json.loads(self.register.read_text(encoding="utf-8"))
+        data["certificates"][cert.cert_id]["digest"] = 7
+        self.register.write_text(json.dumps(data), encoding="utf-8")
+        with self.assertRaises(ValueError) as caught:
+            load_register(self.register)
+        self.assertIn("invalid digest", str(caught.exception))
+        result = verify_certificate(cert_to_dict(cert), register_path=self.register)
+        self.assertEqual(result.status, "INVALID_FORMAT")
+
     def test_a_missing_register_is_empty(self):
         self.assertEqual(load_register(self.temp_dir / "absent.json"), {})
 

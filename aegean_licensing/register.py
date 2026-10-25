@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import dataclasses
 import json
+import re
 from pathlib import Path
 from typing import Dict, Union
 
@@ -19,6 +20,13 @@ REGISTER_VERSION = 1
 DEFAULT_REGISTER_PATH = Path("licenses") / "issued.json"
 STATUS_VALID = "valid"
 STATUS_REVOKED = "revoked"
+# Any other status is not a state this package understands; treating it as valid would let a
+# malformed or tampered register hide a revocation.
+_STATUSES = (STATUS_VALID, STATUS_REVOKED)
+# A certificate digest is a SHA-256 hex digest; any other JSON value would make compare_digest
+# raise TypeError instead of reporting the register as malformed.
+_DIGEST = re.compile(r"[0-9a-f]{64}")
+_TEXT_FIELDS = ("license_type", "issued_at", "revoked_at", "reason")
 
 
 @dataclasses.dataclass(frozen=True)
@@ -47,7 +55,21 @@ def load_register(path: Union[str, Path]) -> Dict[str, RegisterEntry]:
     raw = data.get("certificates")
     if not isinstance(raw, dict):
         raise ValueError(f"{path} must hold a 'certificates' object.")
-    try:
-        return {cert_id: RegisterEntry(cert_id=cert_id, **fields) for cert_id, fields in raw.items()}
-    except TypeError as exc:
-        raise ValueError(f"{path} has a malformed certificate entry: {exc}") from exc
+    entries: Dict[str, RegisterEntry] = {}
+    for cert_id, fields in raw.items():
+        try:
+            entry = RegisterEntry(cert_id=cert_id, **fields)
+        except TypeError as exc:
+            raise ValueError(f"{path} has a malformed certificate entry: {exc}") from exc
+        non_text = [name for name in _TEXT_FIELDS if not isinstance(getattr(entry, name), str)]
+        if non_text:
+            raise ValueError(f"{path} gives certificate {cert_id} non-text {', '.join(non_text)}.")
+        if not isinstance(entry.digest, str) or not _DIGEST.fullmatch(entry.digest):
+            raise ValueError(f"{path} gives certificate {cert_id} an invalid digest.")
+        if entry.status not in _STATUSES:
+            raise ValueError(
+                f"{path} gives certificate {cert_id} an unknown status {entry.status!r}; "
+                f"only {', '.join(_STATUSES)} are understood."
+            )
+        entries[cert_id] = entry
+    return entries

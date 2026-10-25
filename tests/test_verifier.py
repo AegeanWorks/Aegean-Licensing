@@ -83,6 +83,18 @@ class TestVerifier(unittest.TestCase):
         self.assertTrue(res.is_valid)
         self.assertEqual(res.status, "VALID_UNVERIFIED")
 
+    def test_a_json_file_that_is_not_an_object_is_invalid_not_a_crash(self):
+        # A JSON array used to reach data.get("format") and raise AttributeError, so a malformed
+        # file crashed the verifier instead of reporting INVALID_FORMAT.
+        for body in ("[]", '"a string"', "42", "null"):
+            with self.subTest(body=body):
+                path = Path(self.temp_dir) / "not-an-object.json"
+                path.write_text(body, encoding="utf-8")
+                result = verify_certificate(path)
+                self.assertFalse(result.is_valid)
+                self.assertEqual(result.status, "INVALID_FORMAT")
+                self.assertIn("object", result.reasons[0])
+
     def test_verify_detects_tampered_digest(self):
         cert = issue_certificate(licensee_name="Tamper Corp", licensee_contact="bad@tamper.com")
         data = cert_to_dict(cert)

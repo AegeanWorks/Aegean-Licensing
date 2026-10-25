@@ -9,8 +9,8 @@
 - **Total Python Modules**: `18`
 - **Total Classes**: `14`
 - **Total Top-Level Functions**: `26`
-- **Total Class Methods**: `58`
-- **Total Source Lines**: `1526`
+- **Total Class Methods**: `61`
+- **Total Source Lines**: `1595`
 
 ---
 
@@ -98,7 +98,7 @@
 ### [`aegean_licensing/register.py`](aegean_licensing/register.py)
 > *Public certificate register: which certificates AegeanWorks issued, and which it revoked (ADR-013).*
 
-**Size**: `53` lines (`2045` bytes)
+**Size**: `75` lines (`3246` bytes)
 
 **Classes:**
 - `class RegisterEntry` - *One issued certificate, as the public may see it.*
@@ -111,7 +111,7 @@
 ### [`aegean_licensing/verifier.py`](aegean_licensing/verifier.py)
 > *Commercial License Certificate Verification Module.*
 
-**Size**: `276` lines (`10965` bytes)
+**Size**: `283` lines (`11203` bytes)
 
 **Classes:**
 - `class VerificationResult` - *Outcome of validating a License Grant Certificate.*
@@ -216,7 +216,7 @@
 ### [`tests/test_register.py`](tests/test_register.py)
 > *Unit tests for reading the public certificate register (ADR-013, ADR-017).*
 
-**Size**: `97` lines (`4583` bytes)
+**Size**: `125` lines (`6193` bytes)
 
 **Classes:**
 - `class TestRegister` - *The register is the public proof of issuance and revocation.*
@@ -226,6 +226,8 @@
   - Method `.test_registered_unregistered_and_revoked()`
   - Method `.test_a_listed_id_with_another_digest_is_unregistered()`
   - Method `.test_a_malformed_register_is_reported_not_raised()`
+  - Method `.test_an_unknown_status_is_refused_not_treated_as_valid()`
+  - Method `.test_a_non_text_digest_is_refused_instead_of_crashing_compare_digest()`
   - Method `.test_a_missing_register_is_empty()`
 - `class TestAllowances` - *ACL-1.0 exceptions are checked certificate data (ADR-014).*
   - Method `.test_allowances_verify_and_tampering_is_caught()`
@@ -237,7 +239,7 @@
 ### [`tests/test_verifier.py`](tests/test_verifier.py)
 > *Unit tests for commercial license certificate verifier.*
 
-**Size**: `243` lines (`9960` bytes)
+**Size**: `255` lines (`10653` bytes)
 
 **Classes:**
 - `class TestVerifier` - *Test certificate verification, tamper detection, terms, and scope checking.*
@@ -246,6 +248,7 @@
   - Method `.test_verify_signed_certificate_with_key_is_authentic()`
   - Method `.test_self_issued_forgery_passes_digest_but_is_not_authentic()`
   - Method `.test_verify_from_json_file()`
+  - Method `.test_a_json_file_that_is_not_an_object_is_invalid_not_a_crash()`
   - Method `.test_verify_detects_tampered_digest()`
   - Method `.test_verify_detects_tampered_payload_field()`
   - Method `.test_verify_hmac_signature()`

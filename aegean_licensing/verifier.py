@@ -80,6 +80,13 @@ def verify_certificate(
             reasons=("Target must be a dictionary or path to a JSON file.",),
         )
 
+    if not isinstance(data, dict):
+        return VerificationResult(
+            is_valid=False,
+            status="INVALID_FORMAT",
+            reasons=("Certificate JSON must be an object, not a list, string or number.",),
+        )
+
     # 0. Format: only format 2 verifies; format 1, from the issuer published before ADR-018, never does
     certificate_format = data.get("format", 1)
     if certificate_format != CERT_FORMAT:
