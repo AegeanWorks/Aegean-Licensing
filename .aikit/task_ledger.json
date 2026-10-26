@@ -3,38 +3,27 @@
   "active_task": {
     "task_id": "gaps-closure",
     "last_phase": "planning",
-    "active_phase": 2,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1793003308.477985,
     "owner": "kilo:main",
     "started_by": "kilo:main",
-    "continuations": [],
+    "continuations": [
+      {
+        "agent": "claude-code:240bc3b7",
+        "from": "kilo:main",
+        "at": 1793036221.6023302
+      }
+    ],
     "impact_assessment": {
       "why": "The dual-license and support policies allowed these instruments but had no templates",
       "benefits": "A reviewable starting text for both commercial requests",
       "risks": "contract: draft templates; dependency: none; concurrency: none; state: docs",
       "mitigation": "Catalog links, tests, full gates"
-    }
+    },
+    "completed_at": 1793036221.6023312
   },
   "checkpoints": [
-    {
-      "task_id": "licensing-automation",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/5] Re-plan after take-over from kilo:main (kept all its uncommitted work, 4/4 gates green): (1) rename AL-PU->Aegean License 1.0 (AL-1.0), AECL->Aegean Commercial License 1.0 (ACL-1.0), AECL-1.0 kept as accepted legacy ID; (2) strengthen AL-1.0 + ACL-1.0 with conditions, your-company/control, patent defense, required notices, single cure then permanent termination, per-version licensing, no SaaS/no circumvention, AI training ban, severability, governing law placeholder; (3) restricted-tier text; (4) tests; (5) AIKit pinned licenses/ copy",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792952329.4002697,
-      "timestamp_str": "2026-10-25 21:18:49",
-      "agent": "claude-code:c74fca42",
-      "impact_assessment": {
-        "why": "User renamed the licenses to Aegean, asked to strengthen them from open-source/source-available research, and to integrate this folder into AIKit",
-        "benefits": "One canonical license set; stronger, enforceable-by-design terms; issued certificates keep validating",
-        "risks": "contract: license IDs in terms.json, certificates and verifier change; dependency: none; concurrency: took over kilo:main task, its files unchanged until edited here; state: terms.json gains AL-1.0 and alias",
-        "mitigation": "Legacy AECL-1.0 alias with tests; failing-first tests for rename; nothing committed without user authorization"
-      },
-      "continued_from": "kilo:main"
-    },
     {
       "task_id": "licensing-automation",
       "phase": "phase 4",
@@ -318,6 +307,17 @@
         "risks": "contract: draft templates; dependency: none; concurrency: none; state: docs",
         "mitigation": "Catalog links, tests, full gates"
       }
+    },
+    {
+      "task_id": "gaps-closure",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'gaps-closure' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793036221.602332,
+      "timestamp_str": "2026-10-26 20:37:01",
+      "agent": "claude-code:240bc3b7",
+      "continued_from": "kilo:main"
     }
   ]
 }
