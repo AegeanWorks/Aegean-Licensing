@@ -1,67 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "verifier-non-object",
+    "task_id": "license-1-1",
     "last_phase": "delivery",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1792969591.8800132,
+    "updated_at": 1792972148.9564314,
     "owner": "kilo:main",
     "started_by": "kilo:main",
     "continuations": [],
-    "completed_at": 1792969655.087521
+    "completed_at": 1792972149.1480405
   },
   "checkpoints": [
-    {
-      "task_id": "licensing-automation",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/5] Payment operations: advisory state locks, watcher fault isolation, cancel/grant/issue commands",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792938955.715917,
-      "timestamp_str": "2026-10-25 17:35:55",
-      "agent": "kilo:main",
-      "impact_assessment": {
-        "why": "The order flow lacks concurrency protection, has no recovery when issuance fails mid-pass, and offers no way to close an abandoned or manually settled order",
-        "benefits": "One watcher per state directory, per-order fault isolation, and operator commands for cancellation and manual settlement",
-        "risks": "contract: new payments subcommands and cancelled status; dependency: stdlib only (os, time, contextlib); concurrency: O_EXCL lock files with stale recovery; state: optional reason field on orders, store version unchanged",
-        "mitigation": "Failing-first tests for lock contention, stale locks, cancelled orders and issuance failure, plus atomic writes"
-      }
-    },
-    {
-      "task_id": "licensing-automation",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[4/5] Payment operations: advisory locks, watcher fault isolation, cancel/grant/issue commands, Windows CI; 189 tests, 4/4 gates, ops smoke passes, checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792940341.46349,
-      "timestamp_str": "2026-10-25 17:59:01",
-      "agent": "kilo:main",
-      "handoff": {
-        "state": "16 modified, 25 untracked, HEAD==origin/master",
-        "next": "supply wallet RPC credentials and prices",
-        "evidence": "189 project tests, 556 root tests, 4/4 gates, live lock refusal + grant + cancel + settle + verify"
-      }
-    },
-    {
-      "task_id": "licensing-automation",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/4] Payment accounting: append-only event audit log, revenue report/CSV export, expiry report",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792941033.6265078,
-      "timestamp_str": "2026-10-25 18:10:33",
-      "agent": "kilo:main",
-      "impact_assessment": {
-        "why": "Operators need a durable record of every order transition and a way to reconcile revenue and upcoming license expiries without reading JSON by hand",
-        "benefits": "Dispute-ready event history, revenue totals per tier, CSV for accounting, and a renewal list derived from issued certificates",
-        "risks": "contract: new payments report/expiring commands and issued_at field; dependency: stdlib only (json, csv, datetime); concurrency: audit appends happen under the existing order lock; state: events.jsonl grows append-only, issued_at defaults empty for old orders",
-        "mitigation": "Append-only JSONL with fsync, status-diff detection in one place, tolerant reads for legacy orders"
-      }
-    },
     {
       "task_id": "licensing-automation",
       "phase": "phase 4",
@@ -318,6 +268,49 @@
       "status": "completed",
       "timestamp": 1792969655.0875225,
       "timestamp_str": "2026-10-26 02:07:35",
+      "agent": "kilo:main"
+    },
+    {
+      "task_id": "license-1-1",
+      "phase": "planning",
+      "phase_num": 2,
+      "description": "[1/2] Publish AL/AGL/ASL 1.1 beside 1.0, add security-research, moral-rights, data-protection and GPL/AGPL terms, refresh catalog/asset policy/FAQ/notices and pin the new texts",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792972148.7647734,
+      "timestamp_str": "2026-10-26 02:49:08",
+      "agent": "kilo:main",
+      "impact_assessment": {
+        "why": "The 1.0 personal licenses lacked explicit security-research, moral-rights/data-protection and compatibility terms",
+        "benefits": "A complete 1.1 family with 1.0 archived for existing grants",
+        "risks": "contract: license texts and filenames; dependency: none; concurrency: none; state: pins, docs",
+        "mitigation": "Dual-version files, failing-first tests, full gates"
+      }
+    },
+    {
+      "task_id": "license-1-1",
+      "phase": "delivery",
+      "phase_num": 4,
+      "description": "[2/2] done: AL/AGL/ASL 1.1, 1.0 archives, catalog, asset policy, FAQ/notices, 50 tests and 4/4 gates pass; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792972148.9564314,
+      "timestamp_str": "2026-10-26 02:49:08",
+      "agent": "kilo:main",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit and push on user approval",
+        "evidence": "50 tests, 4/4 gates"
+      }
+    },
+    {
+      "task_id": "license-1-1",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'license-1-1' completed successfully.",
+      "status": "completed",
+      "timestamp": 1792972149.148042,
+      "timestamp_str": "2026-10-26 02:49:09",
       "agent": "kilo:main"
     }
   ]

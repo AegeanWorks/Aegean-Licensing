@@ -3,7 +3,7 @@ AegeanWorks Licensing Notice
 
 This software is offered by AegeanWorks under two licenses:
 
-1. Personal Use (Default): Aegean License 1.0 (AL-1.0, LicenseRef-AL-1.0).
+1. Personal Use (Default): Aegean License 1.1 (AL-1.1, LicenseRef-AL-1.1).
    Free for an individual's own private, non-commercial use: learning, study,
    hobby projects and personal research. No redistribution, no hosted service,
    no AI model training, no use for or on behalf of any organization.
@@ -18,4 +18,4 @@ For commercial licenses, terms, or certificates, contact:
   AegeanWorks Licensing
   Email: aegean-licensing@proton.me
   Web:   https://github.com/AegeanWorks
-  Terms: COMMERCIAL.md / licenses/AL-1.0.md / licenses/ACL-1.0.md
+  Terms: COMMERCIAL.md / licenses/AL-1.1.md / licenses/ACL-1.0.md

@@ -1,17 +1,17 @@
 # Aegean Commercial Licensing FAQ
 
-Frequently asked questions about the Aegean License 1.0 (AL-1.0), the Aegean Commercial License
+Frequently asked questions about the Aegean License 1.1 (AL-1.1), the Aegean Commercial License
 1.0 (ACL-1.0), and commercial orders.
 
 ---
 
 ### Q1: Can I use AegeanWorks software commercially for free?
-**No.** The Aegean License 1.0 is free only for an individual's own private, non-commercial use.
+**No.** The Aegean License 1.1 is free only for an individual's own private, non-commercial use.
 Any use by or for a company or other organization, in paid or client work, or in a product or
 hosted service offered to others needs ACL-1.0 before the use begins. The one exception: each
 company may evaluate the software for 28 days, once per company group, non-production only
-(AL-1.0 Section 4.3). Versions AegeanWorks
-released under GNU AGPL-3.0 before a project moved to AL-1.0 stay under AGPL-3.0 for those
+(AL-1.1 Section 4.3). Versions AegeanWorks
+released under GNU AGPL-3.0 before a project moved to AL-1.1 stay under AGPL-3.0 for those
 versions only.
 
 ### Q2: Why buy ACL-1.0?

@@ -2,7 +2,7 @@
 
 [![Built with AIKit](https://img.shields.io/badge/built%20with-AIKit-6f42c1)](https://github.com/AegeanWorks/AIKit)
 
-**Status: The Aegean License 1.0 and Aegean Commercial License 1.0 are the operative texts. Legal review is recommended before relying on either in a dispute.**
+**Status: The Aegean License 1.1, Game License 1.1, Science License 1.1 and Commercial License 1.0 are the operative texts. Legal review is recommended before relying on either in a dispute.**
 
 A central home for the licensing terms, license-version history, commercial licensing process, certificate tooling, and backward-compatibility policy for projects published under the Aegean brand.
 
@@ -30,11 +30,11 @@ A central home for the licensing terms, license-version history, commercial lice
 
 ## 📜 Intended Policy & Licensing Model
 
-- **Personal Use**: Free for an individual's own private, non-commercial use under the Aegean License 1.0 ([`licenses/AL-1.0.md`](licenses/AL-1.0.md), `LicenseRef-AL-1.0`).
-- **Game Use**: Games and interactive works use the Aegean Game License 1.0 ([`licenses/AGL-1.0.md`](licenses/AGL-1.0.md), `LicenseRef-AGL-1.0`): free personal play, streaming, private servers, modding and free mods, with a DRM-free covenant (no mandatory client, account binding or activation) that forbids adding DRM to a permitted mod or patch. Assets are licensed only when the LICENSE or asset manifest lists them.
-- **Science Use**: Non-commercial research and teaching use the Aegean Science License 1.0 ([`licenses/ASL-1.0.md`](licenses/ASL-1.0.md), `LicenseRef-ASL-1.0`): publication, reproducibility sharing, text/data mining and non-commercial ML training. It is non-commercial source-available, not open source.
+- **Personal Use**: Free for an individual's own private, non-commercial use under the Aegean License 1.1 ([`licenses/AL-1.1.md`](licenses/AL-1.1.md), `LicenseRef-AL-1.1`).
+- **Game Use**: Games and interactive works use the Aegean Game License 1.1 ([`licenses/AGL-1.1.md`](licenses/AGL-1.1.md), `LicenseRef-AGL-1.1`): free personal play, streaming, private servers, modding and free mods, with a DRM-free covenant (no mandatory client, account binding or activation) that forbids adding DRM to a permitted mod or patch. Assets are licensed only when the LICENSE or asset manifest lists them.
+- **Science Use**: Non-commercial research and teaching use the Aegean Science License 1.1 ([`licenses/ASL-1.1.md`](licenses/ASL-1.1.md), `LicenseRef-ASL-1.1`): publication, reproducibility sharing, text/data mining and non-commercial ML training. It is non-commercial source-available, not open source.
 - **Which One**: [`licenses/CATALOG.md`](licenses/CATALOG.md) maps each license to the project it fits and lists the gaps still open (trademark, data/model weights, game asset packs, security and support policies).
-- **Commercial & Organizational Use**: Requires the paid Aegean Commercial License 1.0 ([`licenses/ACL-1.0.md`](licenses/ACL-1.0.md)) before the use begins (`aegean-licensing@proton.me`); ACL-1.0 covers code and logic, so art, audio, datasets and model weights need a separate grant under [ASSET_POLICY.md](licenses/ASSET_POLICY.md). Each company may first evaluate for 28 days, once per company group, non-production only (AL-1.0 Section 4.3).
+- **Commercial & Organizational Use**: Requires the paid Aegean Commercial License 1.0 ([`licenses/ACL-1.0.md`](licenses/ACL-1.0.md)) before the use begins (`aegean-licensing@proton.me`); ACL-1.0 covers code and logic, so art, audio, datasets and model weights need a separate grant under [ASSET_POLICY.md](licenses/ASSET_POLICY.md). Each company may first evaluate for 28 days, once per company group, non-production only (AL-1.1 Section 4.3).
 - **Privacy**: Personal data in licensing is processed as the KVKK notice in [`licenses/PRIVACY.md`](licenses/PRIVACY.md) describes.
 - **Restricted Tier**: A project too valuable to distribute switches to the All Rights Reserved notice in [`licenses/RESTRICTED-NOTICE.md`](licenses/RESTRICTED-NOTICE.md) from a recorded cutoff commit; earlier versions keep their license.
 - **No AGPL**: AegeanWorks makes no new release under AGPL-3.0.
@@ -42,7 +42,7 @@ A central home for the licensing terms, license-version history, commercial lice
 - **Older Versions & Reissuance**: Older versions may be reissued under the current Aegean license only where the rights holder controls the necessary rights and the release is clearly marked as such.
 - **Backward Compatibility & Non-Retroactivity**: Existing permissions granted under prior licenses—including AGPL-3.0—are not retroactively revoked. The new license cannot force existing recipients to give up a valid earlier grant. See [BACKWARD-COMPATIBILITY-DRAFT.md](policies/BACKWARD-COMPATIBILITY-DRAFT.md).
 
-> **Operational Notice**: The root `LICENSE` is a verbatim copy of `licenses/AL-1.0.md`. Every repository or release it governs carries that exact text, and its release notes name the license version.
+> **Operational Notice**: The root `LICENSE` is a verbatim copy of `licenses/AL-1.1.md`. Every repository or release it governs carries that exact text, and its release notes name the license version.
 
 ### Pre-Release Checklist
 
@@ -136,7 +136,7 @@ aegean-licensing/
 │   └── cla-signatures.json   <- Durable record of accepted and revoked contributors
 ├── MANIFEST.in               <- Ships legal documents in source distributions
 ├── CHANGELOG.md              <- version and draft change history
-├── LICENSE                   <- Aegean License 1.0 (copy of licenses/AL-1.0.md)
+├── LICENSE                   <- Aegean License 1.1 (copy of licenses/AL-1.1.md)
 ├── COMMERCIAL.md             <- Commercial licensing terms & Exhibit A
 ├── README.md                 <- Architecture, quickstart, and commands
 ├── pyproject.toml            <- Packaging metadata and console entrypoints
@@ -154,9 +154,12 @@ aegean-licensing/
 │   ├── ACL-1.0.md            <- Full binding Aegean Commercial License agreement
 │   ├── issued.json           <- Public register of issued certificates (no personal data)
 │   ├── terms.json            <- License registry: scopes, tiers, allowances, pinned ACL-1.0 digest
-│   ├── AL-1.0.md             <- Aegean License 1.0: free personal use
-│   ├── AGL-1.0.md            <- Aegean Game License 1.0: DRM-free personal play
-│   ├── ASL-1.0.md            <- Aegean Science License 1.0: non-commercial research
+│   ├── AL-1.0.md             <- Archived: grants for Versions released under 1.0
+│   ├── AL-1.1.md             <- Aegean License 1.1: free personal use
+│   ├── AGL-1.0.md            <- Archived: grants for Versions released under 1.0
+│   ├── AGL-1.1.md            <- Aegean Game License 1.1: DRM-free personal play
+│   ├── ASL-1.0.md            <- Archived: grants for Versions released under 1.0
+│   ├── ASL-1.1.md            <- Aegean Science License 1.1: non-commercial research
 │   ├── CATALOG.md            <- Which license to use, what each grants, remaining gaps
 │   ├── RESTRICTED-NOTICE.md  <- All Rights Reserved notice for the restricted tier
 │   ├── PRIVACY.md            <- KVKK Article 10 privacy notice (Turkish controls)
@@ -191,4 +194,4 @@ aegean-licensing/
 
 ## 📜 License
 
-Free for personal use under the Aegean License 1.0; see [LICENSE](LICENSE). Any commercial use needs the Aegean Commercial License 1.0; see [COMMERCIAL.md](COMMERCIAL.md). Any version of this repository already released under GNU AGPL-3.0 keeps that license.
+Free for personal use under the Aegean License 1.1; see [LICENSE](LICENSE). Any commercial use needs the Aegean Commercial License 1.0; see [COMMERCIAL.md](COMMERCIAL.md). Any version of this repository already released under GNU AGPL-3.0 keeps that license.
