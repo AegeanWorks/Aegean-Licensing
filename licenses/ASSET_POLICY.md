@@ -41,7 +41,7 @@ are **not** licensed by AGL-1.1 unless the `LICENSE` names them or the project's
 lists them. An asset manifest is a file the README names, normally `ASSETS.md`, with one row per
 asset set and its license. Unlisted assets remain proprietary: they may be used only as part of
 playing the Covered Game, and may not be extracted, redistributed or included in a mod without a
-grant. Commercial use of any asset needs a dedicated written asset grant; ACL-1.0 covers code and
+grant (see `commercial/GAME-ASSET-ADDENDUM-DRAFT.md`); ACL-1.0 covers code and
 logic only.
 
 #### 2.4 Research Data and Model Weights
@@ -49,8 +49,8 @@ Datasets, annotations and model weights in a research repository are **Project D
 the project owns them or may sublicense them and lists them in its LICENSE or asset manifest.
 Third-party datasets keep their own licenses. ASL-1.1 permits non-commercial research use of
 Project Data; commercial use, redistribution as a standalone dataset, and commercial model
-training need a dedicated data/weights grant. Personal data must have a lawful basis and a
-dataset-specific notice; ASL-1.1 does not grant one.
+training need a dedicated data/weights grant (see `commercial/DATA-WEIGHTS-ADDENDUM-DRAFT.md`).
+Personal data must have a lawful basis and a dataset-specific notice; ASL-1.1 does not grant one.
 
 #### 2.5 Asset Manifests
 A project that licenses assets or data should include an asset manifest named in its README. Each

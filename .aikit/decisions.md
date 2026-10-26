@@ -196,3 +196,27 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Decision**: Publish AL-1.1, AGL-1.1 and ASL-1.1 beside the 1.0 texts. AL-1.1 adds Section 12.1 security research, third-party-component language, moral rights, data-protection/consumer-law and a GPL/AGPL compatibility statement. AGL-1.1 adds the same security-research permission to its no-circumvention clause. ASL-1.1 adds research-integrity language. The 1.0 files remain for Versions released under them; the root LICENSE, package metadata, README, catalog, asset policy and AIKit pins move to 1.1. ACL-1.0 is unchanged because commercial terms did not change.
 - **Consequences**: Existing projects remain on 1.0 until the owner applies `--set`, which writes 1.1; new projects start on 1.1. The two versions are both pinned and both recognized. A project cannot silently upgrade via `publish --license auto`; the upgrade is reported and requires an explicit `--set`. The family remains source-available, not OSI open source, and is not GPL/AGPL compatible.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (claims checked against external licenses), PRINCIPLE-005 (catalog and README name the current text), PRINCIPLE-016 (consecutive ADR register) and PRINCIPLE-019 (no personal data added).
+
+### ADR-023: Legal Review Checklist and Archived Drafts
+- **Date**: 2026-10-26
+- **Status**: Accepted
+- **Context**: The license family has operative 1.1 texts plus older AL-PU, AECL and commercial-template drafts in the same directory. The catalog said counsel review was pending but gave a reviewer no hand-off. That makes it too easy to copy a superseded draft or treat an unreviewed text as release-ready.
+- **Decision**: Add `licenses/LEGAL-REVIEW-CHECKLIST.md` as the counsel hand-off, covering precedence, grants, game/science/commercial terms, assets/data, consumer/privacy, trade controls and operability. The catalog names the archived drafts (`AL-PU-1.0-DRAFT.md`, `AECL-1.0.md`, `COMMERCIAL-LICENSE-TEMPLATE-DRAFT.md`) as non-operative history and links the checklist. The checklist is explicitly not legal advice; a version is release-ready only after counsel signs the applicable items.
+- **Consequences**: The remaining legal gap is now a reviewable checklist instead of an implicit promise. Archived drafts stay available for history but cannot be mistaken for current terms. The checklist must be maintained when a license version changes.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-005 (living documentation), PRINCIPLE-016 (ADR register and synchronized docs) and PRINCIPLE-019 (no personal data added).
+
+### ADR-024: Remaining Governance Instruments Are Drafted
+- **Date**: 2026-10-26
+- **Status**: Accepted
+- **Context**: The catalog listed seven missing instruments: trademark, game asset-pack, data/model weights, security, support, provenance, OpenRAIL and dual licensing. Leaving them as prose gaps made every commercial conversation start from a blank page.
+- **Decision**: Add `licenses/TRADEMARK-POLICY.md`, `licenses/commercial/GAME-ASSET-ADDENDUM-DRAFT.md`, `licenses/commercial/DATA-WEIGHTS-ADDENDUM-DRAFT.md`, `licenses/OPENRAIL-ATTACHMENT-DRAFT.md`, `policies/SECURITY-DISCLOSURE.md`, `policies/SUPPORT-POLICY.md`, `policies/PROVENANCE-POLICY.md` and `policies/DUAL-LICENSE-POLICY.md`. The catalog links them, marks the commercial and OpenRAIL attachments as drafts that bind only when named in an Order Form or project LICENSE, and leaves counsel review as the remaining gate. The ops `template` command can emit each document.
+- **Consequences**: Commercial and research conversations have a concrete starting exhibit; a draft is still not operative, and a permissive/GPL-compatible grant still needs a signed writing. The catalog now distinguishes drafted from missing, and a future review can approve or reject each instrument explicitly.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-005 (living documentation), PRINCIPLE-016 (ADR register and synchronized docs) and PRINCIPLE-019 (no personal data added).
+
+### ADR-025: Permissive Grant and Security SLA Templates
+- **Date**: 2026-10-26
+- **Status**: Accepted
+- **Context**: The dual-license policy allowed a written MIT/Apache-2.0 grant, but no template, and the support policy allowed a security SLA only in an Order Form, with no exhibit. Both gaps forced every request to start from a blank page.
+- **Decision**: Add `licenses/commercial/PERMISSIVE-GRANT-TEMPLATE.md` and `licenses/commercial/SECURITY-SLA-EXHIBIT-DRAFT.md`; link them from the catalog and expose them as ops template kinds. Both are drafts that bind only when signed as part of a grant or Order Form.
+- **Consequences**: A permissive/GPL-compatible request and a commercial security commitment now have a reviewable starting text. A template is not a grant or an SLA; the signature, scope and fee remain deliberate.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-005 (living documentation), PRINCIPLE-016 (ADR register and synchronized docs) and PRINCIPLE-019 (no personal data added).

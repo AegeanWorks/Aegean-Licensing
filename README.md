@@ -149,7 +149,11 @@ aegean-licensing/
 │   └── codebase_map.md
 ├── policies/                 <- Licensing and governance policies
 │   ├── BACKWARD-COMPATIBILITY-DRAFT.md <- Older versions and non-retroactivity policy
-│   └── PORTFOLIO-MIGRATION-PLAN.md     <- Project-by-project migration roadmap
+│   ├── PORTFOLIO-MIGRATION-PLAN.md     <- Project-by-project migration roadmap
+│   ├── SECURITY-DISCLOSURE.md          <- Vulnerability reporting and safe harbour
+│   ├── SUPPORT-POLICY.md               <- Free-tier and commercial support expectations
+│   ├── PROVENANCE-POLICY.md            <- Asset and data rights evidence
+│   └── DUAL-LICENSE-POLICY.md          <- Written permissive/GPL-compatible grants
 ├── licenses/                 <- Canonical legal agreements & policies
 │   ├── ACL-1.0.md            <- Full binding Aegean Commercial License agreement
 │   ├── issued.json           <- Public register of issued certificates (no personal data)
@@ -161,6 +165,9 @@ aegean-licensing/
 │   ├── ASL-1.0.md            <- Archived: grants for Versions released under 1.0
 │   ├── ASL-1.1.md            <- Aegean Science License 1.1: non-commercial research
 │   ├── CATALOG.md            <- Which license to use, what each grants, remaining gaps
+│   ├── LEGAL-REVIEW-CHECKLIST.md <- Counsel review hand-off before first paid issuance
+│   ├── TRADEMARK-POLICY.md     <- Names, badges and nominative use
+│   ├── OPENRAIL-ATTACHMENT-DRAFT.md <- Optional use-restriction attachment
 │   ├── RESTRICTED-NOTICE.md  <- All Rights Reserved notice for the restricted tier
 │   ├── PRIVACY.md            <- KVKK Article 10 privacy notice (Turkish controls)
 │   ├── ASSET_POLICY.md       <- Delineation between source code and creative/domain assets
@@ -168,6 +175,10 @@ aegean-licensing/
 │   ├── CONTRIBUTING_CLA.md   <- Contributor License Agreement: relicensing and patent rights
 │   ├── DUAL_LICENSE_NOTICE.txt <- Standard repo and file header notice
 │   └── commercial/
+│       ├── GAME-ASSET-ADDENDUM-DRAFT.md <- Commercial art/audio grant (draft)
+│       ├── DATA-WEIGHTS-ADDENDUM-DRAFT.md <- Commercial data/weights grant (draft)
+│       ├── PERMISSIVE-GRANT-TEMPLATE.md <- Named MIT/Apache-2.0 grant (draft)
+│       ├── SECURITY-SLA-EXHIBIT-DRAFT.md <- Optional commercial response SLA
 │       └── COMMERCIAL-LICENSE-TEMPLATE-DRAFT.md <- Commercial agreement draft placeholder
 ├── aegean_licensing/         <- Verification package (pure standard library; issuing is private)
 │   ├── __init__.py
