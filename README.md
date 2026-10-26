@@ -153,6 +153,7 @@ aegean-licensing/
 │   ├── SECURITY-DISCLOSURE.md          <- Vulnerability reporting and safe harbour
 │   ├── SUPPORT-POLICY.md               <- Free-tier and commercial support expectations
 │   ├── PROVENANCE-POLICY.md            <- Asset and data rights evidence
+│   ├── SPDX-REUSE-POLICY.md            <- Machine-readable license metadata
 │   └── DUAL-LICENSE-POLICY.md          <- Written permissive/GPL-compatible grants
 ├── licenses/                 <- Canonical legal agreements & policies
 │   ├── ACL-1.0.md            <- Full binding Aegean Commercial License agreement

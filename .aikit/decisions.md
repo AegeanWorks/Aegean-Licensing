@@ -220,3 +220,11 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Decision**: Add `licenses/commercial/PERMISSIVE-GRANT-TEMPLATE.md` and `licenses/commercial/SECURITY-SLA-EXHIBIT-DRAFT.md`; link them from the catalog and expose them as ops template kinds. Both are drafts that bind only when signed as part of a grant or Order Form.
 - **Consequences**: A permissive/GPL-compatible request and a commercial security commitment now have a reviewable starting text. A template is not a grant or an SLA; the signature, scope and fee remain deliberate.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-005 (living documentation), PRINCIPLE-016 (ADR register and synchronized docs) and PRINCIPLE-019 (no personal data added).
+
+### ADR-026: SPDX and REUSE Policy
+- **Date**: 2026-10-26
+- **Status**: Accepted
+- **Context**: The family uses custom `LicenseRef-*` identifiers. Without a manifest and a policy, a scanner cannot resolve the license text, and a project that mixes third-party files has no stated rule for per-file identifiers.
+- **Decision**: Add `policies/SPDX-REUSE-POLICY.md` with the identifier table, the generated `REUSE.toml` and `LICENSES/` convention, per-file header rules, third-party handling and `reuse lint` verification. The catalog links it, and AIKit seeds the metadata for new projects.
+- **Consequences**: The machine-readable gap has a concrete baseline and an external verifier. Custom identifiers remain unrecognised by tools that only know the SPDX License List, and this policy is not legal advice.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-005 (living docs) and PRINCIPLE-016 (docs and code together).
