@@ -51,8 +51,9 @@ A verifier should return the first applicable status:
 2. `TAMPERED` — `digest` is missing.
 3. `INVALID_FORMAT` — a field has the wrong JSON type: `projects` is not a string or a list of
    strings, `allowances` is not a string or a list of strings, `expires_at` is neither a string nor
-   null, or `is_perpetual` is not a boolean. These checks come before canonicalization because a
-   mixed list cannot be sorted safely.
+   null, `is_perpetual` is not a boolean, or an explicitly present `license_type` is not a non-empty
+   string. These checks come before canonicalization because a mixed list cannot be sorted safely.
+   A missing `license_type` defaults to `ACL-1.0` for compatibility with the data model.
 4. `TAMPERED` — `digest` does not equal the computed digest.
 5. `INVALID_FORMAT` — `serial` is not exactly 64 lowercase hexadecimal characters.
 6. `INVALID_FORMAT` — the license type is unknown, the tier is not defined by that agreement, an

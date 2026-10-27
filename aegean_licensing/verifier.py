@@ -22,6 +22,7 @@ from aegean_licensing.license_terms import resolve_license, terms_digest
 from aegean_licensing.register import STATUS_REVOKED, load_register
 
 _SERIAL = re.compile(rf"[0-9a-f]{{{SERIAL_HEX_LENGTH}}}")
+_ISO_DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
 
 
 @dataclasses.dataclass(frozen=True)
@@ -67,6 +68,10 @@ def _type_error(data: Dict[str, Any]) -> Optional[str]:
         return "'expires_at' must be a string or null."
     if "is_perpetual" in data and not isinstance(data["is_perpetual"], bool):
         return "'is_perpetual' must be a boolean."
+    if "license_type" in data and (
+        not isinstance(data["license_type"], str) or not data["license_type"].strip()
+    ):
+        return "'license_type' must be a non-empty string."
     return None
 
 
@@ -287,6 +292,8 @@ def verify_certificate(
     if not cert.is_perpetual and cert.expires_at:
         ref_str = reference_date or datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
         try:
+            if not _ISO_DATE.fullmatch(cert.expires_at) or not _ISO_DATE.fullmatch(ref_str):
+                raise ValueError("dates must use YYYY-MM-DD")
             exp_date = datetime.date.fromisoformat(cert.expires_at)
             ref_date = datetime.date.fromisoformat(ref_str)
             if ref_date > exp_date:

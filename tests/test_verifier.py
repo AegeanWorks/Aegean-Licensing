@@ -222,6 +222,7 @@ class TestVerifier(unittest.TestCase):
             "allowances": 5,
             "expires_at": ["2027-01-01"],
             "is_perpetual": "false",
+            "license_type": "",
         }
         for field, value in cases.items():
             with self.subTest(field=field):
@@ -240,6 +241,22 @@ class TestVerifier(unittest.TestCase):
         data["digest"] = "0" * 64
         data["signature"] = ""
         result = verify_certificate(data, check_project="NeuroCore")
+        self.assertFalse(result.is_valid)
+        self.assertEqual(result.status, "INVALID_FORMAT")
+
+    def test_missing_projects_defaults_to_every_project(self):
+        data = self._payload()
+        data.pop("projects", None)
+        data["digest"] = compute_digest(data)
+        data["signature"] = ""
+        result = verify_certificate(data, check_project="NeuroCore")
+        self.assertTrue(result.is_valid, result.reasons)
+
+    def test_a_non_hyphenated_expiry_is_invalid(self):
+        data = self._payload(is_perpetual=False, expires_at="20260101")
+        data["digest"] = compute_digest(data)
+        data["signature"] = ""
+        result = verify_certificate(data)
         self.assertFalse(result.is_valid)
         self.assertEqual(result.status, "INVALID_FORMAT")
 
