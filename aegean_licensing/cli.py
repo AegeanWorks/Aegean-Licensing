@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+from pathlib import Path
 from typing import Optional, Sequence
 
 from aegean_licensing import __version__
@@ -36,6 +37,9 @@ def _build_parser() -> argparse.ArgumentParser:
 
 def _handle_verify(args: argparse.Namespace) -> int:
     # The signature is checked only by AegeanWorks' private `aegean-ops verify` (ADR-018).
+    if args.register and not Path(args.register).is_file():
+        print(f"Error: register file not found: {args.register}", file=sys.stderr)
+        return 1
     result = verify_certificate(
         target=args.path,
         check_project=args.project,

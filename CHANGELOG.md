@@ -45,3 +45,4 @@ All notable changes to Aegean Licensing documents are recorded here.
 - Added backward-compatibility policy for versioned licenses and older releases.
 - Clarified that older versions newly distributed by the rights holder may use current terms only where legally authorized and expressly reissued under those terms.
 - Clarified that valid earlier grants, including AGPL-3.0, cannot be retroactively revoked by this policy.
+- **Verifier parity**: an explicitly empty `license_type` and a non-hyphenated `expires_at` are now `INVALID_FORMAT` in both the Python reference and the browser verifier; a missing `projects` list defaults to `*` in both; an explicit `--register` path that does not exist is an error instead of `UNREGISTERED`; register digests must be lowercase and register text fields must be strings (ADR-029).

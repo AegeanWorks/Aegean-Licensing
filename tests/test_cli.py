@@ -66,6 +66,16 @@ class TestCLI(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("UNREGISTERED", out)
 
+    def test_an_explicitly_missing_register_is_an_error(self):
+        cert = issue_certificate(licensee_name="Missing", licensee_contact="m@example.com")
+        missing = self.temp_dir / "absent.json"
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = main(["verify", str(self.write_cert(cert)), "--register", str(missing)])
+        self.assertEqual(code, 1)
+        self.assertIn("register file not found", err.getvalue())
+        self.assertNotIn("UNREGISTERED", out.getvalue())
+
     def test_the_public_cli_has_no_signing_key_option(self):
         # The HMAC check needs AegeanWorks' secret, so it lives in `aegean-ops verify` (ADR-018).
         for option in ("--key", "--key-file"):

@@ -9,8 +9,8 @@
 - **Total Python Modules**: `19`
 - **Total Classes**: `15`
 - **Total Top-Level Functions**: `27`
-- **Total Class Methods**: `71`
-- **Total Source Lines**: `1746`
+- **Total Class Methods**: `72`
+- **Total Source Lines**: `1760`
 
 ---
 
@@ -64,7 +64,7 @@
 ### [`aegean_licensing/cli.py`](aegean_licensing/cli.py)
 > *Aegean License Certificate verification command line (`aegean-license verify`).*
 
-**Size**: `91` lines (`3752` bytes)
+**Size**: `95` lines (`3937` bytes)
 
 **Functions:**
 - `def _build_parser()`
@@ -186,7 +186,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for the public verification command line.*
 
-**Size**: `78` lines (`3249` bytes)
+**Size**: `88` lines (`3828` bytes)
 
 **Classes:**
 - `class TestCLI` - *The public CLI verifies; issuing and revoking are private (ADR-017).*
@@ -197,6 +197,7 @@
   - Method `.test_only_verify_is_public()`
   - Method `.test_verify_against_the_register()`
   - Method `.test_unregistered_certificate_fails_with_the_register()`
+  - Method `.test_an_explicitly_missing_register_is_an_error()`
   - Method `.test_the_public_cli_has_no_signing_key_option()`
 
 ---
