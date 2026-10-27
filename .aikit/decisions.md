@@ -252,3 +252,27 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Decision**: Make the reference and browser agree: reject an explicitly empty `license_type` and a non-hyphenated expiry, default missing `projects` to `*`, require lowercase register digests and string register fields, and fail the CLI with a clear error when an explicitly supplied register file is missing. Add Python and Node tests for each case. Keep `load_register`'s documented empty result for callers that create a new register; the CLI guard is at the verifier boundary.
 - **Consequences**: The same certificate now receives the same status in both implementations, and a mistyped register path cannot be mistaken for a valid empty register. The register format, certificate format and operator tooling are unchanged.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (platform parity) and PRINCIPLE-014 (regression coverage).
+
+### ADR-030: Bound Canonical Numbers and Escape U+007F Across Runtimes
+- **Date**: 2026-10-27
+- **Status**: Accepted
+- **Context**: A differential test between the Python reference and the browser verifier found three payloads with different canonical bytes: an integral float `1.0` serialized as `1.0` in Python and `1` in JavaScript; an integer above 2^53 lost precision in JavaScript; and U+007F was escaped as `\u007f` in Python but emitted raw in JavaScript. A verifier that computes a different digest cannot be trusted for those payloads.
+- **Decision**: Normalize integral JSON numbers to safe integers and refuse fractional, non-finite or out-of-range numbers in Python; require `Number.isSafeInteger` in JavaScript; escape U+007F in the browser quote function; add numeric, U+007F and nested-key probes to `licenses/verification-vector.json`; document the numeric domain in `licenses/VERIFICATION.md`. Both sides reject an out-of-domain payload as `INVALID_FORMAT`.
+- **Consequences**: The same JSON value now produces the same canonical bytes in both implementations. Every issued certificate contains only the integer `format` and strings, so existing certificates are unchanged; the conformance vector digest changed because the fixture gained the new probes.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (platform parity) and PRINCIPLE-014 (regression coverage).
+
+### ADR-031: A Missing Register Path Is a Verification Error
+- **Date**: 2026-10-27
+- **Status**: Accepted
+- **Context**: `load_register` returns `{}` for a missing path so a writer can create a new register. `verify_certificate` reused that result, so an explicit `--register` path that pointed nowhere was reported as `UNREGISTERED`, which the specification calls an error. The CLI had a pre-check, but library callers did not.
+- **Decision**: Check that an explicitly supplied register path is a file before loading it; a missing path returns `INVALID_FORMAT` with a clear reason. Keep `load_register`'s empty result for register creation and keep the CLI pre-check for its clearer message. Add a library regression test and update the ops tests to use an empty register file when they mean an empty register.
+- **Consequences**: A mistyped path cannot be mistaken for a valid empty register. An empty register file still means no ids are listed, so `UNREGISTERED` remains meaningful.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (strict claims) and PRINCIPLE-011 (actionable errors).
+
+### ADR-032: Check the Certificate Scope Against the Agreement
+- **Date**: 2026-10-27
+- **Status**: Accepted
+- **Context**: Issuance normalizes the scope through the agreement's vocabulary, but both public verifiers checked only the tier and allowances. A certificate carrying an out-of-vocabulary scope could therefore verify, and the website parsed `scopes` without ever using it.
+- **Decision**: Reject a non-empty `scope` that is not in the resolved agreement's `scopes` list in both the Python reference and the browser verifier, ahead of the signature and register checks, exactly like a tier. Publish the check in `licenses/VERIFICATION.md` and pin it in both suites.
+- **Consequences**: Verification now fails closed on a scope the agreement does not define. Issued certificates are unchanged because their scopes already come from the same vocabulary.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (strict claims) and PRINCIPLE-014 (regression coverage).

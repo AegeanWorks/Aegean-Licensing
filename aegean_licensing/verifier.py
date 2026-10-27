@@ -99,7 +99,7 @@ def verify_certificate(
                 reasons=(f"Certificate file does not exist: {file_path}",),
             )
         try:
-            with open(file_path, "r", encoding="utf-8") as f:
+            with open(file_path, "r", encoding="utf-8-sig") as f:
                 data = json.load(f)
         except Exception as exc:
             return VerificationResult(
@@ -203,6 +203,17 @@ def verify_certificate(
                 reasons=tuple(reasons),
                 cert=cert,
             )
+        if cert.scope and cert.scope not in terms.scopes:
+            reasons.append(
+                f"Scope '{cert.scope}' is not defined by {terms.key}; "
+                f"allowed: {', '.join(terms.scopes)}."
+            )
+            return VerificationResult(
+                is_valid=False,
+                status="INVALID_FORMAT",
+                reasons=tuple(reasons),
+                cert=cert,
+            )
         unknown = [a for a in cert.allowances if a not in terms.allowances]
         if unknown:
             reasons.append(f"Allowances {unknown} are not defined by {terms.key}.")
@@ -254,8 +265,15 @@ def verify_certificate(
     # 4b. Public register: issued by AegeanWorks, and not revoked (ADR-013)
     registered = False
     if register_path is not None:
+        register_file = Path(register_path)
+        if not register_file.is_file():
+            reasons.append(
+                f"Cannot read the certificate register: {register_file} does not exist."
+            )
+            return VerificationResult(is_valid=False, status="INVALID_FORMAT",
+                                      reasons=tuple(reasons), cert=cert)
         try:
-            entry = load_register(register_path).get(cert.cert_id)
+            entry = load_register(register_file).get(cert.cert_id)
         except (OSError, ValueError) as exc:
             reasons.append(f"Cannot read the certificate register: {exc}")
             return VerificationResult(is_valid=False, status="INVALID_FORMAT",

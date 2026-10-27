@@ -30,7 +30,13 @@ Starting from the parsed certificate object:
    ```
 
    This is the byte sequence a JavaScript implementation must reproduce, including
-   escaping of non-ASCII text such as `ı`, `ü` and `—`.
+   escaping of non-ASCII text such as `ı`, `ü` and `—`, and of the C0 controls and
+   U+007F as lowercase `\uXXXX`.
+4. Numbers must be integers in the range `-(2^53-1)` to `2^53-1`, the exact range of
+   both Python and JavaScript. An integral JSON number such as `2.0` is normalized
+   to `2`; a fractional number, a non-finite value or an out-of-range integer is
+   refused as `INVALID_FORMAT`. Every certificate issued by AegeanWorks satisfies
+   this because it contains no numeric fields other than the format.
 
 ## Digest
 
@@ -54,19 +60,21 @@ A verifier should return the first applicable status:
    null, `is_perpetual` is not a boolean, or an explicitly present `license_type` is not a non-empty
    string. These checks come before canonicalization because a mixed list cannot be sorted safely.
    A missing `license_type` defaults to `ACL-1.0` for compatibility with the data model.
-4. `TAMPERED` — `digest` does not equal the computed digest.
-5. `INVALID_FORMAT` — `serial` is not exactly 64 lowercase hexadecimal characters.
-6. `INVALID_FORMAT` — the license type is unknown, the tier is not defined by that agreement, an
-   allowance is not in the agreement vocabulary, or a non-empty `terms_digest` does not match the
-   published agreement text.
-7. `UNREGISTERED` — the id is absent from the register, or the register's digest for that id
+4. `INVALID_FORMAT` — canonicalization refuses a fractional number, a non-finite value or an
+   integer outside the safe range.
+5. `TAMPERED` — `digest` does not equal the computed digest.
+6. `INVALID_FORMAT` — `serial` is not exactly 64 lowercase hexadecimal characters.
+7. `INVALID_FORMAT` — the license type is unknown, the scope or tier is not defined by that
+   agreement, an allowance is not in the agreement vocabulary, or a non-empty `terms_digest` does
+   not match the published agreement text.
+8. `UNREGISTERED` — the id is absent from the register, or the register's digest for that id
    differs from the certificate digest.
-8. `REVOKED` — the register lists the id as revoked.
-9. `INVALID_FORMAT` — a perpetual certificate has `expires_at`, or a term-limited certificate has
+9. `REVOKED` — the register lists the id as revoked.
+10. `INVALID_FORMAT` — a perpetual certificate has `expires_at`, or a term-limited certificate has
    no `expires_at`, or a date is not a real `YYYY-MM-DD` date.
-10. `EXPIRED` — the reference date is after `expires_at`.
-11. `SCOPE_MISMATCH` — a project was requested and is not in `projects` (`*` covers every project).
-12. `VALID` — all checks passed and the register entry is valid.
+11. `EXPIRED` — the reference date is after `expires_at`.
+12. `SCOPE_MISMATCH` — a project was requested and is not in `projects` (`*` covers every project).
+13. `VALID` — all checks passed and the register entry is valid.
 
 The public verifier must use the register copy from this repository, not a copy
 supplied alongside a certificate. A missing, unreadable or malformed register is
@@ -82,13 +90,14 @@ private operations tooling, which requires both the register and the signing key
 [`licenses/verification-vector.json`](verification-vector.json) is a **fixture, not
 an issued certificate**. It pins canonicalization, escaping and the domain prefix:
 
-- expected digest: `855969a9506d23f8f5e0553a63f61f277329018bfc7c8d7fb1c40fba6eda52ff`
+- expected digest: `9b645ad0147bd84d5d89d83d9d5b7c19337c9e4f2757ddd728b6267b509944d7`
 - certificate id: `conformance-vector-0001`
 - it is deliberately absent from the public register
 
-Its fields include Turkish characters, an em dash, a quote, an escaped newline and
-unsorted project names, so a verifier that differs on `ensure_ascii`, key sorting
-or project sorting fails the vector. The Python test is
+Its fields include Turkish characters, an em dash, a quote, an escaped newline,
+unsorted project names, an integral float (`1.0`), U+007F and a nested object, so a
+verifier that differs on `ensure_ascii`, escaping, numeric normalization, nested key
+sorting or project sorting fails the vector. The Python test is
 `tests/test_verification_spec.py`; the website's Node test uses the same vector.
 
 ## Handling untrusted input

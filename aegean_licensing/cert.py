@@ -6,7 +6,11 @@ import dataclasses
 import hashlib
 import hmac
 import json
+import math
 from typing import Any, Dict, List, Optional
+
+# The largest integer every supported JSON runtime represents exactly.
+MAX_SAFE_INTEGER = 2 ** 53 - 1
 
 # Format 2 (ADR-018): every certificate carries `format` and a random 256-bit `serial`, and its
 # digest and signature hash the payload under their own domain prefixes, so no format-1
@@ -54,6 +58,33 @@ class LicenseCertificate:
         object.__setattr__(self, "allowances", tuple(sorted(self.allowances)))
 
 
+def _canonical_value(value: Any) -> Any:
+    """Normalize a JSON value to the intersection of Python and JavaScript exact values."""
+    if value is None or isinstance(value, (str, bool)):
+        return value
+    if isinstance(value, int):
+        if abs(value) > MAX_SAFE_INTEGER:
+            raise ValueError(
+                f"JSON integer {value} is outside the safe range ±{MAX_SAFE_INTEGER}."
+            )
+        return value
+    if isinstance(value, float):
+        if not math.isfinite(value) or not value.is_integer():
+            raise ValueError("JSON numbers must be integers; fractional numbers are not portable.")
+        if abs(value) > MAX_SAFE_INTEGER:
+            raise ValueError(
+                f"JSON number {value} is outside the safe range ±{MAX_SAFE_INTEGER}."
+            )
+        return int(value)
+    if isinstance(value, (list, tuple)):
+        return [_canonical_value(item) for item in value]
+    if isinstance(value, dict):
+        if not all(isinstance(key, str) for key in value):
+            raise ValueError("JSON object keys must be strings.")
+        return {key: _canonical_value(item) for key, item in value.items()}
+    raise ValueError(f"Unsupported JSON value type: {type(value).__name__}.")
+
+
 def compute_canonical_payload(data: Dict[str, Any]) -> bytes:
     """Serialize dictionary excluding digest and signature into deterministic UTF-8 bytes."""
     filtered = {
@@ -63,7 +94,9 @@ def compute_canonical_payload(data: Dict[str, Any]) -> bytes:
     # Ensure lists/tuples are sorted if appropriate or consistently ordered
     if "projects" in filtered and isinstance(filtered["projects"], (list, tuple)):
         filtered["projects"] = sorted(list(filtered["projects"]))
-    return json.dumps(filtered, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("utf-8")
+    normalized = _canonical_value(filtered)
+    return json.dumps(normalized, sort_keys=True, separators=(",", ":"),
+                      ensure_ascii=True, allow_nan=False).encode("utf-8")
 
 
 def compute_digest(data: Dict[str, Any]) -> str:

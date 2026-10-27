@@ -96,6 +96,16 @@ class TestRegister(unittest.TestCase):
     def test_a_missing_register_is_empty(self):
         self.assertEqual(load_register(self.temp_dir / "absent.json"), {})
 
+    def test_verifying_against_a_missing_register_is_an_error(self):
+        # load_register() returns {} so a writer can create a register; a verifier that was given
+        # a path must not treat a mistyped path as an empty register and call every id unregistered.
+        result = verify_certificate(
+            cert_to_dict(self.issue()), register_path=self.temp_dir / "absent.json"
+        )
+        self.assertFalse(result.is_valid)
+        self.assertEqual(result.status, "INVALID_FORMAT")
+        self.assertIn("does not exist", result.reasons[0])
+
 
 class TestAllowances(unittest.TestCase):
     """ACL-1.0 exceptions are checked certificate data (ADR-014)."""

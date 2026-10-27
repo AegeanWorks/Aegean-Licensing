@@ -83,6 +83,17 @@ class TestVerifier(unittest.TestCase):
         self.assertTrue(res.is_valid)
         self.assertEqual(res.status, "VALID_UNVERIFIED")
 
+    def test_a_utf8_bom_file_is_read(self):
+        cert = issue_certificate(
+            licensee_name="BOM Corp",
+            licensee_contact="bom@example.com",
+            cert_id="file-cert-bom",
+        )
+        cert_file = Path(self.temp_dir) / "license_certificate_file-cert-bom.json"
+        cert_file.write_bytes(b"\xef\xbb\xbf" + json.dumps(cert_to_dict(cert)).encode("utf-8"))
+        res = verify_certificate(cert_file)
+        self.assertTrue(res.is_valid, res.reasons)
+
     def test_a_json_file_that_is_not_an_object_is_invalid_not_a_crash(self):
         # A JSON array used to reach data.get("format") and raise AttributeError, so a malformed
         # file crashed the verifier instead of reporting INVALID_FORMAT.
@@ -259,6 +270,15 @@ class TestVerifier(unittest.TestCase):
         result = verify_certificate(data)
         self.assertFalse(result.is_valid)
         self.assertEqual(result.status, "INVALID_FORMAT")
+
+    def test_an_unknown_scope_is_invalid(self):
+        data = self._payload(scope="unlimited-global")
+        data["digest"] = compute_digest(data)
+        data["signature"] = ""
+        result = verify_certificate(data)
+        self.assertFalse(result.is_valid)
+        self.assertEqual(result.status, "INVALID_FORMAT")
+        self.assertIn("Scope", result.reasons[0])
 
 
 class TestCertificateFormat(unittest.TestCase):

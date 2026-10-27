@@ -8,9 +8,9 @@
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `19`
 - **Total Classes**: `15`
-- **Total Top-Level Functions**: `27`
-- **Total Class Methods**: `72`
-- **Total Source Lines**: `1760`
+- **Total Top-Level Functions**: `28`
+- **Total Class Methods**: `77`
+- **Total Source Lines**: `1863`
 
 ---
 
@@ -44,13 +44,14 @@
 ### [`aegean_licensing/cert.py`](aegean_licensing/cert.py)
 > *License Certificate Data Model and Cryptographic Hashing.*
 
-**Size**: `140` lines (`5604` bytes)
+**Size**: `173` lines (`7047` bytes)
 
 **Classes:**
 - `class LicenseCertificate` - *Immutable data transfer object representing a granted commercial license.*
   - Method `.__post_init__()`
 
 **Functions:**
+- `def _canonical_value(value)` - *Normalize a JSON value to the intersection of Python and JavaScript exact values.*
 - `def compute_canonical_payload(data)` - *Serialize dictionary excluding digest and signature into deterministic UTF-8 bytes.*
 - `def compute_digest(data)` - *SHA-256 of the format-2 digest domain and the canonical license payload.*
 - `def compute_signature(data, secret_key)` - *HMAC-SHA256 of the format-2 signature domain and the canonical payload, keyed by the licensor.*
@@ -111,7 +112,7 @@
 ### [`aegean_licensing/verifier.py`](aegean_licensing/verifier.py)
 > *Commercial License Certificate Verification Module.*
 
-**Size**: `339` lines (`13964` bytes)
+**Size**: `357` lines (`14755` bytes)
 
 **Classes:**
 - `class VerificationResult` - *Outcome of validating a License Grant Certificate.*
@@ -218,7 +219,7 @@
 ### [`tests/test_register.py`](tests/test_register.py)
 > *Unit tests for reading the public certificate register (ADR-013, ADR-017).*
 
-**Size**: `125` lines (`6193` bytes)
+**Size**: `135` lines (`6752` bytes)
 
 **Classes:**
 - `class TestRegister` - *The register is the public proof of issuance and revocation.*
@@ -231,6 +232,7 @@
   - Method `.test_an_unknown_status_is_refused_not_treated_as_valid()`
   - Method `.test_a_non_text_digest_is_refused_instead_of_crashing_compare_digest()`
   - Method `.test_a_missing_register_is_empty()`
+  - Method `.test_verifying_against_a_missing_register_is_an_error()`
 - `class TestAllowances` - *ACL-1.0 exceptions are checked certificate data (ADR-014).*
   - Method `.test_allowances_verify_and_tampering_is_caught()`
   - Method `.test_a_self_consistent_unknown_allowance_is_invalid()`
@@ -239,13 +241,15 @@
 ---
 
 ### [`tests/test_verification_spec.py`](tests/test_verification_spec.py)
-**Size**: `51` lines (`2067` bytes)
+**Size**: `73` lines (`3098` bytes)
 
 **Classes:**
 - `class VerificationSpecTests`
   - Method `.setUp()`
   - Method `.test_vector_digest_matches_the_python_canonicalization()`
   - Method `.test_vector_pins_non_ascii_and_projects_sorting()`
+  - Method `.test_ascii_escaping_matches_the_javascript_quote_function()`
+  - Method `.test_numbers_are_safe_integers_in_both_runtimes()`
   - Method `.test_vector_is_not_an_issued_certificate()`
   - Method `.test_vector_uses_the_format_two_contract()`
   - Method `.test_spec_names_the_digest_and_the_vector()`
@@ -255,7 +259,7 @@
 ### [`tests/test_verifier.py`](tests/test_verifier.py)
 > *Unit tests for commercial license certificate verifier.*
 
-**Size**: `299` lines (`12439` bytes)
+**Size**: `319` lines (`13298` bytes)
 
 **Classes:**
 - `class TestVerifier` - *Test certificate verification, tamper detection, terms, and scope checking.*
@@ -264,6 +268,7 @@
   - Method `.test_verify_signed_certificate_with_key_is_authentic()`
   - Method `.test_self_issued_forgery_passes_digest_but_is_not_authentic()`
   - Method `.test_verify_from_json_file()`
+  - Method `.test_a_utf8_bom_file_is_read()`
   - Method `.test_a_json_file_that_is_not_an_object_is_invalid_not_a_crash()`
   - Method `.test_verify_detects_tampered_digest()`
   - Method `.test_verify_detects_tampered_payload_field()`
@@ -280,6 +285,7 @@
   - Method `.test_project_scope_check_with_mixed_project_types_does_not_crash()`
   - Method `.test_missing_projects_defaults_to_every_project()`
   - Method `.test_a_non_hyphenated_expiry_is_invalid()`
+  - Method `.test_an_unknown_scope_is_invalid()`
 - `class TestCertificateFormat` - *Only format-2 certificates, each with a random 256-bit serial, verify (ADR-018).*
   - Method `.test_a_fresh_certificate_is_format_2_with_a_serial()`
   - Method `.test_a_format_1_certificate_is_rejected_even_when_self_consistent()`
