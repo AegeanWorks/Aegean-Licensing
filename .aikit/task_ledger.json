@@ -1,66 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "licensing-v4",
+    "task_id": "licensing-v5",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793081748.2024198,
+    "updated_at": 1793085942.314244,
     "owner": "kilo:main",
     "started_by": "kilo:main",
     "continuations": [],
-    "completed_at": 1793081763.6086447
+    "completed_at": 1793086107.012255
   },
   "checkpoints": [
-    {
-      "task_id": "licensing-automation",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/4] Re-plan round 3: (1) certificate allowances: controlled vocabulary in terms.json (ai-training, hosted-service), cert field, issue --allow, verifier check, markdown; (2) ACL-1.0: Competing Product definition (PolyForm Shield), personnel and contractors, end-user flow-down, ownership of modifications and feedback, tier eligibility changes, fees for use beyond scope, allowances, English-text-controls; AL-1.0 language clause; restricted notice confidentiality; re-pin; (3) order form and CLA fixes, FAQ data notice; remove dead operative_license_keys; (4) re-pin AIKit copies",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792954358.2708557,
-      "timestamp_str": "2026-10-25 21:52:38",
-      "agent": "claude-code:c74fca42",
-      "impact_assessment": {
-        "why": "User asked to keep analysing licenses and the whole repo and to strengthen from other licenses (PolyForm Shield, Prosperity, Sustainable Use License, commercial EULA practice)",
-        "benefits": "Exceptions become verifiable certificate data instead of free text; downstream users and contractors covered; growth past a tier handled; stale key-based verification text removed",
-        "risks": "contract: certificate gains allowances field (digest changes for new certs only, none issued); dependency: none; concurrency: none; state: terms.json gains allowances and new ACL sha256",
-        "mitigation": "Failing-first tests for allowances; ACL re-pinned before any issuance; nothing committed without user authorization"
-      }
-    },
-    {
-      "task_id": "licensing-automation",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[4/4] Allowances (terms.json vocabulary, issue --allow, verifier), ACL-1.0 Competing Product/Personnel/customers/modifications/tier/use-beyond/language, AL-1.0 language, restricted notice confidentiality, order form + CLA + FAQ fixes, dead operative_license_keys removed, ADR-014; 103 tests, 4/4 gates, CLI dogfooded; checklists: passed; uncommitted, awaiting user authorization",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792954673.8087878,
-      "timestamp_str": "2026-10-25 21:57:53",
-      "agent": "claude-code:c74fca42",
-      "handoff": {
-        "state": "uncommitted",
-        "next": "commit on user approval"
-      }
-    },
-    {
-      "task_id": "licensing-automation",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/3] Re-plan round 4: (1) AL-1.0 Section 4.3 company evaluation: 28 days, once per Your Company (all Personnel and affiliates share one), non-production, ends at ACL purchase; failing-first template test; summaries in COMMERCIAL.md, FAQ, notice, templates, AIKit COMMERCIAL.md; (2) licenses/PRIVACY.md: KVKK Art. 10 information notice (Turkish controls, English convenience) covering licensees, inquirers and CLA signers; linked from FAQ, COMMERCIAL.md, order form; (3) re-pin AIKit copies",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792954786.3308866,
-      "timestamp_str": "2026-10-25 21:59:46",
-      "agent": "claude-code:c74fca42",
-      "impact_assessment": {
-        "why": "User chose a 28-day company trial and a KVKK notice, and fixed the licensor name as AegeanWorks",
-        "benefits": "Companies can evaluate before buying; personal data processing disclosed as KVKK Art. 10 requires",
-        "risks": "contract: AL-1.0 grants a limited license to organizations for the first time; dependency: none; concurrency: none; state: none",
-        "mitigation": "Trial bounded by days, once-per-company, non-production and no third-party access; tests pin the wording"
-      }
-    },
     {
       "task_id": "licensing-automation",
       "phase": "phase 4",
@@ -300,6 +251,48 @@
       "status": "completed",
       "timestamp": 1793081763.608646,
       "timestamp_str": "2026-10-27 09:16:03",
+      "agent": "kilo:main"
+    },
+    {
+      "task_id": "licensing-v5",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Harden the public verifier against wrong-typed certificate fields and publish the matching check order",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793085890.1246083,
+      "timestamp_str": "2026-10-27 10:24:50",
+      "agent": "kilo:main",
+      "impact_assessment": {
+        "why": "The public package reads untrusted certificate JSON. Mixed-type projects or allowances, a list expiry or a string is_perpetual raised TypeError during canonicalization or dataclass construction instead of returning INVALID_FORMAT, while the website verifier returned INVALID_FORMAT, so the reference and the browser could disagree.",
+        "benefits": "Malformed certificates now return a structured INVALID_FORMAT with a reason, no input can crash the verifier, and the website and Python reference share one documented order.",
+        "risks": "contract: no change to valid format-2 certificates or the register; dependency: none; concurrency: none; state: none; compatibility: a malformed certificate now has a defined status instead of an exception",
+        "mitigation": "Tests cover every wrong-typed field and a mixed project list; the verification spec lists type checks before canonicalization; run all package and website parity tests."
+      }
+    },
+    {
+      "task_id": "licensing-v5",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[2/2] Wrong-typed fields now return INVALID_FORMAT before canonicalization; 57 tests and 4/4 gates pass. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793085942.314244,
+      "timestamp_str": "2026-10-27 10:25:42",
+      "agent": "kilo:main",
+      "handoff": {
+        "state": "the website verifier follows the same order",
+        "next": "commit and push"
+      }
+    },
+    {
+      "task_id": "licensing-v5",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'licensing-v5' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793086107.0122566,
+      "timestamp_str": "2026-10-27 10:28:27",
       "agent": "kilo:main"
     }
   ]
