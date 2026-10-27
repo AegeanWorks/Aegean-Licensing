@@ -1,59 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "licensing-v5",
+    "task_id": "licensing-v6",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793085942.314244,
+    "updated_at": 1793087778.5356507,
     "owner": "kilo:main",
     "started_by": "kilo:main",
     "continuations": [],
-    "completed_at": 1793086107.012255
+    "completed_at": 1793087805.1505692
   },
   "checkpoints": [
-    {
-      "task_id": "licensing-automation",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[3/3] AL-1.0 4.3 28-day once-per-company non-production evaluation; licenses/PRIVACY.md KVKK Art. 10 notice (TR controls, EN translation) + template privacy; summaries in COMMERCIAL.md, FAQ, notice, templates, README, order form, CI wheel check; guideline G-001 licensor AegeanWorks; ADR-015; 105 tests, 4/4 gates; checklists: passed; uncommitted, awaiting user authorization",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792955034.6631188,
-      "timestamp_str": "2026-10-25 22:03:54",
-      "agent": "claude-code:c74fca42",
-      "handoff": {
-        "state": "uncommitted",
-        "next": "commit on user approval"
-      }
-    },
-    {
-      "task_id": "licensing-automation",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/5] Re-plan round 5 (user chose split): (1) fixes so far kept: CLA commit status, author_association, CRLF notes, register robustness, string allowances, AIKit restricted push needs private remote; (2) new private AIKit project aegean-licensing-ops (restricted tier): issuer, register writes, auditor, templates, storage, sanitize, markdown, normalize helpers, CLI issue/revoke/audit/template + their tests, depends on public aegean_licensing; (3) public keeps cert model/digest, license_terms registry, register read, verifier, verify CLI, bundler; tests rebuilt on a test-only fixture; (4) docs, ADR-016/017, CHANGELOG; (5) gates, commit, push both public repos and create the private ops repo",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792955457.6578162,
-      "timestamp_str": "2026-10-25 22:10:57",
-      "agent": "claude-code:c74fca42",
-      "impact_assessment": {
-        "why": "User decided issuing and operations tooling should not be given to others, while buyers still verify certificates publicly",
-        "benefits": "Public repo exposes only what verification needs; operations stay private",
-        "risks": "contract: public CLI loses issue/revoke/audit/template; dependency: ops depends on aegean_licensing (editable install locally); concurrency: none; state: tool versions already pushed stay in public history",
-        "mitigation": "Ops tests prove issue-then-verify across both packages; public tests verify fixtures built with the public digest"
-      }
-    },
-    {
-      "task_id": "licensing-automation",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'licensing-automation' completed successfully.",
-      "status": "completed",
-      "timestamp": 1792955996.2463675,
-      "timestamp_str": "2026-10-25 22:19:56",
-      "agent": "claude-code:c74fca42"
-    },
     {
       "task_id": "certificate-format-2",
       "phase": "phase 4",
@@ -293,6 +251,48 @@
       "status": "completed",
       "timestamp": 1793086107.0122566,
       "timestamp_str": "2026-10-27 10:28:27",
+      "agent": "kilo:main"
+    },
+    {
+      "task_id": "licensing-v6",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Align the Python verifier with the browser on license_type, missing projects and strict dates",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793087766.7985783,
+      "timestamp_str": "2026-10-27 10:56:06",
+      "agent": "kilo:main",
+      "impact_assessment": {
+        "why": "The website verifier and the public Python reference must agree byte for byte and status for status; an empty license_type, a missing projects list and a non-hyphenated expiry could return different results.",
+        "benefits": "Both verifiers reject an explicitly empty license_type, default missing projects to *, and require hyphenated dates; the conformance vector and tests cover the shared contract.",
+        "risks": "contract: no change for valid format-2 certificates; dependency: none; concurrency: none; state: none; compatibility: a non-hyphenated expiry is now INVALID_FORMAT instead of being accepted",
+        "mitigation": "Pin each case in both Python and Node suites, update the public verification order, and run both gates."
+      }
+    },
+    {
+      "task_id": "licensing-v6",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[2/2] Python and browser verifiers now agree on license_type, missing projects and strict dates; 59 tests and 4/4 gates pass. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793087778.5356507,
+      "timestamp_str": "2026-10-27 10:56:18",
+      "agent": "kilo:main",
+      "handoff": {
+        "state": "the website Node suite carries 35 assertions",
+        "next": "commit, close the task and push"
+      }
+    },
+    {
+      "task_id": "licensing-v6",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'licensing-v6' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793087805.1505704,
+      "timestamp_str": "2026-10-27 10:56:45",
       "agent": "kilo:main"
     }
   ]
