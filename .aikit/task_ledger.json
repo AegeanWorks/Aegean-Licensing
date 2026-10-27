@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "licensing-v6",
+    "task_id": "licensing-v7",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793087778.5356507,
+    "updated_at": 1793088298.8130217,
     "owner": "kilo:main",
     "started_by": "kilo:main",
     "continuations": [],
-    "completed_at": 1793087805.1505692
+    "completed_at": 1793088376.0190406
   },
   "checkpoints": [
-    {
-      "task_id": "certificate-format-2",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Format 2: random 256-bit serial, domain-bound digest and signature, UNSUPPORTED_FORMAT for format 1, public CLI without key options; ADR-018; 47 tests; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792956805.6889565,
-      "timestamp_str": "2026-10-25 22:33:25",
-      "agent": "claude-code:c74fca42",
-      "impact_assessment": {
-        "why": "User asked that older certificates stop working and verification need both repos",
-        "benefits": "Old public issuer output never verifies",
-        "risks": "contract: certificate gains format and serial; public verify loses --key; dependency: none; concurrency: none; state: no certificate issued yet",
-        "mitigation": "Failing-first tests; ops verify carries the key check"
-      }
-    },
-    {
-      "task_id": "certificate-format-2",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'certificate-format-2' completed successfully.",
-      "status": "completed",
-      "timestamp": 1792956840.8090394,
-      "timestamp_str": "2026-10-25 22:34:00",
-      "agent": "claude-code:c74fca42"
-    },
-    {
-      "task_id": "verifier-non-object",
-      "phase": "planning",
-      "phase_num": 2,
-      "description": "[1/1] a certificate JSON file that holds a list, string, number or null is INVALID_FORMAT, never an AttributeError",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792960535.8683817,
-      "timestamp_str": "2026-10-25 23:35:35",
-      "agent": "kilo:main",
-      "impact_assessment": {
-        "why": "A malformed certificate file crashed verify_certificate before the format check",
-        "benefits": "A verifier that always reports a status, even for hostile input",
-        "risks": "contract: none (a crash became the existing INVALID_FORMAT error); dependency: none; concurrency: none; state: none",
-        "mitigation": "Failing-first test over four non-object JSON bodies"
-      }
-    },
     {
       "task_id": "verifier-non-object",
       "phase": "delivery",
@@ -293,6 +249,48 @@
       "status": "completed",
       "timestamp": 1793087805.1505704,
       "timestamp_str": "2026-10-27 10:56:45",
+      "agent": "kilo:main"
+    },
+    {
+      "task_id": "licensing-v7",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Remove the last reference/browser divergences and fail closed on a missing register",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793088295.9979715,
+      "timestamp_str": "2026-10-27 11:04:55",
+      "agent": "kilo:main",
+      "impact_assessment": {
+        "why": "Python and the website disagreed on an explicitly empty license_type, missing projects, non-hyphenated dates, register digest casing and non-text register fields; the CLI also turned a mistyped --register path into UNREGISTERED instead of an error.",
+        "benefits": "The same certificate returns the same status in both implementations, and a missing register path cannot be mistaken for a valid empty register.",
+        "risks": "contract: stricter validation for malformed input only; dependency: none; concurrency: none; state: no register format change; compatibility: an explicit missing register path now exits 1 with an error",
+        "mitigation": "Pin each divergence in both Python and Node suites; keep load_register's empty result for register creation; run both gates."
+      }
+    },
+    {
+      "task_id": "licensing-v7",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[2/2] Reference and browser contracts aligned; 60 tests and 4/4 gates pass. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793088298.8130217,
+      "timestamp_str": "2026-10-27 11:04:58",
+      "agent": "kilo:main",
+      "handoff": {
+        "state": "the website Node suite carries 37 assertions",
+        "next": "commit, close the task and push"
+      }
+    },
+    {
+      "task_id": "licensing-v7",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'licensing-v7' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793088376.019042,
+      "timestamp_str": "2026-10-27 11:06:16",
       "agent": "kilo:main"
     }
   ]
