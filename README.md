@@ -160,6 +160,8 @@ aegean-licensing/
 ├── licenses/                 <- Canonical legal agreements & policies
 │   ├── ACL-1.0.md            <- Full binding Aegean Commercial License agreement
 │   ├── issued.json           <- Public register of issued certificates (no personal data)
+│   ├── VERIFICATION.md       <- Canonical format-2 payload, digest order and register rules
+│   ├── verification-vector.json <- Known-answer fixture for third-party verifiers (not issued)
 │   ├── terms.json            <- License registry: scopes, tiers, allowances, pinned ACL-1.0 digest
 │   ├── AL-1.0.md             <- Archived: grants for Versions released under 1.0
 │   ├── AL-1.1.md             <- Aegean License 1.1: free personal use
@@ -197,6 +199,7 @@ aegean-licensing/
     ├── fixtures.py           <- Test-only certificate builder
     ├── test_cert.py
     ├── test_verifier.py
+    ├── test_verification_spec.py
     ├── test_bundler.py
     ├── test_register.py
     ├── test_license_terms.py
