@@ -5,6 +5,7 @@ All notable changes to Aegean Licensing documents are recorded here.
 ## Unreleased — Draft v0.3
 
 - **Certificate format 2**: certificates carry a random 256-bit `serial` and a format-bound digest; format-1 certificates are rejected as `UNSUPPORTED_FORMAT`, and the public CLI no longer checks signatures, which need AegeanWorks' key (ADR-018).
+- **Public verification specification**: `licenses/VERIFICATION.md` pins the format-2 canonicalization, ASCII escaping, project sorting, digest prefix and check order, with `licenses/verification-vector.json` as a known-answer vector for third-party and browser verifiers. The vector is explicitly not an issued certificate.
 - **Malformed certificate files**: a JSON file holding a list, string, number or `null` is reported as `INVALID_FORMAT` instead of raising `AttributeError` from the format check.
 - **Unknown register status**: a register entry whose `status` is anything other than `valid` or `revoked` is refused as malformed; it used to fall through as a valid certificate.
 - **Game and science licenses**: added AGL-1.0 (DRM-free personal play, streaming, modding) and ASL-1.0 (non-commercial research, publication, reproducibility, non-commercial ML training), with `licenses/CATALOG.md` mapping each to the project it fits.

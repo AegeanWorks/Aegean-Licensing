@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `18`
-- **Total Classes**: `14`
+- **Total Python Modules**: `19`
+- **Total Classes**: `15`
 - **Total Top-Level Functions**: `26`
-- **Total Class Methods**: `61`
-- **Total Source Lines**: `1595`
+- **Total Class Methods**: `67`
+- **Total Source Lines**: `1646`
 
 ---
 
@@ -233,6 +233,20 @@
   - Method `.test_allowances_verify_and_tampering_is_caught()`
   - Method `.test_a_self_consistent_unknown_allowance_is_invalid()`
   - Method `.test_allowances_given_as_a_string_are_one_allowance()`
+
+---
+
+### [`tests/test_verification_spec.py`](tests/test_verification_spec.py)
+**Size**: `51` lines (`2067` bytes)
+
+**Classes:**
+- `class VerificationSpecTests`
+  - Method `.setUp()`
+  - Method `.test_vector_digest_matches_the_python_canonicalization()`
+  - Method `.test_vector_pins_non_ascii_and_projects_sorting()`
+  - Method `.test_vector_is_not_an_issued_certificate()`
+  - Method `.test_vector_uses_the_format_two_contract()`
+  - Method `.test_spec_names_the_digest_and_the_vector()`
 
 ---
 

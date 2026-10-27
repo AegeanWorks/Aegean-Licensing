@@ -228,3 +228,11 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Decision**: Add `policies/SPDX-REUSE-POLICY.md` with the identifier table, the generated `REUSE.toml` and `LICENSES/` convention, per-file header rules, third-party handling and `reuse lint` verification. The catalog links it, and AIKit seeds the metadata for new projects.
 - **Consequences**: The machine-readable gap has a concrete baseline and an external verifier. Custom identifiers remain unrecognised by tools that only know the SPDX License List, and this policy is not legal advice.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-005 (living docs) and PRINCIPLE-016 (docs and code together).
+
+### ADR-027: Public Verification Specification and a Known-Answer Vector
+- **Date**: 2026-10-27
+- **Status**: Accepted
+- **Context**: The AegeanWorks website will reimplement format-2 certificate canonicalization and digest verification in JavaScript. The Python verifier is the reference, but no public, implementation-neutral description or test vector pinned the bytes. A divergence on ASCII escaping, key sorting, project sorting or the domain prefix would make a valid certificate fail in the browser, and a permissive implementation could accept a different payload.
+- **Decision**: Add `licenses/VERIFICATION.md` describing the canonical payload, the `aegean-certificate/2\n` digest domain, the check order and the register rules; add `licenses/verification-vector.json`, a fixture explicitly not an issued certificate, whose digest is computed by the public package and which includes non-ASCII text, an em dash, a quote, an escaped newline and unsorted project names. Add `tests/test_verification_spec.py` to pin the vector and the document. The HMAC signing key remains private and no verifier may implement the signature check.
+- **Consequences**: Third parties and the website can implement and test the public checks against the same bytes without obtaining any secret. The vector is not in the register, so it grants nothing; the certificate format, register format and private operations tooling are unchanged.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (claims checked against the reference implementation), PRINCIPLE-005 (living documentation) and PRINCIPLE-019 (no key or personal data added).

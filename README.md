@@ -69,7 +69,9 @@ The register (`licenses/issued.json`) is the public proof of authenticity: it li
 certificate's id, digest, license type, date and status, never licensee data. An HMAC signature
 can be checked only with the signing key, which is never published (ADR-013). A certificate
 missing from the register is `UNREGISTERED`; a revoked one is `REVOKED`. Always use the register
-from this repository, not a copy supplied with the certificate.
+from this repository, not a copy supplied with the certificate. The exact canonicalization and a
+known-answer vector for third-party verifiers are published in
+[`licenses/VERIFICATION.md`](licenses/VERIFICATION.md).
 
 Only **format 2** certificates verify: each carries a random 256-bit `serial`, and its digest
 is bound to the format-2 domain. Any format-1 certificate, including one made with the issuer
