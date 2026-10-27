@@ -1,76 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "gaps-closure",
-    "last_phase": "planning",
+    "task_id": "licensing-v4",
+    "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793003308.477985,
+    "updated_at": 1793081748.2024198,
     "owner": "kilo:main",
     "started_by": "kilo:main",
-    "continuations": [
-      {
-        "agent": "claude-code:240bc3b7",
-        "from": "kilo:main",
-        "at": 1793036221.6023302
-      }
-    ],
-    "impact_assessment": {
-      "why": "The dual-license and support policies allowed these instruments but had no templates",
-      "benefits": "A reviewable starting text for both commercial requests",
-      "risks": "contract: draft templates; dependency: none; concurrency: none; state: docs",
-      "mitigation": "Catalog links, tests, full gates"
-    },
-    "completed_at": 1793036221.6023312
+    "continuations": [],
+    "completed_at": 1793081763.6086447
   },
   "checkpoints": [
-    {
-      "task_id": "licensing-automation",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[5/5] AL-1.0 + ACL-1.0 renamed and strengthened, RESTRICTED-NOTICE.md, AGPL track removed (LICENSE, templates, auditor, pyproject, CLA, policies, README), ADR-012; 199 tests, 4/4 gates; checklists: passed; uncommitted, awaiting user authorization",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792953191.032928,
-      "timestamp_str": "2026-10-25 21:33:11",
-      "agent": "claude-code:c74fca42",
-      "handoff": {
-        "state": "uncommitted, includes kilo:main's earlier work",
-        "next": "commit on user approval"
-      }
-    },
-    {
-      "task_id": "licensing-automation",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/4] Re-plan: (1) remove Monero payment stack, issuance server, rate limiter, their CLI commands and tests (email-only licensing, ADR-011); (2) public certificate register licenses/issued.json (id, digest, status, no PII): issue appends, new revoke command, verify reports registered/revoked/unregistered; (3) license gaps: outputs clause, notice method, version identification, survival, export in AL; AI-assistant carve-out, compliance certification, register-based verification and revocation in ACL; docs under AL-1.0 in ASSET_POLICY; (4) re-pin AIKit licenses/ copies",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792953440.0619302,
-      "timestamp_str": "2026-10-25 21:37:20",
-      "agent": "claude-code:c74fca42",
-      "impact_assessment": {
-        "why": "User asked to remove unnecessary py code and keep closing license gaps; HMAC verification with a published key would allow forged certificates",
-        "benefits": "~3,000 fewer lines and no online signing key; third parties can verify and see revocations; fewer ambiguities in AL/ACL",
-        "risks": "contract: CLI loses serve and payments commands, verify output gains register status; dependency: none; concurrency: register writes atomic under lock; state: new licenses/issued.json, payment_state/ no longer read",
-        "mitigation": "Failing-first tests for register and revoke; removed code was never committed, deletion recorded in ADR-013"
-      }
-    },
-    {
-      "task_id": "licensing-automation",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[4/4] Removed payment stack + issuance server (~3,000 lines), public register (issue --register, revoke, verify --register), --key-file, ACL-1.0 frozen via terms.json sha256, AL/ACL gaps closed, docs under AL-1.0, ADR-013; 97 tests, 4/4 gates, lifecycle dogfooded; checklists: passed; uncommitted, awaiting user authorization",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792954017.72485,
-      "timestamp_str": "2026-10-25 21:46:57",
-      "agent": "claude-code:c74fca42",
-      "handoff": {
-        "state": "uncommitted",
-        "next": "commit on user approval"
-      }
-    },
     {
       "task_id": "licensing-automation",
       "phase": "phase 2",
@@ -318,6 +259,48 @@
       "timestamp_str": "2026-10-26 20:37:01",
       "agent": "claude-code:240bc3b7",
       "continued_from": "kilo:main"
+    },
+    {
+      "task_id": "licensing-v4",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Publish the canonical verification algorithm and a conformance vector for third-party verifiers",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793081421.1273315,
+      "timestamp_str": "2026-10-27 09:10:21",
+      "agent": "kilo:main",
+      "impact_assessment": {
+        "why": "The website will reimplement certificate canonicalization and digest verification in JavaScript. Without a public, pinned specification and vector, the browser verifier could drift from the Python verifier or silently accept a different payload.",
+        "benefits": "Third parties get an exact algorithm and a known-answer vector; the website test and the Python test pin the same bytes; the register-based trust model stays unchanged.",
+        "risks": "contract: additive documentation and one vector file; dependency: none; concurrency: none; state: no certificate or register changes; legal: the vector is explicitly not an issued certificate",
+        "mitigation": "Test the vector through compute_digest in the public package, label it as a conformance fixture, and keep the HMAC key out of both the document and the vector."
+      }
+    },
+    {
+      "task_id": "licensing-v4",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[2/2] Published licenses/VERIFICATION.md and the known-answer vector; 55 tests and 4/4 gates pass. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793081748.2024198,
+      "timestamp_str": "2026-10-27 09:15:48",
+      "agent": "kilo:main",
+      "handoff": {
+        "next": "commit, close the task and push",
+        "open": "the website copies the vector into its Node parity test"
+      }
+    },
+    {
+      "task_id": "licensing-v4",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'licensing-v4' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793081763.608646,
+      "timestamp_str": "2026-10-27 09:16:03",
+      "agent": "kilo:main"
     }
   ]
 }
