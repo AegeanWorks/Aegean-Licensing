@@ -8,9 +8,9 @@
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `19`
 - **Total Classes**: `15`
-- **Total Top-Level Functions**: `26`
-- **Total Class Methods**: `67`
-- **Total Source Lines**: `1646`
+- **Total Top-Level Functions**: `27`
+- **Total Class Methods**: `69`
+- **Total Source Lines**: `1722`
 
 ---
 
@@ -111,12 +111,13 @@
 ### [`aegean_licensing/verifier.py`](aegean_licensing/verifier.py)
 > *Commercial License Certificate Verification Module.*
 
-**Size**: `283` lines (`11203` bytes)
+**Size**: `332` lines (`13575` bytes)
 
 **Classes:**
 - `class VerificationResult` - *Outcome of validating a License Grant Certificate.*
 
 **Functions:**
+- `def _type_error(data)` - *A field whose JSON type cannot be read safely, or None.*
 - `def verify_certificate(target, secret_key, check_project, reference_date, register_path)` - *Verify authenticity, tamper-resistance, expiration, and scope of a license certificate. With*
 
 ---
@@ -253,7 +254,7 @@
 ### [`tests/test_verifier.py`](tests/test_verifier.py)
 > *Unit tests for commercial license certificate verifier.*
 
-**Size**: `255` lines (`10653` bytes)
+**Size**: `282` lines (`11727` bytes)
 
 **Classes:**
 - `class TestVerifier` - *Test certificate verification, tamper detection, terms, and scope checking.*
@@ -274,6 +275,8 @@
   - Method `._payload(**overrides)`
   - Method `.test_perpetual_certificate_with_expiry_is_rejected()`
   - Method `.test_term_limited_certificate_without_expiry_is_rejected()`
+  - Method `.test_malformed_field_types_are_invalid_not_a_crash()`
+  - Method `.test_project_scope_check_with_mixed_project_types_does_not_crash()`
 - `class TestCertificateFormat` - *Only format-2 certificates, each with a random 256-bit serial, verify (ADR-018).*
   - Method `.test_a_fresh_certificate_is_format_2_with_a_serial()`
   - Method `.test_a_format_1_certificate_is_rejected_even_when_self_consistent()`

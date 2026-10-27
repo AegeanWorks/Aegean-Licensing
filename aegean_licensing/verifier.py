@@ -39,6 +39,37 @@ class VerificationResult:
     registered: bool = False
 
 
+def _type_error(data: Dict[str, Any]) -> Optional[str]:
+    """A field whose JSON type cannot be read safely, or None.
+
+    The public verifier reads untrusted files: a list of numbers in `projects`, a number in
+    `allowances` or a list in `expires_at` used to raise `TypeError` deep in the dataclass instead
+    of reporting INVALID_FORMAT. Only the types the format defines are accepted here.
+    """
+    projects = data.get("projects", ["*"])
+    if isinstance(projects, str):
+        pass
+    elif isinstance(projects, (list, tuple)):
+        if not all(isinstance(project, str) for project in projects):
+            return "'projects' must contain only strings."
+    else:
+        return "'projects' must be a string or a list of strings."
+    allowances = data.get("allowances", [])
+    if isinstance(allowances, str) or allowances is None:
+        pass
+    elif isinstance(allowances, (list, tuple)):
+        if not all(isinstance(allowance, str) for allowance in allowances):
+            return "'allowances' must contain only strings."
+    else:
+        return "'allowances' must be a string or a list of strings."
+    expires_at = data.get("expires_at")
+    if expires_at is not None and not isinstance(expires_at, str):
+        return "'expires_at' must be a string or null."
+    if "is_perpetual" in data and not isinstance(data["is_perpetual"], bool):
+        return "'is_perpetual' must be a boolean."
+    return None
+
+
 def verify_certificate(
     target: Union[Dict[str, Any], str, Path],
     secret_key: Optional[str] = None,
@@ -107,8 +138,21 @@ def verify_certificate(
             reasons=tuple(reasons),
         )
 
-    # 2. Tamper check (Digest verification)
-    expected_digest = compute_digest(data)
+    # 2. Structural type checks before canonicalization: mixed or wrong-typed lists cannot be
+    # sorted or compared safely, and must be INVALID_FORMAT rather than an uncaught TypeError.
+    type_error = _type_error(data)
+    if type_error:
+        reasons.append(type_error)
+        return VerificationResult(is_valid=False, status="INVALID_FORMAT",
+                                  reasons=tuple(reasons))
+
+    # 3. Tamper check (Digest verification)
+    try:
+        expected_digest = compute_digest(data)
+    except (TypeError, ValueError) as exc:
+        reasons.append(f"Certificate payload cannot be canonicalized: {exc}")
+        return VerificationResult(is_valid=False, status="INVALID_FORMAT",
+                                  reasons=tuple(reasons))
     if not hmac.compare_digest(recorded_digest, expected_digest):
         reasons.append(
             f"Digest mismatch! Recorded digest '{recorded_digest}' does not match computed '{expected_digest}'."
@@ -120,7 +164,12 @@ def verify_certificate(
         )
 
     # Construct typed certificate
-    cert = cert_from_dict(data)
+    try:
+        cert = cert_from_dict(data)
+    except (TypeError, ValueError) as exc:
+        reasons.append(f"Certificate fields cannot be read: {exc}")
+        return VerificationResult(is_valid=False, status="INVALID_FORMAT",
+                                  reasons=tuple(reasons))
     if not _SERIAL.fullmatch(cert.serial):
         reasons.append(f"Certificate serial must be {SERIAL_HEX_LENGTH} lowercase hex characters.")
         return VerificationResult(is_valid=False, status="INVALID_FORMAT",

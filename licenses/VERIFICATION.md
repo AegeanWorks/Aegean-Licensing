@@ -48,20 +48,24 @@ newline are part of the hashed bytes.
 A verifier should return the first applicable status:
 
 1. `UNSUPPORTED_FORMAT` — `format` is not the integer `2` (format 1 is retired).
-2. `TAMPERED` — `digest` is missing or does not equal the computed digest.
-3. `INVALID_FORMAT` — `serial` is not exactly 64 lowercase hexadecimal characters.
-4. `INVALID_FORMAT` — the license type is unknown, the tier is not defined by that
-   agreement, an allowance is not in the agreement vocabulary, or a non-empty
-   `terms_digest` does not match the published agreement text.
-5. `UNREGISTERED` — the id is absent from the register, or the register's digest
-   for that id differs from the certificate digest.
-6. `REVOKED` — the register lists the id as revoked.
-7. `INVALID_FORMAT` — a perpetual certificate has `expires_at`, or a term-limited
-   certificate has no `expires_at`.
-8. `EXPIRED` — the reference date is after `expires_at` (dates are ISO `YYYY-MM-DD`).
-9. `SCOPE_MISMATCH` — a project was requested and is not in `projects` (`*` covers
-   every project).
-10. `VALID` — all checks passed and the register entry is valid.
+2. `TAMPERED` — `digest` is missing.
+3. `INVALID_FORMAT` — a field has the wrong JSON type: `projects` is not a string or a list of
+   strings, `allowances` is not a string or a list of strings, `expires_at` is neither a string nor
+   null, or `is_perpetual` is not a boolean. These checks come before canonicalization because a
+   mixed list cannot be sorted safely.
+4. `TAMPERED` — `digest` does not equal the computed digest.
+5. `INVALID_FORMAT` — `serial` is not exactly 64 lowercase hexadecimal characters.
+6. `INVALID_FORMAT` — the license type is unknown, the tier is not defined by that agreement, an
+   allowance is not in the agreement vocabulary, or a non-empty `terms_digest` does not match the
+   published agreement text.
+7. `UNREGISTERED` — the id is absent from the register, or the register's digest for that id
+   differs from the certificate digest.
+8. `REVOKED` — the register lists the id as revoked.
+9. `INVALID_FORMAT` — a perpetual certificate has `expires_at`, or a term-limited certificate has
+   no `expires_at`, or a date is not a real `YYYY-MM-DD` date.
+10. `EXPIRED` — the reference date is after `expires_at`.
+11. `SCOPE_MISMATCH` — a project was requested and is not in `projects` (`*` covers every project).
+12. `VALID` — all checks passed and the register entry is valid.
 
 The public verifier must use the register copy from this repository, not a copy
 supplied alongside a certificate. A missing, unreadable or malformed register is

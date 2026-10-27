@@ -216,6 +216,33 @@ class TestVerifier(unittest.TestCase):
         self.assertFalse(res.is_valid)
         self.assertEqual(res.status, "INVALID_FORMAT")
 
+    def test_malformed_field_types_are_invalid_not_a_crash(self):
+        cases = {
+            "projects": [1, 2],
+            "allowances": 5,
+            "expires_at": ["2027-01-01"],
+            "is_perpetual": "false",
+        }
+        for field, value in cases.items():
+            with self.subTest(field=field):
+                data = self._payload()
+                data[field] = value
+                data["digest"] = "0" * 64
+                data["signature"] = ""
+                result = verify_certificate(data)
+                self.assertFalse(result.is_valid)
+                self.assertEqual(result.status, "INVALID_FORMAT")
+                self.assertTrue(result.reasons)
+
+    def test_project_scope_check_with_mixed_project_types_does_not_crash(self):
+        data = self._payload()
+        data["projects"] = ["*", 7]
+        data["digest"] = "0" * 64
+        data["signature"] = ""
+        result = verify_certificate(data, check_project="NeuroCore")
+        self.assertFalse(result.is_valid)
+        self.assertEqual(result.status, "INVALID_FORMAT")
+
 
 class TestCertificateFormat(unittest.TestCase):
     """Only format-2 certificates, each with a random 256-bit serial, verify (ADR-018)."""
