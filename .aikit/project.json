@@ -4,12 +4,12 @@
   "test_command": "python -m unittest discover tests",
   "topics": [
     "aikit",
+    "aikit-integrated",
     "source-available",
     "aegean-license",
     "commercial-license",
     "legal",
     "licensing",
-    "tools",
     "python",
     "certificates",
     "compliance",
