@@ -4,15 +4,16 @@
   "test_command": "python -m unittest discover tests",
   "topics": [
     "aikit",
+    "source-available",
+    "aegean-license",
+    "commercial-license",
     "legal",
     "licensing",
     "tools",
     "python",
-    "source-available",
     "certificates",
     "compliance",
     "verification",
-    "commercial-license",
     "dual-licensing",
     "reuse",
     "spdx",
@@ -21,7 +22,6 @@
     "command-line-tool",
     "developer-tools",
     "legal-tech",
-    "software",
     "license-compliance"
   ],
   "gates": {},
@@ -46,5 +46,10 @@
   ],
   "topics_choice_round3": [
     "license-compliance"
+  ],
+  "license_topics": [
+    "source-available",
+    "aegean-license",
+    "commercial-license"
   ]
 }
