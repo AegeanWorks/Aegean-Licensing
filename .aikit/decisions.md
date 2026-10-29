@@ -276,3 +276,11 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Decision**: Reject a non-empty `scope` that is not in the resolved agreement's `scopes` list in both the Python reference and the browser verifier, ahead of the signature and register checks, exactly like a tier. Publish the check in `licenses/VERIFICATION.md` and pin it in both suites.
 - **Consequences**: Verification now fails closed on a scope the agreement does not define. Issued certificates are unchanged because their scopes already come from the same vocabulary.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (strict claims) and PRINCIPLE-014 (regression coverage).
+
+### ADR-033: Bound Untrusted JSON and Hash the Serialized Certificate
+- **Date**: 2026-10-29
+- **Status**: Accepted
+- **Context**: Certificate, register and registry files arrive from outside the trust boundary, but every loader called `json.load` with no byte, depth or node cap. Separately, issuance hashed the pre-DTO dictionary while the saved certificate was rendered from the typed dataclass; a field added later with a default would therefore be covered by the file but not by its digest.
+- **Decision**: Add `aegean_licensing/bounded_json.py` with a 16 MiB byte cap, depth 64, node budget 200,000, validated `MB`/`GB` limit parsing and a single-open bounded read. Route certificate, register and registry loading through it. In issuance, serialize the typed certificate first and compute the digest and signature over that exact payload. Pin both paths with unit tests, including a legacy payload missing a defaulted field.
+- **Consequences**: Oversized, deep or node-heavy JSON fails before allocation, and a future dataclass default cannot silently invalidate a saved certificate. Existing certificates keep verifying because the verifier already hashes the stored dictionary; the defaults are 16 MiB/64/200,000 and can be raised per process with `AEGEAN_JSON_MAX_BYTES`, `AEGEAN_JSON_MAX_DEPTH` and `AEGEAN_JSON_MAX_NODES`.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (the stored bytes are the verified bytes), PRINCIPLE-010 (bounded parsing) and PRINCIPLE-014 (regression coverage).

@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `19`
-- **Total Classes**: `15`
-- **Total Top-Level Functions**: `28`
-- **Total Class Methods**: `77`
-- **Total Source Lines**: `1869`
+- **Total Python Modules**: `21`
+- **Total Classes**: `22`
+- **Total Top-Level Functions**: `32`
+- **Total Class Methods**: `93`
+- **Total Source Lines**: `2115`
 
 ---
 
@@ -27,6 +27,29 @@
 > *Main execution entrypoint for python -m aegean_licensing.*
 
 **Size**: `7` lines (`163` bytes)
+
+---
+
+### [`aegean_licensing/bounded_json.py`](aegean_licensing/bounded_json.py)
+> *Bounded JSON loading for files that cross an untrusted boundary.*
+
+**Size**: `137` lines (`5062` bytes)
+
+**Classes:**
+- `class ParseLimits`
+- `class TooLarge` - *The input exceeded the byte cap before or during the bounded read.*
+  - Method `.__init__(observed, limit, variable)`
+- `class TooDeep` - *The input nested deeper than the parser is willing to recurse.*
+  - Method `.__init__(depth, limit)`
+- `class TooManyNodes` - *The input carries more structural nodes than the parser accepts.*
+  - Method `.__init__(count, limit)`
+- `class ConfigError` - *A configured parse limit is not a positive byte count with an optional MB/GB suffix.*
+
+**Functions:**
+- `def parse_limit(raw, *, default, variable)` - *Resolve one limit, accepting plain bytes or the binary suffixes MB and GB.*
+- `def limits_from_env(environ)` - *Read the three limits from the environment, validating each value at startup.*
+- `def _guard_structure(text, limits)` - *Reject depth and node bombs before json.loads can recurse or allocate freely.*
+- `def load_bounded(path, limits)` - *Read and parse one JSON file under byte, depth and node limits.*
 
 ---
 
@@ -77,7 +100,7 @@
 ### [`aegean_licensing/license_terms.py`](aegean_licensing/license_terms.py)
 > *Canonical license registry: the types, scopes, tiers, and term digests a certificate may cite.*
 
-**Size**: `152` lines (`6039` bytes)
+**Size**: `152` lines (`6018` bytes)
 
 **Classes:**
 - `class LicenseTerms` - *One operative license agreement and the vocabulary its certificates may use.*
@@ -99,7 +122,7 @@
 ### [`aegean_licensing/register.py`](aegean_licensing/register.py)
 > *Public certificate register: which certificates AegeanWorks issued, and which it revoked (ADR-013).*
 
-**Size**: `75` lines (`3246` bytes)
+**Size**: `75` lines (`3233` bytes)
 
 **Classes:**
 - `class RegisterEntry` - *One issued certificate, as the public may see it.*
@@ -112,7 +135,7 @@
 ### [`aegean_licensing/verifier.py`](aegean_licensing/verifier.py)
 > *Commercial License Certificate Verification Module.*
 
-**Size**: `358` lines (`14813` bytes)
+**Size**: `358` lines (`14809` bytes)
 
 **Classes:**
 - `class VerificationResult` - *Outcome of validating a License Grant Certificate.*
@@ -152,6 +175,30 @@
 **Functions:**
 - `def issue_certificate(licensee_name, licensee_contact, license_type, projects, scope, is_perpetual, expires_at, notes, secret_key, cert_id, issued_at, tier, allowances)`
 - `def write_register(path, *certs, revoked)` - *A register file listing `certs`, with the ids in `revoked` marked revoked.*
+
+---
+
+### [`tests/test_bounded_json.py`](tests/test_bounded_json.py)
+> *Unit tests for bounded JSON loading (IDEA-118).*
+
+**Size**: `109` lines (`4503` bytes)
+
+**Classes:**
+- `class TestParseLimits`
+  - Method `.test_plain_bytes_and_binary_suffixes()`
+  - Method `.test_invalid_values_are_config_errors_not_silent_defaults()`
+  - Method `.test_environment_limits_are_read_and_validated()`
+- `class TestLoadBounded`
+  - Method `.setUp()`
+  - Method `.write(name, content)`
+  - Method `.test_file_exactly_at_the_byte_cap_parses()`
+  - Method `.test_one_byte_over_the_cap_is_too_large()`
+  - Method `.test_depth_is_bounded_below_the_byte_cap()`
+  - Method `.test_node_count_is_bounded()`
+  - Method `.test_utf8_bom_is_accepted()`
+  - Method `.test_corrupt_json_under_the_cap_raises_a_value_error()`
+  - Method `.test_register_loader_uses_the_bounded_path()`
+  - Method `.test_verifier_file_loader_uses_the_bounded_path()`
 
 ---
 

@@ -102,7 +102,8 @@ sorting or project sorting fails the vector. The Python test is
 
 ## Handling untrusted input
 
-A verifier should cap the input size, parse JSON strictly, read only known fields,
+A verifier should cap the input size (the reference uses 16 MiB, nesting depth 64 and a
+200,000-node budget), parse JSON strictly, read only known fields,
 and render every certificate value as text rather than HTML. It should fetch the
 register over HTTPS from the canonical repository and show when it was fetched, so
 a stale cached revocation is visible to the user. These are implementation rules,

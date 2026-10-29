@@ -10,6 +10,7 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
+from aegean_licensing.bounded_json import load_bounded
 from aegean_licensing.cert import (
     CERT_FORMAT,
     SERIAL_HEX_LENGTH,
@@ -99,8 +100,7 @@ def verify_certificate(
                 reasons=(f"Certificate file does not exist: {file_path}",),
             )
         try:
-            with open(file_path, "r", encoding="utf-8-sig") as f:
-                data = json.load(f)
+            data = load_bounded(file_path)
         except Exception as exc:
             return VerificationResult(
                 is_valid=False,

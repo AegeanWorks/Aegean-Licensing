@@ -11,10 +11,11 @@ operations tooling (ADR-017).
 from __future__ import annotations
 
 import dataclasses
-import json
 import re
 from pathlib import Path
 from typing import Dict, Union
+
+from aegean_licensing.bounded_json import load_bounded
 
 REGISTER_VERSION = 1
 DEFAULT_REGISTER_PATH = Path("licenses") / "issued.json"
@@ -47,8 +48,7 @@ def load_register(path: Union[str, Path]) -> Dict[str, RegisterEntry]:
     target = Path(path)
     if not target.is_file():
         return {}
-    with open(target, "r", encoding="utf-8") as handle:
-        data = json.load(handle)
+    data = load_bounded(target)
     if not isinstance(data, dict) or data.get("version") != REGISTER_VERSION:
         version = data.get("version") if isinstance(data, dict) else None
         raise ValueError(f"Unsupported register version {version!r} in {path}.")

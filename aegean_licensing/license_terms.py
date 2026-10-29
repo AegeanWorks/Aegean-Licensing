@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import dataclasses
 import hashlib
-import json
 from pathlib import Path
 from typing import Dict, Optional
+
+from aegean_licensing.bounded_json import load_bounded
 
 REGISTRY_VERSION = 1
 REGISTRY_RELATIVE_PATH = Path("licenses") / "terms.json"
@@ -40,8 +41,7 @@ def _registry_paths() -> tuple:
 def _load_registry_document() -> Dict[str, object]:
     for candidate in _registry_paths():
         if candidate.is_file():
-            with open(candidate, "r", encoding="utf-8") as handle:
-                data = json.load(handle)
+            data = load_bounded(candidate)
             if not isinstance(data, dict):
                 raise ValueError(f"{candidate} must contain a JSON object.")
             return data

@@ -203,6 +203,7 @@ aegean-licensing/
 ├── aegean_licensing/         <- Verification package (pure standard library; issuing is private)
 │   ├── __init__.py
 │   ├── __main__.py
+│   ├── bounded_json.py       <- Byte, depth and node caps for untrusted JSON
 │   ├── cert.py               <- Frozen certificate DTO & canonical JSON hashing
 │   ├── verifier.py           <- Tamper detection, signature check & scope validation
 │   ├── bundler.py            <- Copies legal documents into built wheels
@@ -213,6 +214,7 @@ aegean-licensing/
     ├── __init__.py
     ├── fixtures.py           <- Test-only certificate builder
     ├── test_cert.py
+    ├── test_bounded_json.py
     ├── test_verifier.py
     ├── test_verification_spec.py
     ├── test_bundler.py
