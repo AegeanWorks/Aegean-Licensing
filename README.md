@@ -204,6 +204,8 @@ aegean-licensing/
 │   ├── __init__.py
 │   ├── __main__.py
 │   ├── bounded_json.py       <- Byte, depth and node caps for untrusted JSON
+│   ├── metadata.py           <- Rendered-field validation and whitespace normalization
+│   ├── fingerprint.py        <- Verification ruleset identity and mismatch refusal
 │   ├── cert.py               <- Frozen certificate DTO & canonical JSON hashing
 │   ├── verifier.py           <- Tamper detection, signature check & scope validation
 │   ├── bundler.py            <- Copies legal documents into built wheels
@@ -215,6 +217,8 @@ aegean-licensing/
     ├── fixtures.py           <- Test-only certificate builder
     ├── test_cert.py
     ├── test_bounded_json.py
+    ├── test_metadata.py
+    ├── test_fingerprint.py
     ├── test_verifier.py
     ├── test_verification_spec.py
     ├── test_bundler.py

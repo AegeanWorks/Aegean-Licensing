@@ -1,58 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "task-license-input-hardening-v1",
+    "task_id": "task-license-metadata-fingerprint-v1",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793287963.1776714,
-    "owner": "opencode:license-wave1",
-    "started_by": "opencode:license-wave1",
+    "updated_at": 1793290278.286681,
+    "owner": "opencode:license-wave2",
+    "started_by": "opencode:license-wave2",
     "continuations": [],
-    "completed_at": 1793287963.3248913
+    "completed_at": 1793290278.472455
   },
   "checkpoints": [
-    {
-      "task_id": "reforge:run-1",
-      "phase": "reforge stage 1",
-      "phase_num": 3,
-      "description": "Reforge stage 1: window 5, 5 commit(s), 2 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793283102.1649103,
-      "timestamp_str": "2026-10-29 17:11:42",
-      "agent": "opencode"
-    },
-    {
-      "task_id": "reforge:run-1",
-      "phase": "reforge stage 2",
-      "phase_num": 3,
-      "description": "Reforge stage 2: window 10, 5 commit(s), 2 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired, 5 binary not analysed",
-      "files_affected": [
-        "assets/artwork.jpg",
-        "assets/logo.jpg",
-        "assets/logo.png",
-        "assets/social-preview.jpg",
-        "assets/social-preview.png"
-      ],
-      "status": "in_progress",
-      "timestamp": 1793283128.0507295,
-      "timestamp_str": "2026-10-29 17:12:08",
-      "agent": "opencode"
-    },
-    {
-      "task_id": "reforge:run-1",
-      "phase": "reforge stage 3",
-      "phase_num": 3,
-      "description": "Reforge stage 3: window 15, 5 commit(s), 15 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired, 1 binary not analysed",
-      "files_affected": [
-        "assets/social-preview.png"
-      ],
-      "status": "in_progress",
-      "timestamp": 1793283156.7338965,
-      "timestamp_str": "2026-10-29 17:12:36",
-      "agent": "opencode"
-    },
     {
       "task_id": "reforge:run-1",
       "phase": "reforge stage 4",
@@ -247,6 +206,44 @@
       "timestamp": 1793287963.3248928,
       "timestamp_str": "2026-10-29 18:32:43",
       "agent": "opencode:license-wave1"
+    },
+    {
+      "task_id": "task-license-metadata-fingerprint-v1",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Reject rendered markup and fingerprint the verification ruleset",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793290271.9201875,
+      "timestamp_str": "2026-10-29 19:11:11",
+      "agent": "opencode:license-wave2",
+      "impact_assessment": {
+        "why": "Free-form certificate fields reached Markdown/HTML renderers without a parsed-value ban, and results did not record which rules produced them.",
+        "benefits": "Unsafe metadata fails at admission and results from different rule profiles cannot be compared as if identical.",
+        "risks": "contract: stricter cert_from_dict validation and a new result field; dependency: none; concurrency: read-only verification; state: no schema change.",
+        "mitigation": "Validate rendered fields in cert_from_dict, keep renderer escaping, add a declarative fingerprint/compare API, and pin both with unit tests."
+      }
+    },
+    {
+      "task_id": "task-license-metadata-fingerprint-v1",
+      "phase": "in_progress",
+      "phase_num": 5,
+      "description": "checklists: passed; 87 tests and 4/4 project gates green",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793290278.286681,
+      "timestamp_str": "2026-10-29 19:11:18",
+      "agent": "opencode:license-wave2"
+    },
+    {
+      "task_id": "task-license-metadata-fingerprint-v1",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'task-license-metadata-fingerprint-v1' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793290278.4724562,
+      "timestamp_str": "2026-10-29 19:11:18",
+      "agent": "opencode:license-wave2"
     }
   ]
 }

@@ -106,5 +106,8 @@ A verifier should cap the input size (the reference uses 16 MiB, nesting depth 6
 200,000-node budget), parse JSON strictly, read only known fields,
 and render every certificate value as text rather than HTML. It should fetch the
 register over HTTPS from the canonical repository and show when it was fetched, so
-a stale cached revocation is visible to the user. These are implementation rules,
-not alternatives to the checks above.
+a stale cached revocation is visible to the user. Each result should carry a stable
+fingerprint of the verification profile and rule set; results with different
+fingerprints may be shown side by side but must never be aggregated as if they
+were produced under the same rules. These are implementation rules, not
+alternatives to the checks above.

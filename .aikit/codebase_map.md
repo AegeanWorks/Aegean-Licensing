@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `21`
-- **Total Classes**: `22`
-- **Total Top-Level Functions**: `32`
-- **Total Class Methods**: `93`
-- **Total Source Lines**: `2115`
+- **Total Python Modules**: `25`
+- **Total Classes**: `27`
+- **Total Top-Level Functions**: `35`
+- **Total Class Methods**: `105`
+- **Total Source Lines**: `2327`
 
 ---
 
@@ -67,7 +67,7 @@
 ### [`aegean_licensing/cert.py`](aegean_licensing/cert.py)
 > *License Certificate Data Model and Cryptographic Hashing.*
 
-**Size**: `173` lines (`7047` bytes)
+**Size**: `182` lines (`7409` bytes)
 
 **Classes:**
 - `class LicenseCertificate` - *Immutable data transfer object representing a granted commercial license.*
@@ -97,6 +97,21 @@
 
 ---
 
+### [`aegean_licensing/fingerprint.py`](aegean_licensing/fingerprint.py)
+> *A stable identity for the rules a verification result was produced under.*
+
+**Size**: `61` lines (`2337` bytes)
+
+**Classes:**
+- `class VerificationProfile`
+- `class FingerprintMismatch` - *Two results were produced under different verification rules.*
+
+**Functions:**
+- `def ruleset_fingerprint(profile, rule_digests)` - *SHA-256 over the declarative profile and the ordered rule identities.*
+- `def compare_results(left, right)` - *Refuse to compare results whose ruleset fingerprints differ or are missing.*
+
+---
+
 ### [`aegean_licensing/license_terms.py`](aegean_licensing/license_terms.py)
 > *Canonical license registry: the types, scopes, tiers, and term digests a certificate may cite.*
 
@@ -119,6 +134,20 @@
 
 ---
 
+### [`aegean_licensing/metadata.py`](aegean_licensing/metadata.py)
+> *Validation and normalization for certificate fields that reach a renderer.*
+
+**Size**: `34` lines (`1448` bytes)
+
+**Classes:**
+- `class MetadataError` - *A rendered certificate field carries markup or a control character.*
+  - Method `.__init__(field, category, message)`
+
+**Functions:**
+- `def normalize_metadata_text(field, value, max_bytes)` - *Collapse whitespace, reject markup/control characters, and cap UTF-8 length.*
+
+---
+
 ### [`aegean_licensing/register.py`](aegean_licensing/register.py)
 > *Public certificate register: which certificates AegeanWorks issued, and which it revoked (ADR-013).*
 
@@ -135,7 +164,7 @@
 ### [`aegean_licensing/verifier.py`](aegean_licensing/verifier.py)
 > *Commercial License Certificate Verification Module.*
 
-**Size**: `358` lines (`14809` bytes)
+**Size**: `360` lines (`14921` bytes)
 
 **Classes:**
 - `class VerificationResult` - *Outcome of validating a License Grant Certificate.*
@@ -250,6 +279,21 @@
 
 ---
 
+### [`tests/test_fingerprint.py`](tests/test_fingerprint.py)
+> *Unit tests for the verification-ruleset fingerprint (IDEA-076).*
+
+**Size**: `53` lines (`2252` bytes)
+
+**Classes:**
+- `class TestFingerprint`
+  - Method `.test_default_fingerprint_is_stable_and_order_independent()`
+  - Method `.test_a_profile_change_changes_the_fingerprint()`
+  - Method `.test_compare_accepts_equal_fingerprints_and_rejects_mismatch()`
+  - Method `.test_unfingerprinted_results_never_compare_equal()`
+  - Method `.test_verifier_results_carry_the_default_fingerprint()`
+
+---
+
 ### [`tests/test_license_terms.py`](tests/test_license_terms.py)
 > *Unit tests for the frozen text of operative agreements (ADR-013).*
 
@@ -260,6 +304,22 @@
   - Method `.test_every_operative_agreement_pins_its_text()`
   - Method `.test_an_edited_agreement_is_refused_and_fails_verification()`
   - Method `.test_an_unpinned_agreement_still_yields_its_digest()`
+
+---
+
+### [`tests/test_metadata.py`](tests/test_metadata.py)
+> *Unit tests for rendered certificate metadata validation (IDEA-090).*
+
+**Size**: `53` lines (`2620` bytes)
+
+**Classes:**
+- `class TestMetadata`
+  - Method `.test_normal_text_survives_and_whitespace_is_collapsed()`
+  - Method `.test_angle_brackets_are_rejected()`
+  - Method `.test_control_and_line_separator_characters_are_rejected()`
+  - Method `.test_utf8_length_is_capped()`
+  - Method `.test_cert_from_dict_rejects_unsafe_metadata()`
+  - Method `.test_cert_from_dict_normalizes_project_and_allowance_spaces()`
 
 ---
 

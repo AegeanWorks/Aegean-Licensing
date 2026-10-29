@@ -5,6 +5,8 @@ All notable changes to Aegean Licensing documents are recorded here.
 ## Unreleased — Draft v0.3
 
 - **Bounded JSON**: certificate, register and registry loading is capped at 16 MiB, nesting depth 64 and 200,000 nodes, with validated `MB`/`GB` overrides; oversized or pathological documents are rejected before parsing (ADR-033).
+- **Rendered metadata**: certificate fields that reach Markdown/HTML reject angle brackets, control characters and line separators, collapse whitespace, and cap UTF-8 length; the renderer still escapes as defence in depth (ADR-034).
+- **Ruleset fingerprint**: every verification result carries a stable digest of the verification profile and rule set, and results with different fingerprints refuse to compare (ADR-034).
 - **Certificate format 2**: certificates carry a random 256-bit `serial` and a format-bound digest; format-1 certificates are rejected as `UNSUPPORTED_FORMAT`, and the public CLI no longer checks signatures, which need AegeanWorks' key (ADR-018).
 - **Public verification specification**: `licenses/VERIFICATION.md` pins the format-2 canonicalization, ASCII escaping, project sorting, digest prefix and check order, with `licenses/verification-vector.json` as a known-answer vector for third-party and browser verifiers. The vector is explicitly not an issued certificate.
 - **Malformed certificate files**: a JSON file holding a list, string, number or `null` is reported as `INVALID_FORMAT` instead of raising `AttributeError` from the format check.

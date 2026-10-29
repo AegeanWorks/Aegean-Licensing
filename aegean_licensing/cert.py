@@ -9,6 +9,8 @@ import json
 import math
 from typing import Any, Dict, List, Optional
 
+from aegean_licensing.metadata import normalize_metadata_text
+
 # The largest integer every supported JSON runtime represents exactly.
 MAX_SAFE_INTEGER = 2 ** 53 - 1
 
@@ -137,37 +139,44 @@ def _format_number(raw: Any) -> int:
 
 def cert_from_dict(data: Dict[str, Any]) -> LicenseCertificate:
     """Construct LicenseCertificate from raw dictionary data."""
+    def text(field: str, default: str = "") -> str:
+        return normalize_metadata_text(field, data.get(field, default))
+
     projects_raw = data.get("projects", ["*"])
     if isinstance(projects_raw, list):
-        projects = tuple(sorted(projects_raw))
+        projects = tuple(sorted(normalize_metadata_text("projects", item) for item in projects_raw))
     elif isinstance(projects_raw, tuple):
-        projects = tuple(sorted(list(projects_raw)))
+        projects = tuple(sorted(normalize_metadata_text("projects", item) for item in projects_raw))
     elif isinstance(projects_raw, str):
-        projects = (projects_raw,)
+        projects = (normalize_metadata_text("projects", projects_raw),)
     else:
         projects = ("*",)
+    allowances = tuple(normalize_metadata_text("allowances", item)
+                       for item in _allowance_tuple(data.get("allowances")))
+    expires = data.get("expires_at")
+    expires_at = normalize_metadata_text("expires_at", expires) if expires else None
 
     return LicenseCertificate(
-        cert_id=str(data.get("cert_id", "")),
-        licensee_name=str(data.get("licensee_name", "")),
-        licensee_contact=str(data.get("licensee_contact", "")),
-        issuer=str(data.get("issuer", "AegeanWorks")),
-        issuer_contact=str(data.get("issuer_contact", "aegean-licensing@proton.me")),
-        license_type=str(data.get("license_type", "ACL-1.0")),
+        cert_id=text("cert_id"),
+        licensee_name=text("licensee_name"),
+        licensee_contact=text("licensee_contact"),
+        issuer=text("issuer", "AegeanWorks"),
+        issuer_contact=text("issuer_contact", "aegean-licensing@proton.me"),
+        license_type=text("license_type", "ACL-1.0"),
         projects=projects,
-        scope=str(data.get("scope", "proprietary-saas-and-redistribution")),
-        issued_at=str(data.get("issued_at", "")),
-        expires_at=data.get("expires_at") if data.get("expires_at") else None,
+        scope=text("scope", "proprietary-saas-and-redistribution"),
+        issued_at=text("issued_at"),
+        expires_at=expires_at,
         is_perpetual=bool(data.get("is_perpetual", True)),
         notes=str(data.get("notes", "")),
         digest=str(data.get("digest", "")),
         signature=str(data.get("signature", "")),
-        tier=str(data.get("tier", "")),
+        tier=text("tier"),
         terms_digest=str(data.get("terms_digest", "")),
-        licensee_address=str(data.get("licensee_address", "")),
-        licensee_registration=str(data.get("licensee_registration", "")),
-        licensee_country=str(data.get("licensee_country", "")),
-        allowances=_allowance_tuple(data.get("allowances")),
+        licensee_address=text("licensee_address"),
+        licensee_registration=text("licensee_registration"),
+        licensee_country=text("licensee_country"),
+        allowances=allowances,
         format=_format_number(data.get("format", 1)),
-        serial=str(data.get("serial", "")),
+        serial=text("serial"),
     )

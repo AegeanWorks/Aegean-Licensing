@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 from aegean_licensing.bounded_json import load_bounded
+from aegean_licensing.fingerprint import DEFAULT_FINGERPRINT
 from aegean_licensing.cert import (
     CERT_FORMAT,
     SERIAL_HEX_LENGTH,
@@ -39,6 +40,7 @@ class VerificationResult:
     signature_verified: bool = False
     terms_verified: bool = False
     registered: bool = False
+    ruleset_fingerprint: str = DEFAULT_FINGERPRINT
 
 
 def _type_error(data: Dict[str, Any]) -> Optional[str]:
