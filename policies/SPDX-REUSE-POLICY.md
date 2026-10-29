@@ -18,13 +18,15 @@ metadata; `reuse lint` and SPDX tools remain the external verifier.
 | Restricted | `LicenseRef-Aegean-Restricted` |
 
 The `LicenseRef-` prefix is deliberate: these are not OSI identifiers. An SPDX tool must find the
-text in `LICENSES/<identifier>.txt`.
+text in `LICENSES/<identifier>.txt`, or in the project's existing `licenses/` directory when it
+already keeps its legal texts there (the two names are one directory on Windows).
 
 ## 2. Generated files
 
 `aikit.py` writes, for a personal-tier project:
 
-- `LICENSES/LicenseRef-AL-1.1.txt` (or AGL/ASL), a copy of `LICENSE`; and
+- `LICENSES/LicenseRef-AL-1.1.txt` (or AGL/ASL), a copy of `LICENSE`; a project that already
+  keeps its legal texts in `licenses/` writes the copy there instead; and
 - `REUSE.toml` with `SPDX-FileCopyrightText = "2026 AegeanWorks"` and
   `SPDX-License-Identifier = "LicenseRef-AL-1.1"` (or the current tier).
 

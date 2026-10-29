@@ -147,6 +147,7 @@ aegean-licensing/
 │   │   └── cla-check.yml     <- Automated pull-request CLA verification
 │   └── cla-signatures.json   <- Durable record of accepted and revoked contributors
 ├── MANIFEST.in               <- Ships legal documents in source distributions
+├── REUSE.toml                <- SPDX/REUSE metadata for the license expression
 ├── CHANGELOG.md              <- version and draft change history
 ├── LICENSE                   <- Aegean License 1.1 (copy of licenses/AL-1.1.md)
 ├── COMMERCIAL.md             <- Commercial licensing terms & Exhibit A
@@ -171,6 +172,7 @@ aegean-licensing/
 │   ├── SPDX-REUSE-POLICY.md            <- Machine-readable license metadata
 │   └── DUAL-LICENSE-POLICY.md          <- Written permissive/GPL-compatible grants
 ├── licenses/                 <- Canonical legal agreements & policies
+│   ├── LicenseRef-AL-1.1.txt <- REUSE copy of the Aegean License 1.1 text
 │   ├── ACL-1.0.md            <- Full binding Aegean Commercial License agreement
 │   ├── issued.json           <- Public register of issued certificates (no personal data)
 │   ├── VERIFICATION.md       <- Canonical format-2 payload, digest order and register rules

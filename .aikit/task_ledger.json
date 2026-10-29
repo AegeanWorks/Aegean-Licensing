@@ -1,42 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "licensing-v8",
-    "last_phase": "phase 4",
+    "task_id": "task-licensing-reuse-metadata-v1",
+    "last_phase": "in_progress",
     "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1793100502.3586113,
-    "owner": "kilo:main",
-    "started_by": "kilo:main",
-    "continuations": [],
-    "completed_at": 1793100526.957617
+    "status": "in_progress",
+    "updated_at": 1793285361.9576094,
+    "owner": "opencode:reforge-main",
+    "started_by": "opencode:reforge-main",
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "licensing-v6",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/2] Python and browser verifiers now agree on license_type, missing projects and strict dates; 59 tests and 4/4 gates pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793087778.5356507,
-      "timestamp_str": "2026-10-27 10:56:18",
-      "agent": "kilo:main",
-      "handoff": {
-        "state": "the website Node suite carries 35 assertions",
-        "next": "commit, close the task and push"
-      }
-    },
-    {
-      "task_id": "licensing-v6",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'licensing-v6' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793087805.1505704,
-      "timestamp_str": "2026-10-27 10:56:45",
-      "agent": "kilo:main"
-    },
     {
       "task_id": "licensing-v7",
       "phase": "phase 2",
@@ -259,6 +233,34 @@
       "timestamp": 1793284340.5974581,
       "timestamp_str": "2026-10-29 17:32:20",
       "agent": "opencode:reforge"
+    },
+    {
+      "task_id": "task-licensing-reuse-metadata-v1",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Add committed REUSE metadata to the existing licenses/ directory",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793285356.1301389,
+      "timestamp_str": "2026-10-29 17:49:16",
+      "agent": "opencode:reforge-main",
+      "impact_assessment": {
+        "why": "The project's legal texts live in licenses/; the Windows checkout cannot also create LICENSES/ without a case collision, so the REUSE metadata was never committed.",
+        "benefits": "A scanner can resolve LicenseRef-AL-1.1 from the tracked tree without renaming historical paths or adding a second directory.",
+        "risks": "contract: generated path stays under licenses/ for this project; dependency: none; concurrency: none; state: no runtime state.",
+        "mitigation": "Use the fixed AIKit directory picker, update the SPDX policy and README tree, and run the project's four gates."
+      }
+    },
+    {
+      "task_id": "task-licensing-reuse-metadata-v1",
+      "phase": "in_progress",
+      "phase_num": 5,
+      "description": "checklists: passed; 4/4 project gates before delivery",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793285361.9576094,
+      "timestamp_str": "2026-10-29 17:49:21",
+      "agent": "opencode:reforge-main"
     }
   ]
 }
