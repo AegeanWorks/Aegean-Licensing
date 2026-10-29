@@ -4,30 +4,14 @@
     "task_id": "task-licensing-reuse-metadata-v1",
     "last_phase": "in_progress",
     "active_phase": 5,
-    "status": "in_progress",
+    "status": "completed",
     "updated_at": 1793285361.9576094,
     "owner": "opencode:reforge-main",
     "started_by": "opencode:reforge-main",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1793285395.5061374
   },
   "checkpoints": [
-    {
-      "task_id": "licensing-v7",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Remove the last reference/browser divergences and fail closed on a missing register",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793088295.9979715,
-      "timestamp_str": "2026-10-27 11:04:55",
-      "agent": "kilo:main",
-      "impact_assessment": {
-        "why": "Python and the website disagreed on an explicitly empty license_type, missing projects, non-hyphenated dates, register digest casing and non-text register fields; the CLI also turned a mistyped --register path into UNREGISTERED instead of an error.",
-        "benefits": "The same certificate returns the same status in both implementations, and a missing register path cannot be mistaken for a valid empty register.",
-        "risks": "contract: stricter validation for malformed input only; dependency: none; concurrency: none; state: no register format change; compatibility: an explicit missing register path now exits 1 with an error",
-        "mitigation": "Pin each divergence in both Python and Node suites; keep load_register's empty result for register creation; run both gates."
-      }
-    },
     {
       "task_id": "licensing-v7",
       "phase": "phase 4",
@@ -260,6 +244,16 @@
       "status": "in_progress",
       "timestamp": 1793285361.9576094,
       "timestamp_str": "2026-10-29 17:49:21",
+      "agent": "opencode:reforge-main"
+    },
+    {
+      "task_id": "task-licensing-reuse-metadata-v1",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'task-licensing-reuse-metadata-v1' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793285395.5061393,
+      "timestamp_str": "2026-10-29 17:49:55",
       "agent": "opencode:reforge-main"
     }
   ]
