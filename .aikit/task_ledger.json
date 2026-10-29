@@ -13,178 +13,6 @@
   },
   "checkpoints": [
     {
-      "task_id": "license-1-1",
-      "phase": "planning",
-      "phase_num": 2,
-      "description": "[1/2] Publish AL/AGL/ASL 1.1 beside 1.0, add security-research, moral-rights, data-protection and GPL/AGPL terms, refresh catalog/asset policy/FAQ/notices and pin the new texts",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792972148.7647734,
-      "timestamp_str": "2026-10-26 02:49:08",
-      "agent": "kilo:main",
-      "impact_assessment": {
-        "why": "The 1.0 personal licenses lacked explicit security-research, moral-rights/data-protection and compatibility terms",
-        "benefits": "A complete 1.1 family with 1.0 archived for existing grants",
-        "risks": "contract: license texts and filenames; dependency: none; concurrency: none; state: pins, docs",
-        "mitigation": "Dual-version files, failing-first tests, full gates"
-      }
-    },
-    {
-      "task_id": "license-1-1",
-      "phase": "delivery",
-      "phase_num": 4,
-      "description": "[2/2] done: AL/AGL/ASL 1.1, 1.0 archives, catalog, asset policy, FAQ/notices, 50 tests and 4/4 gates pass; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792972148.9564314,
-      "timestamp_str": "2026-10-26 02:49:08",
-      "agent": "kilo:main",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit and push on user approval",
-        "evidence": "50 tests, 4/4 gates"
-      }
-    },
-    {
-      "task_id": "license-1-1",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'license-1-1' completed successfully.",
-      "status": "completed",
-      "timestamp": 1792972149.148042,
-      "timestamp_str": "2026-10-26 02:49:09",
-      "agent": "kilo:main"
-    },
-    {
-      "task_id": "gaps-closure",
-      "phase": "planning",
-      "phase_num": 2,
-      "description": "[1/2] Add permissive-grant and security-SLA drafts, record ADR-025, and commit/push the governance batch",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793003308.477985,
-      "timestamp_str": "2026-10-26 11:28:28",
-      "agent": "kilo:main",
-      "impact_assessment": {
-        "why": "The dual-license and support policies allowed these instruments but had no templates",
-        "benefits": "A reviewable starting text for both commercial requests",
-        "risks": "contract: draft templates; dependency: none; concurrency: none; state: docs",
-        "mitigation": "Catalog links, tests, full gates"
-      }
-    },
-    {
-      "task_id": "gaps-closure",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'gaps-closure' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793036221.602332,
-      "timestamp_str": "2026-10-26 20:37:01",
-      "agent": "claude-code:240bc3b7",
-      "continued_from": "kilo:main"
-    },
-    {
-      "task_id": "licensing-v4",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Publish the canonical verification algorithm and a conformance vector for third-party verifiers",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793081421.1273315,
-      "timestamp_str": "2026-10-27 09:10:21",
-      "agent": "kilo:main",
-      "impact_assessment": {
-        "why": "The website will reimplement certificate canonicalization and digest verification in JavaScript. Without a public, pinned specification and vector, the browser verifier could drift from the Python verifier or silently accept a different payload.",
-        "benefits": "Third parties get an exact algorithm and a known-answer vector; the website test and the Python test pin the same bytes; the register-based trust model stays unchanged.",
-        "risks": "contract: additive documentation and one vector file; dependency: none; concurrency: none; state: no certificate or register changes; legal: the vector is explicitly not an issued certificate",
-        "mitigation": "Test the vector through compute_digest in the public package, label it as a conformance fixture, and keep the HMAC key out of both the document and the vector."
-      }
-    },
-    {
-      "task_id": "licensing-v4",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/2] Published licenses/VERIFICATION.md and the known-answer vector; 55 tests and 4/4 gates pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793081748.2024198,
-      "timestamp_str": "2026-10-27 09:15:48",
-      "agent": "kilo:main",
-      "handoff": {
-        "next": "commit, close the task and push",
-        "open": "the website copies the vector into its Node parity test"
-      }
-    },
-    {
-      "task_id": "licensing-v4",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'licensing-v4' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793081763.608646,
-      "timestamp_str": "2026-10-27 09:16:03",
-      "agent": "kilo:main"
-    },
-    {
-      "task_id": "licensing-v5",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Harden the public verifier against wrong-typed certificate fields and publish the matching check order",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793085890.1246083,
-      "timestamp_str": "2026-10-27 10:24:50",
-      "agent": "kilo:main",
-      "impact_assessment": {
-        "why": "The public package reads untrusted certificate JSON. Mixed-type projects or allowances, a list expiry or a string is_perpetual raised TypeError during canonicalization or dataclass construction instead of returning INVALID_FORMAT, while the website verifier returned INVALID_FORMAT, so the reference and the browser could disagree.",
-        "benefits": "Malformed certificates now return a structured INVALID_FORMAT with a reason, no input can crash the verifier, and the website and Python reference share one documented order.",
-        "risks": "contract: no change to valid format-2 certificates or the register; dependency: none; concurrency: none; state: none; compatibility: a malformed certificate now has a defined status instead of an exception",
-        "mitigation": "Tests cover every wrong-typed field and a mixed project list; the verification spec lists type checks before canonicalization; run all package and website parity tests."
-      }
-    },
-    {
-      "task_id": "licensing-v5",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/2] Wrong-typed fields now return INVALID_FORMAT before canonicalization; 57 tests and 4/4 gates pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793085942.314244,
-      "timestamp_str": "2026-10-27 10:25:42",
-      "agent": "kilo:main",
-      "handoff": {
-        "state": "the website verifier follows the same order",
-        "next": "commit and push"
-      }
-    },
-    {
-      "task_id": "licensing-v5",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'licensing-v5' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793086107.0122566,
-      "timestamp_str": "2026-10-27 10:28:27",
-      "agent": "kilo:main"
-    },
-    {
-      "task_id": "licensing-v6",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Align the Python verifier with the browser on license_type, missing projects and strict dates",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793087766.7985783,
-      "timestamp_str": "2026-10-27 10:56:06",
-      "agent": "kilo:main",
-      "impact_assessment": {
-        "why": "The website verifier and the public Python reference must agree byte for byte and status for status; an empty license_type, a missing projects list and a non-hyphenated expiry could return different results.",
-        "benefits": "Both verifiers reject an explicitly empty license_type, default missing projects to *, and require hyphenated dates; the conformance vector and tests cover the shared contract.",
-        "risks": "contract: no change for valid format-2 certificates; dependency: none; concurrency: none; state: none; compatibility: a non-hyphenated expiry is now INVALID_FORMAT instead of being accepted",
-        "mitigation": "Pin each case in both Python and Node suites, update the public verification order, and run both gates."
-      }
-    },
-    {
       "task_id": "licensing-v6",
       "phase": "phase 4",
       "phase_num": 4,
@@ -292,6 +120,145 @@
       "timestamp": 1793100526.9576187,
       "timestamp_str": "2026-10-27 14:28:46",
       "agent": "kilo:main"
+    },
+    {
+      "task_id": "reforge:run-1",
+      "phase": "reforge run",
+      "phase_num": 3,
+      "description": "run started (start=5, step=5, stop=41)",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793283096.600862,
+      "timestamp_str": "2026-10-29 17:11:36",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-1",
+      "phase": "reforge stage 1",
+      "phase_num": 3,
+      "description": "Reforge stage 1: window 5, 5 commit(s), 2 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793283102.1649103,
+      "timestamp_str": "2026-10-29 17:11:42",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-1",
+      "phase": "reforge stage 2",
+      "phase_num": 3,
+      "description": "Reforge stage 2: window 10, 5 commit(s), 2 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired, 5 binary not analysed",
+      "files_affected": [
+        "assets/artwork.jpg",
+        "assets/logo.jpg",
+        "assets/logo.png",
+        "assets/social-preview.jpg",
+        "assets/social-preview.png"
+      ],
+      "status": "in_progress",
+      "timestamp": 1793283128.0507295,
+      "timestamp_str": "2026-10-29 17:12:08",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-1",
+      "phase": "reforge stage 3",
+      "phase_num": 3,
+      "description": "Reforge stage 3: window 15, 5 commit(s), 15 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired, 1 binary not analysed",
+      "files_affected": [
+        "assets/social-preview.png"
+      ],
+      "status": "in_progress",
+      "timestamp": 1793283156.7338965,
+      "timestamp_str": "2026-10-29 17:12:36",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-1",
+      "phase": "reforge stage 4",
+      "phase_num": 3,
+      "description": "Reforge stage 4: window 20, 5 commit(s), 8 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793283350.6009452,
+      "timestamp_str": "2026-10-29 17:15:50",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-1",
+      "phase": "reforge stage 5",
+      "phase_num": 3,
+      "description": "Reforge stage 5: window 25, 5 commit(s), 9 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793283428.8280635,
+      "timestamp_str": "2026-10-29 17:17:08",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-1",
+      "phase": "reforge stage 6",
+      "phase_num": 3,
+      "description": "Reforge stage 6: window 30, 5 commit(s), 17 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793283706.626335,
+      "timestamp_str": "2026-10-29 17:21:46",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-1",
+      "phase": "reforge stage 7",
+      "phase_num": 3,
+      "description": "Reforge stage 7: window 35, 5 commit(s), 48 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793283835.4894292,
+      "timestamp_str": "2026-10-29 17:23:55",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-1",
+      "phase": "reforge stage 8",
+      "phase_num": 3,
+      "description": "Reforge stage 8: window 40, 5 commit(s), 30 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793284075.8842967,
+      "timestamp_str": "2026-10-29 17:27:55",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-1",
+      "phase": "reforge stage 9",
+      "phase_num": 3,
+      "description": "Reforge stage 9: window 41, 1 commit(s), 7 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "completed",
+      "timestamp": 1793284154.2908888,
+      "timestamp_str": "2026-10-29 17:29:14",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-1",
+      "phase": "in_progress",
+      "phase_num": 5,
+      "description": "checklists: passed; 4/4 project gates before delivery",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793284277.4099996,
+      "timestamp_str": "2026-10-29 17:31:17",
+      "agent": "opencode:reforge"
+    },
+    {
+      "task_id": "reforge:run-1",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'reforge:run-1' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793284340.5974581,
+      "timestamp_str": "2026-10-29 17:32:20",
+      "agent": "opencode:reforge"
     }
   ]
 }

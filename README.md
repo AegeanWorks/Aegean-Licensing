@@ -151,10 +151,13 @@ aegean-licensing/
 ├── LICENSE                   <- Aegean License 1.1 (copy of licenses/AL-1.1.md)
 ├── COMMERCIAL.md             <- Commercial licensing terms & Exhibit A
 ├── README.md                 <- Architecture, quickstart, and commands
+├── assets/
 ├── pyproject.toml            <- Packaging metadata and console entrypoints
 ├── setup.py                  <- Build hook that bundles legal documents into the wheel
 ├── .aikit/                   <- AIKit memory: record, ledger, decisions
 │   ├── project.json
+│   ├── media.json
+│   ├── reforge.json
 │   ├── task_ledger.json
 │   ├── decisions.md
 │   ├── guidelines.md

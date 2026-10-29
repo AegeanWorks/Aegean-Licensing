@@ -10,7 +10,7 @@
 - **Total Classes**: `15`
 - **Total Top-Level Functions**: `28`
 - **Total Class Methods**: `77`
-- **Total Source Lines**: `1863`
+- **Total Source Lines**: `1864`
 
 ---
 
@@ -112,7 +112,7 @@
 ### [`aegean_licensing/verifier.py`](aegean_licensing/verifier.py)
 > *Commercial License Certificate Verification Module.*
 
-**Size**: `357` lines (`14755` bytes)
+**Size**: `358` lines (`14813` bytes)
 
 **Classes:**
 - `class VerificationResult` - *Outcome of validating a License Grant Certificate.*

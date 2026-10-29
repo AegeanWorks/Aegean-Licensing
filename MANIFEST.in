@@ -5,7 +5,7 @@ include COMMERCIAL.md
 include pyproject.toml
 include setup.py
 recursive-include aegean_licensing *.py
-recursive-include licenses *.md *.txt
+recursive-include licenses *.md *.txt *.json
 recursive-include policies *.md
 recursive-include tests *.py
 include .github/workflows/cla-check.yml

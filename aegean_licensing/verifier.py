@@ -56,7 +56,7 @@ def _type_error(data: Dict[str, Any]) -> Optional[str]:
     else:
         return "'projects' must be a string or a list of strings."
     allowances = data.get("allowances", [])
-    if isinstance(allowances, str) or allowances is None:
+    if isinstance(allowances, str):
         pass
     elif isinstance(allowances, (list, tuple)):
         if not all(isinstance(allowance, str) for allowance in allowances):
@@ -158,7 +158,8 @@ def verify_certificate(
         reasons.append(f"Certificate payload cannot be canonicalized: {exc}")
         return VerificationResult(is_valid=False, status="INVALID_FORMAT",
                                   reasons=tuple(reasons))
-    if not hmac.compare_digest(recorded_digest, expected_digest):
+    if not hmac.compare_digest(recorded_digest.encode("utf-8", "surrogatepass"),
+                               expected_digest.encode("utf-8")):
         reasons.append(
             f"Digest mismatch! Recorded digest '{recorded_digest}' does not match computed '{expected_digest}'."
         )
