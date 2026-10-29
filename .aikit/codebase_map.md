@@ -10,7 +10,7 @@
 - **Total Classes**: `15`
 - **Total Top-Level Functions**: `28`
 - **Total Class Methods**: `77`
-- **Total Source Lines**: `1864`
+- **Total Source Lines**: `1869`
 
 ---
 
@@ -297,7 +297,7 @@
 ### [`tests/test_workflow_assets.py`](tests/test_workflow_assets.py)
 > *Asset tests for the CLA workflow, CI workflow, and packaging manifest.*
 
-**Size**: `66` lines (`3095` bytes)
+**Size**: `71` lines (`3398` bytes)
 
 **Classes:**
 - `class TestWorkflowAssets` - *Test the durable CLA register, workflow wiring, and manifest coverage.*

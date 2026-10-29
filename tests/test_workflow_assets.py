@@ -56,10 +56,15 @@ class TestWorkflowAssets(unittest.TestCase):
             "recursive-include policies",
             ".github/workflows/cla-check.yml",
             "include setup.py",
+            "include REUSE.toml",
+            "*.json",
         ):
             self.assertIn(entry, manifest)
         for directory in ("licenses", "policies"):
             self.assertTrue((REPO_ROOT / directory).is_dir())
+        self.assertTrue((REPO_ROOT / "REUSE.toml").is_file())
+        self.assertIn("LicenseRef-AL-1.1", (REPO_ROOT / "REUSE.toml").read_text(encoding="utf-8"))
+        self.assertTrue((REPO_ROOT / "licenses" / "LicenseRef-AL-1.1.txt").is_file())
 
 
 if __name__ == "__main__":

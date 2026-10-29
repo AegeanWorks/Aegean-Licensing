@@ -4,39 +4,13 @@
     "task_id": "task-licensing-reuse-metadata-v1",
     "last_phase": "in_progress",
     "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1793285361.9576094,
+    "status": "in_progress",
+    "updated_at": 1793286334.049474,
     "owner": "opencode:reforge-main",
     "started_by": "opencode:reforge-main",
-    "continuations": [],
-    "completed_at": 1793285395.5061374
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "licensing-v7",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/2] Reference and browser contracts aligned; 60 tests and 4/4 gates pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793088298.8130217,
-      "timestamp_str": "2026-10-27 11:04:58",
-      "agent": "kilo:main",
-      "handoff": {
-        "state": "the website Node suite carries 37 assertions",
-        "next": "commit, close the task and push"
-      }
-    },
-    {
-      "task_id": "licensing-v7",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'licensing-v7' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793088376.019042,
-      "timestamp_str": "2026-10-27 11:06:16",
-      "agent": "kilo:main"
-    },
     {
       "task_id": "licensing-v8",
       "phase": "phase 2",
@@ -254,6 +228,28 @@
       "status": "completed",
       "timestamp": 1793285395.5061393,
       "timestamp_str": "2026-10-29 17:49:55",
+      "agent": "opencode:reforge-main"
+    },
+    {
+      "task_id": "task-licensing-reuse-metadata-v1",
+      "phase": "in_progress",
+      "phase_num": 3,
+      "description": "[2/2] Ship REUSE.toml in the sdist manifest and pin it in the workflow-assets test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793286333.9116056,
+      "timestamp_str": "2026-10-29 18:05:33",
+      "agent": "opencode:reforge-main"
+    },
+    {
+      "task_id": "task-licensing-reuse-metadata-v1",
+      "phase": "in_progress",
+      "phase_num": 5,
+      "description": "checklists: passed; 4/4 project gates before delivery",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793286334.049474,
+      "timestamp_str": "2026-10-29 18:05:34",
       "agent": "opencode:reforge-main"
     }
   ]
