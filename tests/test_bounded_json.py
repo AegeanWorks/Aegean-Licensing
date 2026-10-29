@@ -83,6 +83,12 @@ class TestLoadBounded(unittest.TestCase):
         path = self.write("bom.json", b"\xef\xbb\xbf{}")
         self.assertEqual(load_bounded(path), {})
 
+    def test_environment_limits_are_honored_by_default(self):
+        path = self.write("env.json", b"{}")
+        with mock.patch.dict("os.environ", {"AEGEAN_JSON_MAX_BYTES": "1"}):
+            with self.assertRaises(TooLarge):
+                load_bounded(path)
+
     def test_corrupt_json_under_the_cap_raises_a_value_error(self):
         path = self.write("corrupt.json", b"{")
         with self.assertRaises(ValueError):

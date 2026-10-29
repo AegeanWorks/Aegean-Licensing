@@ -124,7 +124,7 @@ def _guard_structure(text: str, limits: ParseLimits) -> None:
 def load_bounded(path: Union[str, Path], limits: Optional[ParseLimits] = None) -> Any:
     """Read and parse one JSON file under byte, depth and node limits."""
     target = Path(path)
-    limits = limits or ParseLimits()
+    limits = limits or limits_from_env()
     with open(target, "rb") as handle:
         observed = os.fstat(handle.fileno()).st_size
         if observed > limits.max_bytes:

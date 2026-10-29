@@ -39,6 +39,22 @@ class TestMetadata(unittest.TestCase):
             cert_from_dict({"cert_id": "x", "licensee_name": "Acme",
                             "licensee_contact": "a@example.com", "projects": ["ok", "<bad>"]})
 
+    def test_cert_from_dict_normalizes_notes_and_crypto_fields(self):
+        cert = cert_from_dict({"cert_id": "x", "licensee_name": "Acme",
+                               "licensee_contact": "a@example.com",
+                               "notes": "  renewal  due ", "digest": "a" * 64,
+                               "signature": "b" * 64, "terms_digest": "c" * 64})
+        self.assertEqual(cert.notes, "renewal due")
+        self.assertEqual(cert.digest, "a" * 64)
+        self.assertEqual(cert.signature, "b" * 64)
+        self.assertEqual(cert.terms_digest, "c" * 64)
+        for field, value in (("notes", "<script>"), ("digest", "<b>"),
+                             ("signature", "<b>"), ("terms_digest", "<b>")):
+            with self.subTest(field=field):
+                with self.assertRaises(MetadataError):
+                    cert_from_dict({"cert_id": "x", "licensee_name": "Acme",
+                                    "licensee_contact": "a@example.com", field: value})
+
     def test_cert_from_dict_normalizes_project_and_allowance_spaces(self):
         cert = cert_from_dict({"cert_id": "x", "licensee_name": "  Acme  ",
                                "licensee_contact": "a@example.com",

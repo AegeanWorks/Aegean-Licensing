@@ -9,8 +9,8 @@
 - **Total Python Modules**: `25`
 - **Total Classes**: `27`
 - **Total Top-Level Functions**: `35`
-- **Total Class Methods**: `105`
-- **Total Source Lines**: `2327`
+- **Total Class Methods**: `107`
+- **Total Source Lines**: `2349`
 
 ---
 
@@ -33,7 +33,7 @@
 ### [`aegean_licensing/bounded_json.py`](aegean_licensing/bounded_json.py)
 > *Bounded JSON loading for files that cross an untrusted boundary.*
 
-**Size**: `137` lines (`5062` bytes)
+**Size**: `137` lines (`5066` bytes)
 
 **Classes:**
 - `class ParseLimits`
@@ -67,7 +67,7 @@
 ### [`aegean_licensing/cert.py`](aegean_licensing/cert.py)
 > *License Certificate Data Model and Cryptographic Hashing.*
 
-**Size**: `182` lines (`7409` bytes)
+**Size**: `182` lines (`7357` bytes)
 
 **Classes:**
 - `class LicenseCertificate` - *Immutable data transfer object representing a granted commercial license.*
@@ -210,7 +210,7 @@
 ### [`tests/test_bounded_json.py`](tests/test_bounded_json.py)
 > *Unit tests for bounded JSON loading (IDEA-118).*
 
-**Size**: `109` lines (`4503` bytes)
+**Size**: `115` lines (`4768` bytes)
 
 **Classes:**
 - `class TestParseLimits`
@@ -225,6 +225,7 @@
   - Method `.test_depth_is_bounded_below_the_byte_cap()`
   - Method `.test_node_count_is_bounded()`
   - Method `.test_utf8_bom_is_accepted()`
+  - Method `.test_environment_limits_are_honored_by_default()`
   - Method `.test_corrupt_json_under_the_cap_raises_a_value_error()`
   - Method `.test_register_loader_uses_the_bounded_path()`
   - Method `.test_verifier_file_loader_uses_the_bounded_path()`
@@ -310,7 +311,7 @@
 ### [`tests/test_metadata.py`](tests/test_metadata.py)
 > *Unit tests for rendered certificate metadata validation (IDEA-090).*
 
-**Size**: `53` lines (`2620` bytes)
+**Size**: `69` lines (`3608` bytes)
 
 **Classes:**
 - `class TestMetadata`
@@ -319,6 +320,7 @@
   - Method `.test_control_and_line_separator_characters_are_rejected()`
   - Method `.test_utf8_length_is_capped()`
   - Method `.test_cert_from_dict_rejects_unsafe_metadata()`
+  - Method `.test_cert_from_dict_normalizes_notes_and_crypto_fields()`
   - Method `.test_cert_from_dict_normalizes_project_and_allowance_spaces()`
 
 ---
