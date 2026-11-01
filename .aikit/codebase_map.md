@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `25`
-- **Total Classes**: `27`
-- **Total Top-Level Functions**: `35`
-- **Total Class Methods**: `107`
-- **Total Source Lines**: `2349`
+- **Total Classes**: `29`
+- **Total Top-Level Functions**: `42`
+- **Total Class Methods**: `127`
+- **Total Source Lines**: `2780`
 
 ---
 
@@ -88,7 +88,7 @@
 ### [`aegean_licensing/cli.py`](aegean_licensing/cli.py)
 > *Aegean License Certificate verification command line (`aegean-license verify`).*
 
-**Size**: `95` lines (`3937` bytes)
+**Size**: `112` lines (`4854` bytes)
 
 **Functions:**
 - `def _build_parser()`
@@ -100,7 +100,7 @@
 ### [`aegean_licensing/fingerprint.py`](aegean_licensing/fingerprint.py)
 > *A stable identity for the rules a verification result was produced under.*
 
-**Size**: `61` lines (`2337` bytes)
+**Size**: `62` lines (`2403` bytes)
 
 **Classes:**
 - `class VerificationProfile`
@@ -151,27 +151,34 @@
 ### [`aegean_licensing/register.py`](aegean_licensing/register.py)
 > *Public certificate register: which certificates AegeanWorks issued, and which it revoked (ADR-013).*
 
-**Size**: `75` lines (`3233` bytes)
+**Size**: `190` lines (`9217` bytes)
 
 **Classes:**
 - `class RegisterEntry` - *One issued certificate, as the public may see it.*
+- `class RegisterDocument` - *The register file, including the freshness window that bounds its revocation view.*
+  - Method `.freshness(moment)` - *Whether the register is fresh at `moment`; a missing window is not fresh.*
 
 **Functions:**
+- `def _parse_timestamp(value, field)`
+- `def _parse_date(value, field)`
+- `def load_register_document(path)` - *Read the register and its freshness window; a missing file is an empty v2 document.*
 - `def load_register(path)` - *Every entry keyed by certificate id; a missing register is empty.*
+- `def entry_effective_date(entry)` - *The date a revocation takes effect: its recorded invalidity date, else the publication date.*
 
 ---
 
 ### [`aegean_licensing/verifier.py`](aegean_licensing/verifier.py)
 > *Commercial License Certificate Verification Module.*
 
-**Size**: `360` lines (`14921` bytes)
+**Size**: `437` lines (`19039` bytes)
 
 **Classes:**
 - `class VerificationResult` - *Outcome of validating a License Grant Certificate.*
 
 **Functions:**
+- `def _date_moment(value)` - *End of the named UTC day, used when a caller asks for an as-of/historical check.*
 - `def _type_error(data)` - *A field whose JSON type cannot be read safely, or None.*
-- `def verify_certificate(target, secret_key, check_project, reference_date, register_path)` - *Verify authenticity, tamper-resistance, expiration, and scope of a license certificate. With*
+- `def verify_certificate(target, secret_key, check_project, reference_date, register_path, as_of)` - *Verify authenticity, tamper-resistance, expiration, and scope of a license certificate. With*
 
 ---
 
@@ -199,11 +206,13 @@
 ### [`tests/fixtures.py`](tests/fixtures.py)
 > *Test-only certificate builder (ADR-017).*
 
-**Size**: `58` lines (`2434` bytes)
+**Size**: `91` lines (`3812` bytes)
 
 **Functions:**
+- `def day(offset)` - *The ISO date `offset` days from today; negative offsets are in the past.*
+- `def moment(offset)` - *The UTC timestamp at midnight, `offset` days from today.*
 - `def issue_certificate(licensee_name, licensee_contact, license_type, projects, scope, is_perpetual, expires_at, notes, secret_key, cert_id, issued_at, tier, allowances)`
-- `def write_register(path, *certs, revoked)` - *A register file listing `certs`, with the ids in `revoked` marked revoked.*
+- `def write_register(path, *certs, revoked, reason_code, invalidity_date, generated_at, next_update, revoked_at)` - *A version-2 register listing `certs`, with the ids in `revoked` marked revoked.*
 
 ---
 
@@ -264,7 +273,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for the public verification command line.*
 
-**Size**: `88` lines (`3828` bytes)
+**Size**: `117` lines (`5345` bytes)
 
 **Classes:**
 - `class TestCLI` - *The public CLI verifies; issuing and revoking are private (ADR-017).*
@@ -274,6 +283,8 @@
   - Method `.test_version_output()`
   - Method `.test_only_verify_is_public()`
   - Method `.test_verify_against_the_register()`
+  - Method `.test_as_of_reports_a_historical_key_compromise_as_valid()`
+  - Method `.test_a_malformed_as_of_date_is_a_clean_error()`
   - Method `.test_unregistered_certificate_fails_with_the_register()`
   - Method `.test_an_explicitly_missing_register_is_an_error()`
   - Method `.test_the_public_cli_has_no_signing_key_option()`
@@ -328,7 +339,7 @@
 ### [`tests/test_register.py`](tests/test_register.py)
 > *Unit tests for reading the public certificate register (ADR-013, ADR-017).*
 
-**Size**: `135` lines (`6752` bytes)
+**Size**: `294` lines (`15039` bytes)
 
 **Classes:**
 - `class TestRegister` - *The register is the public proof of issuance and revocation.*
@@ -342,6 +353,24 @@
   - Method `.test_a_non_text_digest_is_refused_instead_of_crashing_compare_digest()`
   - Method `.test_a_missing_register_is_empty()`
   - Method `.test_verifying_against_a_missing_register_is_an_error()`
+- `class TestRegisterVersionTwo` - *Freshness, typed revocation and as-of behavior (IDEA-935, IDEA-948).*
+  - Method `.setUp()`
+  - Method `.issue(name)`
+  - Method `.test_a_stale_register_is_refused()`
+  - Method `.test_a_version_one_register_is_undated()`
+  - Method `.test_a_future_generated_at_is_refused()`
+  - Method `.test_version_two_requires_freshness_metadata()`
+  - Method `.test_freshness_window_is_bounded()`
+  - Method `.test_version_one_rejects_version_two_entry_fields()`
+  - Method `.test_an_unknown_reason_code_is_refused()`
+  - Method `.test_invalidity_date_requires_a_retroactive_code()`
+  - Method `.test_invalidity_date_cannot_be_after_revocation()`
+  - Method `.test_key_compromise_is_valid_as_of_before_the_effective_date()`
+  - Method `.test_a_non_retroactive_revocation_is_revoked_as_of_any_date()`
+  - Method `.test_as_of_before_issuance_is_not_yet_issued()`
+  - Method `.test_as_of_and_reference_date_are_exclusive()`
+  - Method `.test_a_historical_question_is_judged_against_todays_register_not_the_asked_date()`
+  - Method `.test_a_stale_register_still_refuses_a_historical_question()`
 - `class TestAllowances` - *ACL-1.0 exceptions are checked certificate data (ADR-014).*
   - Method `.test_allowances_verify_and_tampering_is_caught()`
   - Method `.test_a_self_consistent_unknown_allowance_is_invalid()`

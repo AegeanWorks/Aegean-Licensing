@@ -7,9 +7,9 @@ import unittest
 from pathlib import Path
 
 from aegean_licensing.cert import cert_from_dict, cert_to_dict, compute_digest
-from aegean_licensing.register import load_register
+from aegean_licensing.register import load_register, load_register_document
 from aegean_licensing.verifier import verify_certificate
-from tests.fixtures import issue_certificate, write_register
+from tests.fixtures import day, issue_certificate, moment, write_register
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -29,6 +29,9 @@ class TestRegister(unittest.TestCase):
         path = REPO_ROOT / "licenses" / "issued.json"
         load_register(path)
         data = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(data["version"], 2)
+        self.assertRegex(data["generated_at"], r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
+        self.assertRegex(data["next_update"], r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
         for entry in data["certificates"].values():
             self.assertEqual(sorted(entry), ["digest", "issued_at", "license_type", "reason",
                                              "revoked_at", "status"])
@@ -105,6 +108,162 @@ class TestRegister(unittest.TestCase):
         self.assertFalse(result.is_valid)
         self.assertEqual(result.status, "INVALID_FORMAT")
         self.assertIn("does not exist", result.reasons[0])
+
+
+class TestRegisterVersionTwo(unittest.TestCase):
+    """Freshness, typed revocation and as-of behavior (IDEA-935, IDEA-948)."""
+
+    def setUp(self):
+        self.temp_dir = Path(tempfile.mkdtemp(prefix="test_register_v2_"))
+        self.addCleanup(shutil.rmtree, self.temp_dir, ignore_errors=True)
+        self.register = self.temp_dir / "issued.json"
+
+    def issue(self, name="Register V2 Corp"):
+        return issue_certificate(licensee_name=name, licensee_contact="legal@register.example",
+                                 issued_at="2026-10-25")
+
+    def test_a_stale_register_is_refused(self):
+        cert = self.issue()
+        write_register(self.register, cert, generated_at="2026-01-01T00:00:00Z",
+                       next_update="2026-01-02T00:00:00Z")
+        result = verify_certificate(cert_to_dict(cert), register_path=self.register)
+        self.assertFalse(result.is_valid)
+        self.assertEqual(result.status, "STALE_REGISTER")
+        self.assertIn("freshness window", result.reasons[0])
+
+    def test_a_version_one_register_is_undated(self):
+        cert = self.issue()
+        self.register.write_text(json.dumps({
+            "version": 1,
+            "certificates": {cert.cert_id: {
+                "digest": cert.digest, "license_type": cert.license_type,
+                "issued_at": cert.issued_at, "status": "valid"}}}), encoding="utf-8")
+        result = verify_certificate(cert_to_dict(cert), register_path=self.register)
+        self.assertFalse(result.is_valid)
+        self.assertEqual(result.status, "UNDATED_REGISTER")
+
+    def test_a_future_generated_at_is_refused(self):
+        cert = self.issue()
+        write_register(self.register, cert, generated_at=moment(1),
+                       next_update=moment(30))
+        result = verify_certificate(cert_to_dict(cert), register_path=self.register)
+        self.assertFalse(result.is_valid)
+        self.assertEqual(result.status, "STALE_REGISTER")
+
+    def test_version_two_requires_freshness_metadata(self):
+        cert = self.issue()
+        self.register.write_text(json.dumps({
+            "version": 2,
+            "certificates": {cert.cert_id: {
+                "digest": cert.digest, "license_type": cert.license_type,
+                "issued_at": cert.issued_at, "status": "valid"}}}), encoding="utf-8")
+        with self.assertRaises(ValueError) as caught:
+            load_register_document(self.register)
+        self.assertIn("generated_at/next_update", str(caught.exception))
+
+    def test_freshness_window_is_bounded(self):
+        cert = self.issue()
+        write_register(self.register, cert, generated_at="2020-01-01T00:00:00Z",
+                       next_update="2026-01-01T00:00:00Z")
+        with self.assertRaises(ValueError) as caught:
+            load_register_document(self.register)
+        self.assertIn("longer than", str(caught.exception))
+
+    def test_version_one_rejects_version_two_entry_fields(self):
+        cert = self.issue()
+        self.register.write_text(json.dumps({
+            "version": 1,
+            "certificates": {cert.cert_id: {
+                "digest": cert.digest, "license_type": cert.license_type,
+                "issued_at": cert.issued_at, "status": "revoked",
+                "revoked_at": "2026-11-01", "reason_code": "other"}}}), encoding="utf-8")
+        with self.assertRaises(ValueError) as caught:
+            load_register_document(self.register)
+        self.assertIn("version-2 fields", str(caught.exception))
+
+    def test_an_unknown_reason_code_is_refused(self):
+        cert = self.issue()
+        write_register(self.register, cert, revoked={cert.cert_id}, reason_code="because")
+        with self.assertRaises(ValueError) as caught:
+            load_register_document(self.register)
+        self.assertIn("unknown reason_code", str(caught.exception))
+
+    def test_invalidity_date_requires_a_retroactive_code(self):
+        cert = self.issue()
+        write_register(self.register, cert, revoked={cert.cert_id},
+                       reason_code="non-payment", invalidity_date="2026-10-01")
+        with self.assertRaises(ValueError) as caught:
+            load_register_document(self.register)
+        self.assertIn("non-retroactive", str(caught.exception))
+
+    def test_invalidity_date_cannot_be_after_revocation(self):
+        cert = self.issue()
+        write_register(self.register, cert, revoked={cert.cert_id},
+                       reason_code="key-compromise", invalidity_date=day(1))
+        with self.assertRaises(ValueError) as caught:
+            load_register_document(self.register)
+        self.assertIn("after revoked_at", str(caught.exception))
+
+    def test_key_compromise_is_valid_as_of_before_the_effective_date(self):
+        cert = self.issue()
+        before, after = day(-5), day(1)
+        write_register(self.register, cert, revoked={cert.cert_id},
+                       reason_code="key-compromise", invalidity_date=day(0))
+        current = verify_certificate(cert_to_dict(cert), register_path=self.register)
+        self.assertEqual(current.status, "REVOKED")
+        historical = verify_certificate(cert_to_dict(cert), register_path=self.register,
+                                        as_of=before)
+        self.assertTrue(historical.is_valid)
+        self.assertEqual(historical.status, "VALID_AS_OF")
+        self.assertTrue(historical.historical)
+        self.assertIn(f"was valid on {before}", historical.reasons[0])
+        after_result = verify_certificate(cert_to_dict(cert), register_path=self.register,
+                                          as_of=after)
+        self.assertEqual(after_result.status, "REVOKED")
+
+    def test_a_non_retroactive_revocation_is_revoked_as_of_any_date(self):
+        cert = self.issue()
+        write_register(self.register, cert, revoked={cert.cert_id},
+                       reason_code="non-payment")
+        result = verify_certificate(cert_to_dict(cert), register_path=self.register,
+                                    as_of="2026-10-26")
+        self.assertEqual(result.status, "REVOKED")
+
+    def test_as_of_before_issuance_is_not_yet_issued(self):
+        cert = self.issue()
+        write_register(self.register, cert)
+        result = verify_certificate(cert_to_dict(cert), register_path=self.register,
+                                    as_of="2026-10-01")
+        self.assertEqual(result.status, "NOT_YET_ISSUED")
+        self.assertFalse(result.is_valid)
+
+    def test_as_of_and_reference_date_are_exclusive(self):
+        with self.assertRaises(ValueError):
+            verify_certificate(cert_to_dict(self.issue()), as_of="2026-10-26",
+                               reference_date="2026-10-26")
+
+    def test_a_historical_question_is_judged_against_todays_register_not_the_asked_date(self):
+        # Freshness asks whether the register file is current, not whether it existed on the
+        # queried date. Judging it at `as_of` rejected every question about a date before the
+        # register was generated as STALE_REGISTER, even though a newer register is better
+        # evidence for an older date.
+        cert = self.issue()
+        write_register(self.register, cert, revoked={cert.cert_id},
+                       reason_code="key-compromise", invalidity_date=day(0))
+        result = verify_certificate(cert_to_dict(cert), register_path=self.register,
+                                    as_of=day(-5))
+        self.assertEqual(result.status, "VALID_AS_OF")
+        self.assertTrue(result.is_valid)
+
+    def test_a_stale_register_still_refuses_a_historical_question(self):
+        # The fix above must not turn the freshness gate off for historical checks.
+        cert = self.issue()
+        write_register(self.register, cert, generated_at=moment(-90),
+                       next_update=moment(-60))
+        result = verify_certificate(cert_to_dict(cert), register_path=self.register,
+                                    as_of=day(-5))
+        self.assertFalse(result.is_valid)
+        self.assertEqual(result.status, "STALE_REGISTER")
 
 
 class TestAllowances(unittest.TestCase):

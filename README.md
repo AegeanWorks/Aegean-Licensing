@@ -66,16 +66,23 @@ operations tooling and are not distributed (ADR-017).
 
 ### 1. Verify a Certificate
 ```bash
-python -m aegean_licensing verify license_certificate_<id>.json --project chronos   --register licenses/issued.json
+python -m aegean_licensing verify license_certificate_<id>.json --project chronos --register licenses/issued.json
+python -m aegean_licensing verify license_certificate_<id>.json --register licenses/issued.json --as-of 2026-10-26
 ```
 
 The register (`licenses/issued.json`) is the public proof of authenticity: it lists each issued
-certificate's id, digest, license type, date and status, never licensee data. An HMAC signature
-can be checked only with the signing key, which is never published (ADR-013). A certificate
-missing from the register is `UNREGISTERED`; a revoked one is `REVOKED`. Always use the register
-from this repository, not a copy supplied with the certificate. The exact canonicalization and a
-known-answer vector for third-party verifiers are published in
-[`licenses/VERIFICATION.md`](licenses/VERIFICATION.md).
+certificate's id, digest, license type, date and status, never licensee data, plus a `generated_at`
+/ `next_update` freshness window and a closed `reason_code` on revocations. An HMAC signature can
+be checked only with the signing key, which is never published (ADR-013). A certificate missing
+from the register is `UNREGISTERED`; a revoked one is `REVOKED`. A missing or expired freshness
+window is `UNDATED_REGISTER` / `STALE_REGISTER`, and the verifier fails closed. Always use the
+register from this repository, not a copy supplied with the certificate. The exact
+canonicalization, register format and a known-answer vector for third-party verifiers are
+published in [`licenses/VERIFICATION.md`](licenses/VERIFICATION.md).
+
+`--as-of DATE` is a historical question, not a current authorization. A key-compromise entry that
+carries an `invalidity_date` can be `VALID_AS_OF` before that date; every other revocation is
+prospective and stays `REVOKED`. `--as-of` and `--date` cannot be combined.
 
 Only **format 2** certificates verify: each carries a random 256-bit `serial`, and its digest
 is bound to the format-2 domain. Any format-1 certificate, including one made with the issuer

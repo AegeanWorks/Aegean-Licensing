@@ -10,7 +10,7 @@ from pathlib import Path
 
 from aegean_licensing.cert import cert_to_dict
 from aegean_licensing.cli import main
-from tests.fixtures import issue_certificate, write_register
+from tests.fixtures import day, issue_certificate, write_register
 
 
 class TestCLI(unittest.TestCase):
@@ -57,6 +57,35 @@ class TestCLI(unittest.TestCase):
         code, out, _ = self.run_cli("verify", str(self.write_cert(cert)), "--register", str(register))
         self.assertEqual(code, 1)
         self.assertIn("REVOKED", out)
+
+    def test_as_of_reports_a_historical_key_compromise_as_valid(self):
+        cert = issue_certificate(licensee_name="Historical Corp", licensee_contact="h@example.com",
+                                 issued_at="2026-10-25")
+        register = self.temp_dir / "issued.json"
+        before = day(-5)
+        write_register(register, cert, revoked={cert.cert_id},
+                       reason_code="key-compromise", invalidity_date=day(0))
+        path = self.write_cert(cert)
+        code, out, _ = self.run_cli("verify", str(path), "--register", str(register))
+        self.assertEqual(code, 1)
+        self.assertIn("REVOKED", out)
+
+        code, out, _ = self.run_cli("verify", str(path), "--register", str(register),
+                                    "--as-of", before)
+        self.assertEqual(code, 0)
+        self.assertIn("Status : VALID_AS_OF", out)
+        self.assertIn("historical, not a current authorization", out)
+        self.assertIn(f"was valid as of {before}", out)
+
+    def test_a_malformed_as_of_date_is_a_clean_error(self):
+        cert = issue_certificate(licensee_name="As Of Corp", licensee_contact="a@example.com")
+        register = self.temp_dir / "issued.json"
+        write_register(register, cert)
+        code, out, err = self.run_cli("verify", str(self.write_cert(cert)),
+                                      "--register", str(register), "--as-of", "not-a-date")
+        self.assertEqual(code, 1)
+        self.assertIn("YYYY-MM-DD", err)
+        self.assertEqual(out, "")
 
     def test_unregistered_certificate_fails_with_the_register(self):
         cert = issue_certificate(licensee_name="Forger", licensee_contact="f@example.com")

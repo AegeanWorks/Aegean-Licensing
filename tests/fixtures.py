@@ -5,6 +5,7 @@ public data model, so the verifier is tested against exactly the format it reads
 built here is not in the public register, which is the whole point of the register.
 """
 
+import datetime
 import json
 import secrets
 import uuid
@@ -12,6 +13,21 @@ from pathlib import Path
 
 from aegean_licensing.cert import cert_from_dict, compute_digest, compute_signature
 from aegean_licensing.license_terms import resolve_license, terms_digest
+
+# A test must never encode a wall-clock date: a constant that means "in the future" becomes the
+# past and the assertion flips without any code change. Every date below is derived from the day
+# the suite runs, so "future" and "stale" keep their meaning forever.
+TODAY = datetime.datetime.now(datetime.timezone.utc).date()
+
+
+def day(offset: int) -> str:
+    """The ISO date `offset` days from today; negative offsets are in the past."""
+    return (TODAY + datetime.timedelta(days=offset)).isoformat()
+
+
+def moment(offset: int) -> str:
+    """The UTC timestamp at midnight, `offset` days from today."""
+    return f"{(TODAY + datetime.timedelta(days=offset)).isoformat()}T00:00:00Z"
 
 
 def issue_certificate(licensee_name, licensee_contact, license_type="ACL-1.0", projects=("*",),
@@ -46,13 +62,30 @@ def issue_certificate(licensee_name, licensee_contact, license_type="ACL-1.0", p
     return cert_from_dict(data)
 
 
-def write_register(path, *certs, revoked=()):
-    """A register file listing `certs`, with the ids in `revoked` marked revoked."""
+def write_register(path, *certs, revoked=(), reason_code="other", invalidity_date="",
+                   generated_at=None, next_update=None, revoked_at=None):
+    """A version-2 register listing `certs`, with the ids in `revoked` marked revoked.
+
+    Without explicit dates the register is published yesterday and stays fresh for 30 days, and a
+    revocation happens today: the freshness and retroactivity assertions keep their meaning on any
+    day the suite runs.
+    """
+    generated_at = generated_at or moment(-1)
+    next_update = next_update or moment(30)
+    revoked_at = revoked_at or day(0)
     entries = {}
     for cert in certs:
         entry = {"digest": cert.digest, "license_type": cert.license_type,
-                 "issued_at": cert.issued_at, "status": "valid", "revoked_at": "", "reason": ""}
+                 "issued_at": cert.issued_at, "status": "valid"}
         if cert.cert_id in revoked:
-            entry.update(status="revoked", revoked_at="2026-11-01", reason="terminated for breach")
+            entry.update(status="revoked", revoked_at=revoked_at,
+                         reason="terminated for breach", reason_code=reason_code)
+            if invalidity_date:
+                entry["invalidity_date"] = invalidity_date
         entries[cert.cert_id] = entry
-    Path(path).write_text(json.dumps({"version": 1, "certificates": entries}), encoding="utf-8")
+    Path(path).write_text(json.dumps({
+        "version": 2,
+        "generated_at": generated_at,
+        "next_update": next_update,
+        "certificates": entries,
+    }), encoding="utf-8")

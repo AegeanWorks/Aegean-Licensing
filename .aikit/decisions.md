@@ -292,3 +292,32 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Decision**: Add `aegean_licensing/metadata.py` and validate every rendered field in `cert_from_dict`: collapse whitespace, reject `<`/`>`, control and separator categories, and cap UTF-8 length at 200 bytes. Keep renderer escaping as defence in depth. Add `aegean_licensing/fingerprint.py` with a declarative `VerificationProfile`, a SHA-256 ruleset fingerprint, and `compare_results` that refuses missing or different fingerprints. Every `VerificationResult` carries the default fingerprint.
 - **Consequences**: Unsafe metadata is rejected at admission, including hand-edited certificates, while ordinary names such as `O'Brien & Sons` survive. Results from different rule profiles can be displayed but not aggregated. The certificate format and existing digests are unchanged.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (the rendered value is the validated value) and PRINCIPLE-014 (regression coverage).
+
+### ADR-035: Editorial revision of AL-1.1 removes the named earlier-license example
+- **Date**: 2026-10-29
+- **Status**: Accepted
+- **Context**: The owner requires the operative texts to carry no reference to the earlier license
+  family. Section 10.3 named that family only as an example of rights already granted, and Section 15
+  named it in the compatibility restriction; both read as references to a license the portfolio no
+  longer uses, while the actual grant is unchanged.
+- **Decision**: Section 10.3 preserves earlier grants in general terms without naming the family, and
+  Section 15 states the compatibility limit for copyleft licenses generally. The canonical text,
+  AIKit's pinned copy and every AL-1.1 project copy are updated together; AL-1.1 remains the version
+  for existing releases because the revision removes no permission and narrows no grant.
+- **Consequences**: No operative text names the earlier license. Section 10.3 still preserves earlier
+  grants as a matter of law. A future change that alters permissions still needs a new version rather
+  than an in-place edit.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (the pinned bytes are the
+  licensed bytes) and PRINCIPLE-016 (the canonical text and its copies move atomically).
+
+### ADR-036: Register v2 Freshness, Typed Revocation and As-Of Verification (IDEA-935, IDEA-948)
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: `issued.json` was version 1 with no freshness metadata, so a cached or installed copy could hide a revocation indefinitely. Revocation reasons were free text, every revoked entry was `REVOKED` for every reference date, and there was no way to answer whether a certificate was valid before a key-compromise revocation without weakening current use.
+- **Decision**:
+  1. Bump the register to version 2 with `generated_at`/`next_update` UTC timestamps (maximum window 366 days, five minutes of clock skew). `load_register_document()` reads the window and `verify_certificate` returns `UNDATED_REGISTER`/`STALE_REGISTER` before an entry lookup. Version 1 stays readable but is undated and fails closed; old readers reject version 2 before parsing an entry.
+  2. Add the closed `reason_code` vocabulary (`key-compromise`, `non-payment`, `breach`, `superseded`, `voluntary`, `other`). Only `key-compromise` may carry an `invalidity_date`, which must not follow `revoked_at`.
+  3. Keep current verification fail-closed: any revoked entry is `REVOKED`. Add `--as-of DATE` as a separate historical question. A key-compromise entry with an `invalidity_date` returns `VALID_AS_OF` before that date; other reasons stay `REVOKED`. `--as-of` and `--date` are mutually exclusive, and a date before `issued_at` is `NOT_YET_ISSUED`.
+  4. The private writer refreshes the freshness window on every issue/revoke and passes the code/date through the ops CLI and web API.
+- **Consequences**: A stale or undated register can no longer authorize current use, and a historical answer cannot be mistaken for current authorization. The public register is still unsigned: freshness detects staleness, not a writer who replaces the file. The register was empty at migration time, so no issued entry needed rewriting; a 30-day writer cadence now requires periodic republication. Old verifiers fail closed on version 2, so the version-2 verifier must be released before a version-2 register is published.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (freshness and reason claims match the bytes), PRINCIPLE-011 (fail-closed, actionable statuses) and PRINCIPLE-014 (stale, typed, retroactive and as-of regression tests).

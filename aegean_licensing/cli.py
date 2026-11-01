@@ -31,7 +31,12 @@ def _build_parser() -> argparse.ArgumentParser:
              "in the aegean-licensing repository).",
     )
     p_verify.add_argument("--project", default=None, help="Check if specific project is covered by certificate.")
-    p_verify.add_argument("--date", default=None, help="Reference date (YYYY-MM-DD) for expiration check.")
+    date_group = p_verify.add_mutually_exclusive_group()
+    date_group.add_argument("--date", default=None,
+                            help="Reference date (YYYY-MM-DD) for the expiration check.")
+    date_group.add_argument("--as-of", default=None, metavar="DATE",
+                            help="Historical check: was the certificate valid on DATE? "
+                                 "This is not a current authorization.")
     return parser
 
 
@@ -40,17 +45,24 @@ def _handle_verify(args: argparse.Namespace) -> int:
     if args.register and not Path(args.register).is_file():
         print(f"Error: register file not found: {args.register}", file=sys.stderr)
         return 1
-    result = verify_certificate(
-        target=args.path,
-        check_project=args.project,
-        reference_date=args.date,
-        register_path=args.register,
-    )
+    try:
+        result = verify_certificate(
+            target=args.path,
+            check_project=args.project,
+            reference_date=args.date,
+            register_path=args.register,
+            as_of=args.as_of,
+        )
+    except ValueError as exc:
+        print(f"Error: {exc}", file=sys.stderr)
+        return 1
 
     print("==========================================================")
     print("AEGEAN CERTIFICATE VERIFICATION")
     print("==========================================================")
     print(f"Target : {args.path}")
+    if args.as_of:
+        print(f"Check  : as of {args.as_of} (historical, not a current authorization)")
     print(f"Status : {result.status}")
 
     if result.cert:
@@ -66,9 +78,14 @@ def _handle_verify(args: argparse.Namespace) -> int:
         print(f"Covered: {', '.join(result.cert.projects)}")
         print(f"Terms  : {terms_state}")
         print(f"Listed : {'yes, in the public register' if result.registered else 'not checked'}")
+        if result.register_generated_at:
+            print(f"Register: generated {result.register_generated_at}, "
+                  f"next update {result.register_next_update}")
 
     if result.is_valid:
-        if result.registered:
+        if result.status == "VALID_AS_OF":
+            print(f"[PASS] Certificate was valid as of {args.as_of}; it is NOT a current authorization.")
+        elif result.registered:
             print("[PASS] Certificate is listed in the public register, untampered, and currently valid.")
         else:
             print("[WARN] Certificate is structurally valid and tamper-evident, but its")

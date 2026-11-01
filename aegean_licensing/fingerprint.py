@@ -20,7 +20,8 @@ DEFAULT_PROFILE = VerificationProfile()
 DEFAULT_RULE_DIGESTS = (
     "format-2", "serial-64-hex", "type-checks-before-canonicalization",
     "digest-domain", "signature-domain", "terms-registry", "scope-vocabulary",
-    "allowance-vocabulary", "register-status", "term-consistency", "expiry",
+    "allowance-vocabulary", "register-status", "register-freshness",
+    "typed-revocation", "historical-as-of", "term-consistency", "expiry",
 )
 
 

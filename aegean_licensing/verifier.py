@@ -21,10 +21,24 @@ from aegean_licensing.cert import (
     compute_signature,
 )
 from aegean_licensing.license_terms import resolve_license, terms_digest
-from aegean_licensing.register import STATUS_REVOKED, load_register
+from aegean_licensing.register import (
+    RETROACTIVE_REASON_CODES,
+    STATUS_REVOKED,
+    entry_effective_date,
+    load_register_document,
+)
 
 _SERIAL = re.compile(rf"[0-9a-f]{{{SERIAL_HEX_LENGTH}}}")
 _ISO_DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
+
+
+def _date_moment(value: str) -> datetime.datetime:
+    """End of the named UTC day, used when a caller asks for an as-of/historical check."""
+    if not _ISO_DATE.fullmatch(value):
+        raise ValueError("dates must use YYYY-MM-DD")
+    day = datetime.date.fromisoformat(value)
+    return datetime.datetime.combine(day, datetime.time(23, 59, 59),
+                                     tzinfo=datetime.timezone.utc)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -32,8 +46,9 @@ class VerificationResult:
     """Outcome of validating a License Grant Certificate."""
 
     is_valid: bool
-    # "VALID", "VALID_UNVERIFIED", "TAMPERED", "EXPIRED", "SCOPE_MISMATCH", "INVALID_FORMAT",
-    # "UNREGISTERED", "REVOKED", "UNSUPPORTED_FORMAT"
+    # "VALID", "VALID_UNVERIFIED", "VALID_AS_OF", "NOT_YET_ISSUED", "TAMPERED", "EXPIRED",
+    # "SCOPE_MISMATCH", "INVALID_FORMAT", "UNREGISTERED", "REVOKED", "UNSUPPORTED_FORMAT",
+    # "STALE_REGISTER", "UNDATED_REGISTER"
     status: str
     reasons: tuple[str, ...]
     cert: Optional[LicenseCertificate] = None
@@ -41,6 +56,9 @@ class VerificationResult:
     terms_verified: bool = False
     registered: bool = False
     ruleset_fingerprint: str = DEFAULT_FINGERPRINT
+    register_generated_at: str = ""
+    register_next_update: str = ""
+    historical: bool = False
 
 
 def _type_error(data: Dict[str, Any]) -> Optional[str]:
@@ -84,14 +102,31 @@ def verify_certificate(
     check_project: Optional[str] = None,
     reference_date: Optional[str] = None,
     register_path: Optional[Union[str, Path]] = None,
+    as_of: Optional[str] = None,
 ) -> VerificationResult:
     """
     Verify authenticity, tamper-resistance, expiration, and scope of a license certificate. With
     `register_path`, the public register (ADR-013) proves authenticity without the signing key: a
     certificate absent from it, or listed with another digest, is UNREGISTERED; a revoked one is
-    REVOKED.
+    REVOKED. `as_of` asks a historical question ("was it valid on this date?"), not a current
+    authorization; only a key-compromise entry with an invalidity date can answer VALID_AS_OF.
     """
+    if as_of and reference_date:
+        raise ValueError("Use either as_of or reference_date, not both.")
     reasons: List[str] = []
+    verification_moment = (
+        _date_moment(as_of) if as_of
+        else _date_moment(reference_date) if reference_date
+        else datetime.datetime.now(datetime.timezone.utc)
+    )
+    # Register freshness is a property of the register file against the clock, not of the date the
+    # caller asked about: a register published yesterday is the current one, and it is the best
+    # evidence available for a question about last week. Judging it at `as_of` made every
+    # historical query before the register's generation date fail as STALE_REGISTER.
+    freshness_moment = (
+        _date_moment(reference_date) if reference_date
+        else datetime.datetime.now(datetime.timezone.utc)
+    )
 
     if isinstance(target, (str, Path)):
         file_path = Path(target)
@@ -183,6 +218,18 @@ def verify_certificate(
         return VerificationResult(is_valid=False, status="INVALID_FORMAT",
                                   reasons=tuple(reasons), cert=cert)
 
+    if as_of:
+        try:
+            issued = datetime.date.fromisoformat(cert.issued_at[:10])
+        except (TypeError, ValueError):
+            reasons.append(f"Certificate issue date {cert.issued_at!r} is not a real date.")
+            return VerificationResult(is_valid=False, status="INVALID_FORMAT",
+                                      reasons=tuple(reasons), cert=cert, historical=True)
+        if datetime.date.fromisoformat(as_of) < issued:
+            reasons.append(f"Certificate was not issued until {cert.issued_at}.")
+            return VerificationResult(is_valid=False, status="NOT_YET_ISSUED",
+                                      reasons=tuple(reasons), cert=cert, historical=True)
+
     # 3. Terms check: the certificate must cite an operative agreement whose bundled text matches
     terms_verified = False
     if cert.license_type:
@@ -265,8 +312,9 @@ def verify_certificate(
             )
         signature_verified = True
 
-    # 4b. Public register: issued by AegeanWorks, and not revoked (ADR-013)
+    # 4b. Public register: issued by AegeanWorks, unrevoked and fresh (ADR-013, IDEA-935, IDEA-948)
     registered = False
+    document = None
     if register_path is not None:
         register_file = Path(register_path)
         if not register_file.is_file():
@@ -276,19 +324,42 @@ def verify_certificate(
             return VerificationResult(is_valid=False, status="INVALID_FORMAT",
                                       reasons=tuple(reasons), cert=cert)
         try:
-            entry = load_register(register_file).get(cert.cert_id)
+            document = load_register_document(register_file)
         except (OSError, ValueError) as exc:
             reasons.append(f"Cannot read the certificate register: {exc}")
             return VerificationResult(is_valid=False, status="INVALID_FORMAT",
                                       reasons=tuple(reasons), cert=cert)
+        fresh, freshness_reason = document.freshness(freshness_moment)
+        if not fresh:
+            status = "UNDATED_REGISTER" if not document.generated_at else "STALE_REGISTER"
+            reasons.append(f"Cannot rely on the certificate register: {freshness_reason}.")
+            return VerificationResult(
+                is_valid=False, status=status, reasons=tuple(reasons), cert=cert,
+                register_generated_at=document.generated_at,
+                register_next_update=document.next_update, historical=bool(as_of))
+        entry = document.entries.get(cert.cert_id)
         if entry is None or not hmac.compare_digest(entry.digest, recorded_digest):
             reasons.append(f"Certificate {cert.cert_id} is not in the register of issued certificates.")
-            return VerificationResult(is_valid=False, status="UNREGISTERED",
-                                      reasons=tuple(reasons), cert=cert)
+            return VerificationResult(
+                is_valid=False, status="UNREGISTERED", reasons=tuple(reasons), cert=cert,
+                register_generated_at=document.generated_at,
+                register_next_update=document.next_update, historical=bool(as_of))
         if entry.status == STATUS_REVOKED:
-            reasons.append(f"Certificate {cert.cert_id} was revoked on {entry.revoked_at}: {entry.reason}")
-            return VerificationResult(is_valid=False, status="REVOKED",
-                                      reasons=tuple(reasons), cert=cert)
+            effective = entry_effective_date(entry)
+            if (as_of and entry.reason_code in RETROACTIVE_REASON_CODES and effective
+                    and as_of < effective):
+                reasons.append(
+                    f"Certificate {cert.cert_id} was valid on {as_of}; it was revoked "
+                    f"effective {effective} for {entry.reason_code}.")
+            else:
+                reasons.append(
+                    f"Certificate {cert.cert_id} was revoked on {entry.revoked_at}"
+                    + (f" ({entry.reason_code})" if entry.reason_code else "")
+                    + (f": {entry.reason}" if entry.reason else ""))
+                return VerificationResult(
+                    is_valid=False, status="REVOKED", reasons=tuple(reasons), cert=cert,
+                    register_generated_at=document.generated_at,
+                    register_next_update=document.next_update, historical=bool(as_of))
         registered = True
 
     # 5. Term consistency: perpetual certificates cannot expire, term-limited ones must
@@ -311,7 +382,8 @@ def verify_certificate(
 
     # 6. Expiration check
     if not cert.is_perpetual and cert.expires_at:
-        ref_str = reference_date or datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
+        ref_str = (as_of or reference_date
+                   or datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d"))
         try:
             if not _ISO_DATE.fullmatch(cert.expires_at) or not _ISO_DATE.fullmatch(ref_str):
                 raise ValueError("dates must use YYYY-MM-DD")
@@ -349,12 +421,17 @@ def verify_certificate(
                 cert=cert,
             )
 
+    status = "VALID_AS_OF" if as_of and registered else (
+        "VALID" if signature_verified or registered else "VALID_UNVERIFIED")
     return VerificationResult(
         is_valid=True,
-        status="VALID" if signature_verified or registered else "VALID_UNVERIFIED",
+        status=status,
         reasons=tuple(reasons),
         cert=cert,
         signature_verified=signature_verified,
         terms_verified=terms_verified,
         registered=registered,
+        register_generated_at=document.generated_at if document else "",
+        register_next_update=document.next_update if document else "",
+        historical=bool(as_of),
     )

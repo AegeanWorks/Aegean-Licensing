@@ -13,6 +13,44 @@ signature is a keyed hash that only AegeanWorks can check; the signing key is
 never published. Publishing that key would let anyone forge a certificate, so a
 public verifier must never ask for it and must never implement the signature check.
 
+The register itself is not signed. Its freshness metadata defeats an accidentally
+stale cache, not a writer who can replace the file; the git repository is the
+publication boundary. A verifier must fail closed when the window is missing or
+expired.
+
+## Register format
+
+`licenses/issued.json` is version 2:
+
+```json
+{
+  "version": 2,
+  "generated_at": "2026-10-30T00:00:00Z",
+  "next_update": "2026-11-29T00:00:00Z",
+  "certificates": {
+    "<certificate-id>": {
+      "digest": "<64 lowercase hex>",
+      "license_type": "ACL-1.0",
+      "issued_at": "2026-10-25",
+      "status": "valid"
+    }
+  }
+}
+```
+
+- `generated_at` and `next_update` are UTC timestamps (`YYYY-MM-DDThh:mm:ssZ`).
+- `next_update` must be later than `generated_at`; the reference verifier refuses a
+  window longer than 366 days and allows five minutes of clock skew.
+- A revoked entry adds `revoked_at`, `reason` and `reason_code`. `reason_code` is one
+  of `key-compromise`, `non-payment`, `breach`, `superseded`, `voluntary` or `other`.
+- Only `key-compromise` may carry `invalidity_date`; it must not be later than
+  `revoked_at`. It records when the grant ceased to be effective, which may be
+  before the revocation was published.
+- Version 1 is still readable by this verifier, but it has no freshness evidence and
+  is therefore `UNDATED_REGISTER`. Readers older than version 2 reject the whole
+  file before parsing an entry, which fails closed. Publish the version-2 verifier
+  before writing a version-2 register.
+
 ## Canonical payload
 
 Starting from the parsed certificate object:
@@ -67,19 +105,33 @@ A verifier should return the first applicable status:
 7. `INVALID_FORMAT` — the license type is unknown, the scope or tier is not defined by that
    agreement, an allowance is not in the agreement vocabulary, or a non-empty `terms_digest` does
    not match the published agreement text.
-8. `UNREGISTERED` — the id is absent from the register, or the register's digest for that id
+8. `UNDATED_REGISTER` / `STALE_REGISTER` - the register has no freshness metadata, was generated
+   after the check time, or its `next_update` has passed. The revocation view is not reliable;
+   fail closed before looking up the id.
+9. `UNREGISTERED` - the id is absent from the register, or the register's digest for that id
    differs from the certificate digest.
-9. `REVOKED` — the register lists the id as revoked.
-10. `INVALID_FORMAT` — a perpetual certificate has `expires_at`, or a term-limited certificate has
-   no `expires_at`, or a date is not a real `YYYY-MM-DD` date.
-11. `EXPIRED` — the reference date is after `expires_at`.
-12. `SCOPE_MISMATCH` — a project was requested and is not in `projects` (`*` covers every project).
-13. `VALID` — all checks passed and the register entry is valid.
+10. `REVOKED` - the register lists the id as revoked. Current verification stays fail-closed:
+    any revoked entry is `REVOKED`, even when the entry carries a future or historical
+    `invalidity_date`.
+11. `NOT_YET_ISSUED` - only with `--as-of`: the requested date is before the certificate's
+    `issued_at`.
+12. `INVALID_FORMAT` - a perpetual certificate has `expires_at`, or a term-limited certificate has
+    no `expires_at`, or a date is not a real `YYYY-MM-DD` date.
+13. `EXPIRED` - the reference date or `--as-of` date is after `expires_at`.
+14. `SCOPE_MISMATCH` - a project was requested and is not in `projects` (`*` covers every project).
+15. `VALID` / `VALID_AS_OF` - all checks passed. `VALID_AS_OF` is a historical answer, not a
+    current authorization.
+
+`--as-of DATE` answers "was this certificate valid on DATE?" It uses the end of that
+UTC day for issuance, revocation and expiry. A revoked entry yields `VALID_AS_OF` only
+when its `reason_code` is `key-compromise`, it carries an `invalidity_date`, and DATE
+is before that date. For every other reason code the revocation is prospective, so the
+entry is `REVOKED` for every DATE. `--as-of` and `--date` are mutually exclusive.
 
 The public verifier must use the register copy from this repository, not a copy
 supplied alongside a certificate. A missing, unreadable or malformed register is
-an error, not an empty register. A register entry with an unknown `status` is
-malformed; only `valid` and `revoked` are understood.
+an error, not an empty register. A register entry with an unknown `status`, reason
+code or invalidity date is malformed; only `valid` and `revoked` are understood.
 
 The certificate digest and the HMAC signature are different checks. The public
 register is the public proof; the signature is checked only in AegeanWorks'
@@ -105,8 +157,9 @@ sorting or project sorting fails the vector. The Python test is
 A verifier should cap the input size (the reference uses 16 MiB, nesting depth 64 and a
 200,000-node budget), parse JSON strictly, read only known fields,
 and render every certificate value as text rather than HTML. It should fetch the
-register over HTTPS from the canonical repository and show when it was fetched, so
-a stale cached revocation is visible to the user. Each result should carry a stable
+register over HTTPS from the canonical repository, respect `generated_at` and
+`next_update`, and show when it was fetched; a missing or expired window is a
+failure, not an empty revocation list. Each result should carry a stable
 fingerprint of the verification profile and rule set; results with different
 fingerprints may be shown side by side but must never be aggregated as if they
 were produced under the same rules. These are implementation rules, not

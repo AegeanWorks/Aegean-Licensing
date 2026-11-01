@@ -4,6 +4,7 @@ All notable changes to Aegean Licensing documents are recorded here.
 
 ## Unreleased — Draft v0.3
 
+- **Register v2**: the public register carries `generated_at`/`next_update` freshness metadata and closed revocation `reason_code`s; a missing or expired window is `UNDATED_REGISTER`/`STALE_REGISTER` and fails closed, and `--as-of` answers a historical question (`VALID_AS_OF`) without authorizing current use. `key-compromise` may carry an `invalidity_date`; other reasons are prospective (IDEA-935, IDEA-948; ADR-036).
 - **Bounded JSON**: certificate, register and registry loading is capped at 16 MiB, nesting depth 64 and 200,000 nodes, with validated `MB`/`GB` overrides; oversized or pathological documents are rejected before parsing (IDEA-118, IDEA-018; ADR-033).
 - **Rendered metadata**: certificate fields that reach Markdown/HTML reject angle brackets, control characters and line separators, collapse whitespace, and cap UTF-8 length; the renderer still escapes as defence in depth (IDEA-090; ADR-034).
 - **Ruleset fingerprint**: every verification result carries a stable digest of the verification profile and rule set, and results with different fingerprints refuse to compare (IDEA-076; ADR-034).
