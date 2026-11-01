@@ -1,168 +1,23 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "task-license-metadata-fingerprint-v1",
-    "last_phase": "in_progress",
+    "task_id": "idea-935-948-register-v2",
+    "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793290278.286681,
-    "owner": "opencode:license-wave2",
-    "started_by": "opencode:license-wave2",
-    "continuations": [],
-    "completed_at": 1793290278.472455
+    "updated_at": 1793498085.7648122,
+    "owner": "kilo:licensing-v2",
+    "started_by": "opencode:idea-935-948",
+    "continuations": [
+      {
+        "agent": "kilo:licensing-v2",
+        "from": "opencode:idea-935-948",
+        "at": 1793498085.7648122
+      }
+    ],
+    "completed_at": 1793498090.4574308
   },
   "checkpoints": [
-    {
-      "task_id": "reforge:run-1",
-      "phase": "reforge stage 8",
-      "phase_num": 3,
-      "description": "Reforge stage 8: window 40, 5 commit(s), 30 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793284075.8842967,
-      "timestamp_str": "2026-10-29 17:27:55",
-      "agent": "opencode"
-    },
-    {
-      "task_id": "reforge:run-1",
-      "phase": "reforge stage 9",
-      "phase_num": 3,
-      "description": "Reforge stage 9: window 41, 1 commit(s), 7 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
-      "files_affected": [],
-      "status": "completed",
-      "timestamp": 1793284154.2908888,
-      "timestamp_str": "2026-10-29 17:29:14",
-      "agent": "opencode"
-    },
-    {
-      "task_id": "reforge:run-1",
-      "phase": "in_progress",
-      "phase_num": 5,
-      "description": "checklists: passed; 4/4 project gates before delivery",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793284277.4099996,
-      "timestamp_str": "2026-10-29 17:31:17",
-      "agent": "opencode:reforge"
-    },
-    {
-      "task_id": "reforge:run-1",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'reforge:run-1' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793284340.5974581,
-      "timestamp_str": "2026-10-29 17:32:20",
-      "agent": "opencode:reforge"
-    },
-    {
-      "task_id": "task-licensing-reuse-metadata-v1",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Add committed REUSE metadata to the existing licenses/ directory",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793285356.1301389,
-      "timestamp_str": "2026-10-29 17:49:16",
-      "agent": "opencode:reforge-main",
-      "impact_assessment": {
-        "why": "The project's legal texts live in licenses/; the Windows checkout cannot also create LICENSES/ without a case collision, so the REUSE metadata was never committed.",
-        "benefits": "A scanner can resolve LicenseRef-AL-1.1 from the tracked tree without renaming historical paths or adding a second directory.",
-        "risks": "contract: generated path stays under licenses/ for this project; dependency: none; concurrency: none; state: no runtime state.",
-        "mitigation": "Use the fixed AIKit directory picker, update the SPDX policy and README tree, and run the project's four gates."
-      }
-    },
-    {
-      "task_id": "task-licensing-reuse-metadata-v1",
-      "phase": "in_progress",
-      "phase_num": 5,
-      "description": "checklists: passed; 4/4 project gates before delivery",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793285361.9576094,
-      "timestamp_str": "2026-10-29 17:49:21",
-      "agent": "opencode:reforge-main"
-    },
-    {
-      "task_id": "task-licensing-reuse-metadata-v1",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'task-licensing-reuse-metadata-v1' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793285395.5061393,
-      "timestamp_str": "2026-10-29 17:49:55",
-      "agent": "opencode:reforge-main"
-    },
-    {
-      "task_id": "task-licensing-reuse-metadata-v1",
-      "phase": "in_progress",
-      "phase_num": 3,
-      "description": "[2/2] Ship REUSE.toml in the sdist manifest and pin it in the workflow-assets test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793286333.9116056,
-      "timestamp_str": "2026-10-29 18:05:33",
-      "agent": "opencode:reforge-main"
-    },
-    {
-      "task_id": "task-licensing-reuse-metadata-v1",
-      "phase": "in_progress",
-      "phase_num": 5,
-      "description": "checklists: passed; 4/4 project gates before delivery",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793286334.049474,
-      "timestamp_str": "2026-10-29 18:05:34",
-      "agent": "opencode:reforge-main"
-    },
-    {
-      "task_id": "task-licensing-reuse-metadata-v1",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'task-licensing-reuse-metadata-v1' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793286354.023342,
-      "timestamp_str": "2026-10-29 18:05:54",
-      "agent": "opencode:reforge-main"
-    },
-    {
-      "task_id": "task-license-input-hardening-v1",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] Bound untrusted JSON; [2/2] hash the serialized certificate payload",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793287957.4211578,
-      "timestamp_str": "2026-10-29 18:32:37",
-      "agent": "opencode:license-wave1",
-      "impact_assessment": {
-        "why": "Certificate, register and registry loaders parsed unbounded JSON, and issuance hashed a pre-DTO dict that could diverge from the saved dataclass payload when a future default is added.",
-        "benefits": "Memory bombs fail before parsing, and the bytes that are saved are the bytes that are signed.",
-        "risks": "contract: new parse limits and exact-payload hashing; dependency: none; concurrency: read-only loaders; state: no schema change.",
-        "mitigation": "Bounded loader with byte/depth/node tests, route register/verifier/registry through it, and pin the serialized-payload digest with a regression test."
-      }
-    },
-    {
-      "task_id": "task-license-input-hardening-v1",
-      "phase": "in_progress",
-      "phase_num": 5,
-      "description": "checklists: passed; 76 tests and 4/4 project gates green",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793287963.1776714,
-      "timestamp_str": "2026-10-29 18:32:43",
-      "agent": "opencode:license-wave1"
-    },
-    {
-      "task_id": "task-license-input-hardening-v1",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'task-license-input-hardening-v1' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793287963.3248928,
-      "timestamp_str": "2026-10-29 18:32:43",
-      "agent": "opencode:license-wave1"
-    },
     {
       "task_id": "task-license-metadata-fingerprint-v1",
       "phase": "in_progress",
@@ -244,6 +99,163 @@
       "timestamp": 1793299787.2830622,
       "timestamp_str": "2026-10-29 21:49:47",
       "agent": "opencode"
+    },
+    {
+      "task_id": "idea-935-948-register-v2",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/5] Plan register v2: freshness window, typed revocation reasons and as-of verification; writer/CLI parity in ops",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793382870.1450782,
+      "timestamp_str": "2026-10-30 20:54:30",
+      "agent": "opencode:idea-935-948",
+      "impact_assessment": {
+        "why": "The public register has no freshness metadata and free-text revocations; a stale cache cannot be detected and an as-of question cannot distinguish a key-compromise revocation from a prospective termination",
+        "benefits": "Verifiers fail closed on a stale register, revocations carry a closed reason code and optional invalidity date, and an explicit historical check returns VALID_AS_OF without authorizing current use",
+        "risks": "contract: register version 2 and new entry fields break old readers; dependency: stdlib only; concurrency: ops writer updates metadata on every save; state: empty register migrated, old v1 copies become undated",
+        "mitigation": "v2 writer and verifier released together; v1 is read but reported UNDATED; current verification stays fail-closed on any revoked entry; as-of is a separate flag; failing-first tests for stale, typed, retroactive and old-reader cases"
+      }
+    },
+    {
+      "task_id": "idea-935-948-register-v2",
+      "phase": "phase 3",
+      "phase_num": 3,
+      "description": "[2/5] Register v2 schema: generated_at/next_update validation, closed reason codes, invalidity_date and v1 UNDATED compatibility",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793383469.604935,
+      "timestamp_str": "2026-10-30 21:04:29",
+      "agent": "opencode:idea-935-948"
+    },
+    {
+      "task_id": "idea-935-948-register-v2",
+      "phase": "phase 3",
+      "phase_num": 3,
+      "description": "[3/5] Verifier: freshness fail-closed, current REVOKED, historical VALID_AS_OF/NOT_YET_ISSUED; 100 public tests pass",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793383470.2055147,
+      "timestamp_str": "2026-10-30 21:04:30",
+      "agent": "opencode:idea-935-948"
+    },
+    {
+      "task_id": "idea-935-948-register-v2",
+      "phase": "phase 3",
+      "phase_num": 3,
+      "description": "[4/5] Ops writer/CLI/API emit register v2, typed revoke controls; README, VERIFICATION.md, CHANGELOG and ADR-036/ADR-014 updated",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793383470.8316453,
+      "timestamp_str": "2026-10-30 21:04:30",
+      "agent": "opencode:idea-935-948"
+    },
+    {
+      "task_id": "idea-935-948-register-v2",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[5/5] Full verification: 100 public tests and 143 ops tests pass; both project checks 4/4; checklists: passed; uncommitted, no commit authorized",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793383471.3951344,
+      "timestamp_str": "2026-10-30 21:04:31",
+      "agent": "opencode:idea-935-948",
+      "handoff": {
+        "next": "commit both projects when the owner authorizes",
+        "open": "public legal files were already dirty before this task"
+      }
+    },
+    {
+      "task_id": "idea-935-948-register-v2",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[5/5] Final verification after v1/v2 boundary tests: 104 public tests, 143 ops tests; both project checks 4/4; checklists: passed; uncommitted, no commit authorized",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793383591.3589797,
+      "timestamp_str": "2026-10-30 21:06:31",
+      "agent": "opencode:idea-935-948",
+      "handoff": {
+        "next": "commit both projects when the owner authorizes",
+        "open": "public legal files were already dirty before this task"
+      }
+    },
+    {
+      "task_id": "reforge:run-1",
+      "phase": "reforge stage 2",
+      "phase_num": 3,
+      "description": "Reforge stage 2: stage 2 host review reviewed; run active; coverage 7/7",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793459700.730022,
+      "timestamp_str": "2026-10-31 18:15:00",
+      "agent": "github"
+    },
+    {
+      "task_id": "reforge:run-1",
+      "phase": "reforge stage 4",
+      "phase_num": 3,
+      "description": "Reforge stage 4: stage 4 host review reviewed; run active; coverage 22/22",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793459709.49156,
+      "timestamp_str": "2026-10-31 18:15:09",
+      "agent": "github"
+    },
+    {
+      "task_id": "reforge:run-1",
+      "phase": "reforge stage 6",
+      "phase_num": 3,
+      "description": "Reforge stage 6: stage 6 host review reviewed; run active; coverage 32/32",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793459717.7027338,
+      "timestamp_str": "2026-10-31 18:15:17",
+      "agent": "github"
+    },
+    {
+      "task_id": "reforge:run-1",
+      "phase": "reforge stage 1",
+      "phase_num": 3,
+      "description": "Reforge stage 1: stage 1 host review reviewed; run active; coverage 9/9",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793459744.424049,
+      "timestamp_str": "2026-10-31 18:15:44",
+      "agent": "github"
+    },
+    {
+      "task_id": "reforge:run-1",
+      "phase": "reforge stage 3",
+      "phase_num": 3,
+      "description": "Reforge stage 3: stage 3 host review reviewed; run completed; coverage 35/35",
+      "files_affected": [],
+      "status": "completed",
+      "timestamp": 1793459750.8576887,
+      "timestamp_str": "2026-10-31 18:15:50",
+      "agent": "github"
+    },
+    {
+      "task_id": "idea-935-948-register-v2",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[5/5] Verified and delivered: register v2 feature committed; fixed two defects found in review \u2014 a wall-clock time bomb in the freshness fixtures/tests (a fixed 'future' date became the past today) and freshness being judged at as_of, which rejected every historical query before the register's generation date; 106 tests, 4/4 gates, checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793498085.7648122,
+      "timestamp_str": "2026-11-01 04:54:45",
+      "agent": "kilo:licensing-v2",
+      "continued_from": "opencode:idea-935-948"
+    },
+    {
+      "task_id": "idea-935-948-register-v2",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'idea-935-948-register-v2' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793498090.457432,
+      "timestamp_str": "2026-11-01 04:54:50",
+      "agent": "kilo:licensing-v2"
     }
   ]
 }
