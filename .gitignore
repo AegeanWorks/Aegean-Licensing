@@ -19,3 +19,5 @@ dist/
 
 # Register write lock (transient)
 licenses/*.lock
+# AIKit transient state
+.aikit/*.log

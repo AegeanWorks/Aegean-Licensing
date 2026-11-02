@@ -276,7 +276,8 @@ def verify_certificate(
                 reasons.append(str(exc))
                 return VerificationResult(is_valid=False, status="INVALID_FORMAT",
                                           reasons=tuple(reasons), cert=cert)
-            if not hmac.compare_digest(cert.terms_digest, expected_terms):
+            if not hmac.compare_digest(cert.terms_digest.encode("utf-8", "surrogatepass"),
+                                           expected_terms.encode("utf-8")):
                 reasons.append(
                     "Certificate cites terms that do not match the current agreement text; "
                     "the license document may have changed after issuance."
@@ -302,7 +303,8 @@ def verify_certificate(
                 cert=cert,
             )
         expected_sig = compute_signature(data, secret_key)
-        if not hmac.compare_digest(recorded_signature, expected_sig):
+        if not hmac.compare_digest(recorded_signature.encode("utf-8", "surrogatepass"),
+                                       expected_sig.encode("utf-8")):
             reasons.append("Cryptographic HMAC signature is invalid.")
             return VerificationResult(
                 is_valid=False,
@@ -338,7 +340,9 @@ def verify_certificate(
                 register_generated_at=document.generated_at,
                 register_next_update=document.next_update, historical=bool(as_of))
         entry = document.entries.get(cert.cert_id)
-        if entry is None or not hmac.compare_digest(entry.digest, recorded_digest):
+        if entry is None or not hmac.compare_digest(entry.digest.encode("utf-8"),
+                                                           recorded_digest.encode("utf-8",
+                                                                                  "surrogatepass")):
             reasons.append(f"Certificate {cert.cert_id} is not in the register of issued certificates.")
             return VerificationResult(
                 is_valid=False, status="UNREGISTERED", reasons=tuple(reasons), cert=cert,

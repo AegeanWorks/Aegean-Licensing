@@ -321,3 +321,11 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   4. The private writer refreshes the freshness window on every issue/revoke and passes the code/date through the ops CLI and web API.
 - **Consequences**: A stale or undated register can no longer authorize current use, and a historical answer cannot be mistaken for current authorization. The public register is still unsigned: freshness detects staleness, not a writer who replaces the file. The register was empty at migration time, so no issued entry needed rewriting; a 30-day writer cadence now requires periodic republication. Old verifiers fail closed on version 2, so the version-2 verifier must be released before a version-2 register is published.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (freshness and reason claims match the bytes), PRINCIPLE-011 (fail-closed, actionable statuses) and PRINCIPLE-014 (stale, typed, retroactive and as-of regression tests).
+
+### ADR-037: Compare verification secrets as UTF-8 bytes, never as str
+- **Date**: 2026-11-02
+- **Status**: Accepted
+- **Context**: `hmac.compare_digest` on `str` raises `TypeError` for non-ASCII input instead of returning `False`. The digest comparison already encoded to bytes, but the terms-digest, signature and register-entry comparisons still passed `str`, so a hand-crafted certificate with a non-ASCII `terms_digest` or `signature` crashed `verify_certificate` instead of reporting `INVALID_FORMAT`/`TAMPERED`.
+- **Decision**: Encode both sides of every remaining `compare_digest` in `verifier.py` to UTF-8 bytes (untrusted side with `surrogatepass`, computed side plain), matching the existing digest-comparison pattern. Add failing-first regression tests that assert a non-ASCII `terms_digest` is `INVALID_FORMAT` and a non-ASCII `signature` is `TAMPERED`.
+- **Consequences**: Malformed credentials are verdicts, never exceptions. No contract change: ASCII inputs compare identically; only the former crash path now returns a status.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (untrusted input never crashes the verifier) and PRINCIPLE-014 (failing-first regression coverage).

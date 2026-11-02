@@ -280,6 +280,27 @@ class TestVerifier(unittest.TestCase):
         self.assertEqual(result.status, "INVALID_FORMAT")
         self.assertIn("Scope", result.reasons[0])
 
+    def test_non_ascii_terms_digest_is_invalid_not_a_crash(self):
+        # hmac.compare_digest on non-ASCII str raises TypeError, which used to
+        # escape verify_certificate instead of reporting INVALID_FORMAT.
+        data = self._payload()
+        data["terms_digest"] = "é" * 64
+        data["digest"] = compute_digest(data)
+        data["signature"] = ""
+        result = verify_certificate(data)
+        self.assertFalse(result.is_valid)
+        self.assertEqual(result.status, "INVALID_FORMAT")
+
+    def test_non_ascii_signature_is_tampered_not_a_crash(self):
+        # Same str-only compare_digest crash on the signature path when a key
+        # is supplied; a wrong signature must be TAMPERED, not an exception.
+        data = self._payload()
+        data["signature"] = "é" * 10
+        data["digest"] = compute_digest(data)
+        result = verify_certificate(data, secret_key="top-secret")
+        self.assertFalse(result.is_valid)
+        self.assertEqual(result.status, "TAMPERED")
+
 
 class TestCertificateFormat(unittest.TestCase):
     """Only format-2 certificates, each with a random 256-bit serial, verify (ADR-018)."""
