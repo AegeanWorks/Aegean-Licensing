@@ -280,6 +280,16 @@ class TestVerifier(unittest.TestCase):
         self.assertEqual(result.status, "INVALID_FORMAT")
         self.assertIn("Scope", result.reasons[0])
 
+    def test_an_empty_scope_is_invalid(self):
+        for scope in ("", "   "):
+            with self.subTest(scope=scope):
+                data = self._payload(scope=scope)
+                data["digest"] = compute_digest(data)
+                data["signature"] = ""
+                result = verify_certificate(data)
+                self.assertFalse(result.is_valid)
+                self.assertEqual(result.status, "INVALID_FORMAT")
+
     def test_non_ascii_terms_digest_is_invalid_not_a_crash(self):
         # hmac.compare_digest on non-ASCII str raises TypeError, which used to
         # escape verify_certificate instead of reporting INVALID_FORMAT.

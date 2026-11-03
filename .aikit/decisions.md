@@ -329,3 +329,11 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Decision**: Encode both sides of every remaining `compare_digest` in `verifier.py` to UTF-8 bytes (untrusted side with `surrogatepass`, computed side plain), matching the existing digest-comparison pattern. Add failing-first regression tests that assert a non-ASCII `terms_digest` is `INVALID_FORMAT` and a non-ASCII `signature` is `TAMPERED`.
 - **Consequences**: Malformed credentials are verdicts, never exceptions. No contract change: ASCII inputs compare identically; only the former crash path now returns a status.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (untrusted input never crashes the verifier) and PRINCIPLE-014 (failing-first regression coverage).
+
+### ADR-038: Reject an empty certificate scope as not in the agreement vocabulary
+- **Date**: 2026-11-03
+- **Status**: Accepted
+- **Context**: Wave 21-30 added scope-vocabulary enforcement (ADR-032), but the check read `if cert.scope and ...`, so an explicit empty or whitespace-only `scope` (normalized to `""`) verified as `VALID_UNVERIFIED` instead of `INVALID_FORMAT`. A missing `scope` correctly defaults to `proprietary-saas-and-redistribution`; an explicit empty string is a different claim that names no grant.
+- **Decision**: Require `cert.scope in terms.scopes` without the truthiness guard in `verifier.py`. Empty and whitespace-only scopes are now `INVALID_FORMAT` naming the allowed scopes; missing scope still defaults. Add failing-first `test_an_empty_scope_is_invalid` covering `""` and `"   "`.
+- **Consequences**: No issued certificate changes (fixtures and the empty public register use the default scope). An empty scope can no longer verify; callers must omit the field to take the default.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (the scope claim matches the agreement bytes) and PRINCIPLE-014 (failing-first regression coverage).

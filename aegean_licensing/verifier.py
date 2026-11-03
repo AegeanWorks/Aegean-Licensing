@@ -253,7 +253,7 @@ def verify_certificate(
                 reasons=tuple(reasons),
                 cert=cert,
             )
-        if cert.scope and cert.scope not in terms.scopes:
+        if cert.scope not in terms.scopes:
             reasons.append(
                 f"Scope '{cert.scope}' is not defined by {terms.key}; "
                 f"allowed: {', '.join(terms.scopes)}."

@@ -9,8 +9,8 @@
 - **Total Python Modules**: `25`
 - **Total Classes**: `29`
 - **Total Top-Level Functions**: `42`
-- **Total Class Methods**: `129`
-- **Total Source Lines**: `2805`
+- **Total Class Methods**: `130`
+- **Total Source Lines**: `2815`
 
 ---
 
@@ -170,7 +170,7 @@
 ### [`aegean_licensing/verifier.py`](aegean_licensing/verifier.py)
 > *Commercial License Certificate Verification Module.*
 
-**Size**: `441` lines (`19409` bytes)
+**Size**: `441` lines (`19394` bytes)
 
 **Classes:**
 - `class VerificationResult` - *Outcome of validating a License Grant Certificate.*
@@ -397,7 +397,7 @@
 ### [`tests/test_verifier.py`](tests/test_verifier.py)
 > *Unit tests for commercial license certificate verifier.*
 
-**Size**: `340` lines (`14304` bytes)
+**Size**: `350` lines (`14738` bytes)
 
 **Classes:**
 - `class TestVerifier` - *Test certificate verification, tamper detection, terms, and scope checking.*
@@ -424,6 +424,7 @@
   - Method `.test_missing_projects_defaults_to_every_project()`
   - Method `.test_a_non_hyphenated_expiry_is_invalid()`
   - Method `.test_an_unknown_scope_is_invalid()`
+  - Method `.test_an_empty_scope_is_invalid()`
   - Method `.test_non_ascii_terms_digest_is_invalid_not_a_crash()`
   - Method `.test_non_ascii_signature_is_tampered_not_a_crash()`
 - `class TestCertificateFormat` - *Only format-2 certificates, each with a random 256-bit serial, verify (ADR-018).*
