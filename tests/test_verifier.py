@@ -388,6 +388,15 @@ class TestCertificateFormat(unittest.TestCase):
                 self.assertFalse(result.is_valid)
                 self.assertEqual(result.status, "INVALID_FORMAT")
 
+    def test_empty_check_project_is_invalid_not_valid(self):
+        data = cert_to_dict(issue_certificate(
+            licensee_name="A", licensee_contact="a@example.com", projects=("myproj",)))
+        for check_project in ("", "   "):
+            with self.subTest(check_project=repr(check_project)):
+                result = verify_certificate(dict(data), check_project=check_project)
+                self.assertFalse(result.is_valid)
+                self.assertEqual(result.status, "INVALID_FORMAT")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -9,8 +9,8 @@
 - **Total Python Modules**: `25`
 - **Total Classes**: `29`
 - **Total Top-Level Functions**: `45`
-- **Total Class Methods**: `155`
-- **Total Source Lines**: `3181`
+- **Total Class Methods**: `157`
+- **Total Source Lines**: `3216`
 
 ---
 
@@ -118,7 +118,7 @@
 ### [`aegean_licensing/license_terms.py`](aegean_licensing/license_terms.py)
 > *Canonical license registry: the types, scopes, tiers, and term digests a certificate may cite.*
 
-**Size**: `175` lines (`7217` bytes)
+**Size**: `178` lines (`7310` bytes)
 
 **Classes:**
 - `class LicenseTerms` - *One operative license agreement and the vocabulary its certificates may use.*
@@ -173,7 +173,7 @@
 ### [`aegean_licensing/verifier.py`](aegean_licensing/verifier.py)
 > *Commercial License Certificate Verification Module.*
 
-**Size**: `468` lines (`20546` bytes)
+**Size**: `476` lines (`20861` bytes)
 
 **Classes:**
 - `class VerificationResult` - *Outcome of validating a License Grant Certificate.*
@@ -321,7 +321,7 @@
 ### [`tests/test_license_terms.py`](tests/test_license_terms.py)
 > *Unit tests for the frozen text of operative agreements (ADR-013).*
 
-**Size**: `78` lines (`3817` bytes)
+**Size**: `93` lines (`4655` bytes)
 
 **Classes:**
 - `class TestFrozenTerms` - *A certificate cites an agreement's digest, so an issued agreement's text must never change.*
@@ -331,6 +331,7 @@
   - Method `.test_boolean_registry_version_is_rejected()`
   - Method `.test_document_outside_the_repository_is_rejected()`
   - Method `.test_sha256_must_be_hex_when_pinned()`
+  - Method `.test_empty_vocabulary_strings_are_rejected()`
 
 ---
 
@@ -417,7 +418,7 @@
 ### [`tests/test_verifier.py`](tests/test_verifier.py)
 > *Unit tests for commercial license certificate verifier.*
 
-**Size**: `393` lines (`17034` bytes)
+**Size**: `402` lines (`17540` bytes)
 
 **Classes:**
 - `class TestVerifier` - *Test certificate verification, tamper detection, terms, and scope checking.*
@@ -456,6 +457,7 @@
   - Method `.test_float_format_is_unsupported()`
   - Method `.test_deeply_nested_or_circular_target_is_invalid_not_a_crash()`
   - Method `.test_non_string_check_project_is_invalid_not_a_crash()`
+  - Method `.test_empty_check_project_is_invalid_not_valid()`
 
 ---
 

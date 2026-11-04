@@ -73,6 +73,21 @@ class TestFrozenTerms(unittest.TestCase):
                         load_registry()
                 self.assertIn("sha256", str(caught.exception))
 
+    def test_empty_vocabulary_strings_are_rejected(self):
+        for field, bad in (("scopes", [""]), ("scopes", ["   "]),
+                           ("tiers", [""]), ("allowances", [""]),
+                           ("allowances", ["   "])):
+            with self.subTest(field=field, bad=bad):
+                entry = {"scopes": ["x"], "document": "",
+                         "status": "operative", "tiers": [], "allowances": []}
+                entry[field] = bad
+                body = {"version": 1, "licenses": {"T": entry}}
+                with mock.patch.object(license_terms, "_load_registry_document",
+                                      return_value=body):
+                    with self.assertRaises(ValueError) as caught:
+                        load_registry()
+                self.assertIn(field, str(caught.exception))
+
 
 if __name__ == "__main__":
     unittest.main()

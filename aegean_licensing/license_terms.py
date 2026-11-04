@@ -88,12 +88,15 @@ def load_registry() -> Dict[str, LicenseTerms]:
             )
         scopes = raw.get("scopes")
         tiers = raw.get("tiers", [])
-        if not isinstance(scopes, list) or not scopes or not all(isinstance(s, str) for s in scopes):
+        if not isinstance(scopes, list) or not scopes or not all(
+                isinstance(s, str) and s.strip() for s in scopes):
             raise ValueError(f"License '{key}' requires a non-empty 'scopes' list.")
-        if not isinstance(tiers, list) or not all(isinstance(t, str) for t in tiers):
+        if not isinstance(tiers, list) or not all(
+                isinstance(t, str) and t.strip() for t in tiers):
             raise ValueError(f"License '{key}' has an invalid 'tiers' list.")
         allowances = raw.get("allowances", [])
-        if not isinstance(allowances, list) or not all(isinstance(a, str) for a in allowances):
+        if not isinstance(allowances, list) or not all(
+                isinstance(a, str) and a.strip() for a in allowances):
             raise ValueError(f"License '{key}' has an invalid 'allowances' list.")
         registry[key] = LicenseTerms(
             key=key,

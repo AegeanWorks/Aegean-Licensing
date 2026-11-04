@@ -430,9 +430,17 @@ def verify_certificate(
             )
 
     # 7. Project scope check
-    if check_project:
+    if check_project is not None:
         if not isinstance(check_project, str):
             reasons.append("Query project must be text.")
+            return VerificationResult(
+                is_valid=False,
+                status="INVALID_FORMAT",
+                reasons=tuple(reasons),
+                cert=cert,
+            )
+        if not check_project.strip():
+            reasons.append("Query project must be a non-empty string.")
             return VerificationResult(
                 is_valid=False,
                 status="INVALID_FORMAT",
