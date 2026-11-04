@@ -111,6 +111,8 @@ def load_register_document(path: Union[str, Path]) -> RegisterDocument:
     if not target.is_file():
         return RegisterDocument(REGISTER_VERSION, "", "", {})
     data = load_bounded(target)
+    if not isinstance(data, dict):
+        raise ValueError(f"{path} must contain a JSON object.")
     # bool is an int subclass, so True/False must be rejected explicitly: True == 1 would
     # otherwise load as register version 1.
     if type(data.get("version")) is not int or data.get("version") not in SUPPORTED_REGISTER_VERSIONS:

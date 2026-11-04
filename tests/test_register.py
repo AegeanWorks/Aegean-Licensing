@@ -153,6 +153,14 @@ class TestRegister(unittest.TestCase):
             load_register(self.register)
         self.assertIn("version", str(caught.exception))
 
+    def test_non_object_register_is_a_value_error_not_an_attribute_error(self):
+        for body in ("[1, 2, 3]", '"just a string"', "42", "null"):
+            with self.subTest(body=body):
+                self.register.write_text(body, encoding="utf-8")
+                with self.assertRaises(ValueError) as caught:
+                    load_register(self.register)
+                self.assertIn("JSON object", str(caught.exception))
+
 
 class TestRegisterVersionTwo(unittest.TestCase):
     """Freshness, typed revocation and as-of behavior (IDEA-935, IDEA-948)."""

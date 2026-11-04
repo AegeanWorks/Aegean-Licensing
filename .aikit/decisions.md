@@ -361,3 +361,11 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Decision**: Keep the frozen `TODAY` and the current fixture shapes. If a fixture date ever goes stale against the rolling 366-day freshness window, update the single `TODAY` constant rather than relativizing the helper. Do not add clock injection unless a test needs two different "nows" in one case.
 - **Consequences**: No test churn. The 4/6/7/8-key shape difference is documented here instead of "fixed": valid fixture entries omit always-empty `reason`/`revoked_at`, revoked entries add v2-only fields, and the published test's 6-key shape describes an ops-tooling convention outside this package. Any future alignment must be driven by the ops tooling's actual output, not by test aesthetics.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-012 (no churn without a payoff) and PRINCIPLE-014 (deterministic tests over clever ones).
+
+### ADR-042: Reject a Non-Object Register as Malformed Instead of Crashing
+- **Date**: 2026-11-04
+- **Status**: Accepted
+- **Context**: The bool-version hardening (delta commit `605c726`) replaced `if not isinstance(data, dict) or ...` with `if type(data.get("version")) is not int or ...`. A register holding a JSON list, string, number or null then raised `AttributeError` from `load_register_document`, which escapes `verify_certificate`'s `except (OSError, ValueError)` register guard instead of reporting `INVALID_FORMAT`. Delta review reproduced the escape on all four shapes and through the verifier boundary.
+- **Decision**: Restore the `not isinstance(data, dict)` guard first in `load_register_document`, raising `ValueError("<path> must contain a JSON object.")` before reading `version`. Add failing-first `test_non_object_register_is_a_value_error_not_an_attribute_error` covering list, string, number and null bodies. No contract change: ASCII dict registers compare identically; only the former crash path now returns a verdict.
+- **Consequences**: Malformed registers are verdicts, never exceptions. The verifier reports a non-object register as `INVALID_FORMAT` via its existing register-read guard.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (untrusted input never crashes the verifier) and PRINCIPLE-014 (failing-first regression coverage).

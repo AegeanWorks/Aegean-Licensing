@@ -9,8 +9,8 @@
 - **Total Python Modules**: `25`
 - **Total Classes**: `29`
 - **Total Top-Level Functions**: `45`
-- **Total Class Methods**: `154`
-- **Total Source Lines**: `3171`
+- **Total Class Methods**: `155`
+- **Total Source Lines**: `3181`
 
 ---
 
@@ -154,7 +154,7 @@
 ### [`aegean_licensing/register.py`](aegean_licensing/register.py)
 > *Public certificate register: which certificates AegeanWorks issued, and which it revoked (ADR-013).*
 
-**Size**: `199` lines (`9849` bytes)
+**Size**: `201` lines (`9948` bytes)
 
 **Classes:**
 - `class RegisterEntry` - *One issued certificate, as the public may see it.*
@@ -354,7 +354,7 @@
 ### [`tests/test_register.py`](tests/test_register.py)
 > *Unit tests for reading the public certificate register (ADR-013, ADR-017).*
 
-**Size**: `345` lines (`17782` bytes)
+**Size**: `353` lines (`18217` bytes)
 
 **Classes:**
 - `class TestRegister` - *The register is the public proof of issuance and revocation.*
@@ -371,6 +371,7 @@
   - Method `.test_register_rejects_malformed_issued_at()`
   - Method `.test_register_rejects_empty_license_type_and_cert_id()`
   - Method `.test_boolean_version_is_rejected_not_read_as_v1()`
+  - Method `.test_non_object_register_is_a_value_error_not_an_attribute_error()`
 - `class TestRegisterVersionTwo` - *Freshness, typed revocation and as-of behavior (IDEA-935, IDEA-948).*
   - Method `.setUp()`
   - Method `.issue(name)`
