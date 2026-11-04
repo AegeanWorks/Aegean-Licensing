@@ -9,8 +9,8 @@
 - **Total Python Modules**: `25`
 - **Total Classes**: `29`
 - **Total Top-Level Functions**: `45`
-- **Total Class Methods**: `148`
-- **Total Source Lines**: `3082`
+- **Total Class Methods**: `150`
+- **Total Source Lines**: `3100`
 
 ---
 
@@ -457,7 +457,7 @@
 ### [`tests/test_workflow_assets.py`](tests/test_workflow_assets.py)
 > *Asset tests for the CLA workflow, CI workflow, and packaging manifest.*
 
-**Size**: `98` lines (`4968` bytes)
+**Size**: `116` lines (`6107` bytes)
 
 **Classes:**
 - `class TestWorkflowAssets` - *Test the durable CLA register, workflow wiring, and manifest coverage.*
@@ -465,6 +465,8 @@
   - Method `.test_workflow_records_evidence_and_honours_revocation()`
   - Method `.test_cla_result_is_a_commit_status_the_comment_run_can_turn_green()`
   - Method `.test_ci_workflow_runs_tests_and_checks_the_wheel()`
+  - Method `.test_cla_register_preserves_schema_version()`
+  - Method `.test_cla_signatures_sort_is_deterministic()`
   - Method `.test_ci_windows_job_is_a_pinned_single_version_smoke()`
   - Method `.test_manifest_covers_legal_documents()`
   - Method `.test_docs_name_the_operative_personal_license()`

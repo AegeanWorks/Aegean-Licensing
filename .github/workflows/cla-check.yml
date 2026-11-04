@@ -71,12 +71,13 @@ jobs:
                 const text = Buffer.from(response.data.content, 'base64').toString('utf8').trim();
                 const parsed = text ? JSON.parse(text) : {};
                 return {
+                  version: typeof parsed.version === 'number' ? parsed.version : null,
                   signatures: Array.isArray(parsed.signatures) ? parsed.signatures : [],
                   revoked: Array.isArray(parsed.revoked) ? parsed.revoked : [],
                   sha: response.data.sha,
                 };
               } catch (error) {
-                if (error.status === 404) return { signatures: [], revoked: [], sha: null };
+                if (error.status === 404) return { version: null, signatures: [], revoked: [], sha: null };
                 throw error;
               }
             }
@@ -134,9 +135,9 @@ jobs:
                   });
                   const body = JSON.stringify(
                     {
-                      version: 2,
+                      version: fresh.version ?? 2,
                       signatures: fresh.signatures
-                        .sort((a, b) => a.login.localeCompare(b.login)),
+                        .sort((a, b) => (a.login < b.login ? -1 : a.login > b.login ? 1 : 0)),
                       revoked: fresh.revoked,
                     },
                     null,

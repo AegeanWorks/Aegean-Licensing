@@ -26,7 +26,9 @@ class TestWorkflowAssets(unittest.TestCase):
         self.assertIn("/agree-cla", workflow)
         self.assertIn("revoked", workflow)
         self.assertIn("evidence", workflow)
-        self.assertIn("version: 2", workflow)
+        # The write path carries the loaded schema version forward (defaulting to 2),
+        # so a future register v3 survives an /agree-cla write instead of downgrading.
+        self.assertIn("fresh.version ?? 2", workflow)
 
     def test_cla_result_is_a_commit_status_the_comment_run_can_turn_green(self):
         # ADR-016: a run started by a /agree-cla comment is not attached to the pull request's
@@ -48,6 +50,22 @@ class TestWorkflowAssets(unittest.TestCase):
         self.assertIn("windows-latest", workflow)
         for version in ('"3.10"', '"3.11"', '"3.12"', '"3.13"'):
             self.assertIn(version, workflow)
+
+    def test_cla_register_preserves_schema_version(self):
+        # A future register v3 must survive an /agree-cla write: hardcoding
+        # `version: 2` on the write path would silently downgrade it and drop
+        # v3 fields. The writer must carry the loaded version forward.
+        workflow = (REPO_ROOT / ".github" / "workflows" / "cla-check.yml").read_text(encoding="utf-8")
+        self.assertIn("fresh.version ?? 2", workflow)
+        self.assertNotIn("version: 2,", workflow)
+
+    def test_cla_signatures_sort_is_deterministic(self):
+        # localeCompare follows ICU and can reorder the same logins across runner
+        # images, producing spurious register commits and 409 retries. Codepoint
+        # order is stable everywhere.
+        workflow = (REPO_ROOT / ".github" / "workflows" / "cla-check.yml").read_text(encoding="utf-8")
+        self.assertNotIn("localeCompare", workflow)
+        self.assertIn("a.login < b.login", workflow)
 
     def test_ci_windows_job_is_a_pinned_single_version_smoke(self):
         # The full 3.10-3.13 matrix runs on ubuntu; Windows is a platform smoke on one
