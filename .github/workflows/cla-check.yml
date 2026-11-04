@@ -127,6 +127,16 @@ jobs:
                 for (let attempt = 0; attempt < 3; attempt += 1) {
                   const fresh = await loadRegister();
                   if (findEntry(fresh.signatures, author)) break;
+                  // A revocation that landed after the first check still wins: never
+                  // record a signature over it.
+                  if (findEntry(fresh.revoked, author)) {
+                    await setStatus('failure', 'CLA acceptance revoked; contact the maintainers');
+                    core.setFailed(
+                      `Contributor @${author} has a revoked CLA acceptance on record. ` +
+                      `Contact the maintainers before contributing.`
+                    );
+                    return;
+                  }
                   fresh.signatures.push({
                     login: author,
                     signed_at: new Date().toISOString(),

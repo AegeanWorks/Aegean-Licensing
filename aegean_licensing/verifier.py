@@ -199,7 +199,9 @@ def verify_certificate(
     # 3. Tamper check (Digest verification)
     try:
         expected_digest = compute_digest(data)
-    except (TypeError, ValueError) as exc:
+    except (TypeError, ValueError, RecursionError) as exc:
+        # Deeply nested, circular or otherwise unserializable dict targets cannot be
+        # canonicalized safely: RecursionError must not escape the library.
         reasons.append(f"Certificate payload cannot be canonicalized: {exc}")
         return VerificationResult(is_valid=False, status="INVALID_FORMAT",
                                   reasons=tuple(reasons))
@@ -310,7 +312,16 @@ def verify_certificate(
                 reasons=tuple(reasons),
                 cert=cert,
             )
-        expected_sig = compute_signature(data, secret_key)
+        try:
+            expected_sig = compute_signature(data, secret_key)
+        except (TypeError, ValueError, RecursionError) as exc:
+            reasons.append(f"Certificate signature cannot be recomputed: {exc}")
+            return VerificationResult(
+                is_valid=False,
+                status="INVALID_FORMAT",
+                reasons=tuple(reasons),
+                cert=cert,
+            )
         if not hmac.compare_digest(recorded_signature.encode("utf-8", "surrogatepass"),
                                        expected_sig.encode("utf-8")):
             reasons.append("Cryptographic HMAC signature is invalid.")
@@ -420,6 +431,14 @@ def verify_certificate(
 
     # 7. Project scope check
     if check_project:
+        if not isinstance(check_project, str):
+            reasons.append("Query project must be text.")
+            return VerificationResult(
+                is_valid=False,
+                status="INVALID_FORMAT",
+                reasons=tuple(reasons),
+                cert=cert,
+            )
         norm_project = check_project.strip().lower()
         allowed = [p.lower() for p in cert.projects]
         if "*" not in allowed and norm_project not in allowed:

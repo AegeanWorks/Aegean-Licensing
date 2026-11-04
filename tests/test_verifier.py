@@ -363,6 +363,31 @@ class TestCertificateFormat(unittest.TestCase):
         self.assertFalse(result.is_valid)
         self.assertEqual(result.status, "UNSUPPORTED_FORMAT")
 
+    def test_deeply_nested_or_circular_target_is_invalid_not_a_crash(self):
+        nested = {"format": 2, "digest": "x"}
+        cursor = nested
+        for _ in range(3000):
+            cursor["n"] = {}
+            cursor = cursor["n"]
+        for kwargs in ({}, {"secret_key": "s" * 32}):
+            with self.subTest(kwargs=bool(kwargs)):
+                result = verify_certificate(dict(nested), **kwargs)
+                self.assertFalse(result.is_valid)
+                self.assertEqual(result.status, "INVALID_FORMAT")
+        circular = cert_to_dict(issue_certificate(licensee_name="A", licensee_contact="a@example.com"))
+        circular["self"] = circular
+        result = verify_certificate(circular)
+        self.assertFalse(result.is_valid)
+        self.assertEqual(result.status, "INVALID_FORMAT")
+
+    def test_non_string_check_project_is_invalid_not_a_crash(self):
+        data = cert_to_dict(issue_certificate(licensee_name="A", licensee_contact="a@example.com"))
+        for check_project in (123, ["chronos"], None.__class__):
+            with self.subTest(check_project=repr(check_project)):
+                result = verify_certificate(dict(data), check_project=check_project)
+                self.assertFalse(result.is_valid)
+                self.assertEqual(result.status, "INVALID_FORMAT")
+
 
 if __name__ == "__main__":
     unittest.main()

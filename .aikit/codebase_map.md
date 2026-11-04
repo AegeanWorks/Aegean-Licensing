@@ -9,8 +9,8 @@
 - **Total Python Modules**: `25`
 - **Total Classes**: `29`
 - **Total Top-Level Functions**: `45`
-- **Total Class Methods**: `150`
-- **Total Source Lines**: `3100`
+- **Total Class Methods**: `152`
+- **Total Source Lines**: `3149`
 
 ---
 
@@ -173,7 +173,7 @@
 ### [`aegean_licensing/verifier.py`](aegean_licensing/verifier.py)
 > *Commercial License Certificate Verification Module.*
 
-**Size**: `449` lines (`19717` bytes)
+**Size**: `468` lines (`20546` bytes)
 
 **Classes:**
 - `class VerificationResult` - *Outcome of validating a License Grant Certificate.*
@@ -414,7 +414,7 @@
 ### [`tests/test_verifier.py`](tests/test_verifier.py)
 > *Unit tests for commercial license certificate verifier.*
 
-**Size**: `368` lines (`15718` bytes)
+**Size**: `393` lines (`17034` bytes)
 
 **Classes:**
 - `class TestVerifier` - *Test certificate verification, tamper detection, terms, and scope checking.*
@@ -451,13 +451,15 @@
   - Method `.test_a_bad_serial_is_invalid()`
   - Method `.test_malformed_as_of_and_reference_date_are_invalid_not_a_crash()`
   - Method `.test_float_format_is_unsupported()`
+  - Method `.test_deeply_nested_or_circular_target_is_invalid_not_a_crash()`
+  - Method `.test_non_string_check_project_is_invalid_not_a_crash()`
 
 ---
 
 ### [`tests/test_workflow_assets.py`](tests/test_workflow_assets.py)
 > *Asset tests for the CLA workflow, CI workflow, and packaging manifest.*
 
-**Size**: `116` lines (`6107` bytes)
+**Size**: `121` lines (`6517` bytes)
 
 **Classes:**
 - `class TestWorkflowAssets` - *Test the durable CLA register, workflow wiring, and manifest coverage.*
@@ -467,7 +469,7 @@
   - Method `.test_ci_workflow_runs_tests_and_checks_the_wheel()`
   - Method `.test_cla_register_preserves_schema_version()`
   - Method `.test_cla_signatures_sort_is_deterministic()`
-  - Method `.test_ci_windows_job_is_a_pinned_single_version_smoke()`
+  - Method `.test_cla_write_path_rechecks_revocation()`
   - Method `.test_manifest_covers_legal_documents()`
   - Method `.test_docs_name_the_operative_personal_license()`
 

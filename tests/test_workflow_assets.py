@@ -67,7 +67,12 @@ class TestWorkflowAssets(unittest.TestCase):
         self.assertNotIn("localeCompare", workflow)
         self.assertIn("a.login < b.login", workflow)
 
-    def test_ci_windows_job_is_a_pinned_single_version_smoke(self):
+    def test_cla_write_path_rechecks_revocation(self):
+        # The revocation verdict is read before the comment search; a revocation that
+        # lands in between must still win over the signature write. The retry loop
+        # re-reads the register, so it must re-check revocation on the fresh copy.
+        workflow = (REPO_ROOT / ".github" / "workflows" / "cla-check.yml").read_text(encoding="utf-8")
+        self.assertIn("findEntry(fresh.revoked, author)", workflow)
         # The full 3.10-3.13 matrix runs on ubuntu; Windows is a platform smoke on one
         # pinned version. If the Windows job gains a matrix, this test must be updated
         # deliberately — the 1-version coverage is a locked cost decision, not an oversight.
