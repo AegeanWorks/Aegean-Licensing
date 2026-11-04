@@ -246,6 +246,17 @@ class TestVerifier(unittest.TestCase):
                 self.assertEqual(result.status, "INVALID_FORMAT")
                 self.assertTrue(result.reasons)
 
+    def test_null_allowances_is_invalid_not_coerced(self):
+        # 80c3a4f rejects null allowances per the published spec: JSON null
+        # must not coerce to an empty list via _allowance_tuple's falsy guard.
+        data = self._payload()
+        data["allowances"] = None
+        data["digest"] = "0" * 64
+        data["signature"] = ""
+        result = verify_certificate(data)
+        self.assertFalse(result.is_valid)
+        self.assertEqual(result.status, "INVALID_FORMAT")
+
     def test_project_scope_check_with_mixed_project_types_does_not_crash(self):
         data = self._payload()
         data["projects"] = ["*", 7]

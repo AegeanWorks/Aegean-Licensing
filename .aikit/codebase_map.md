@@ -9,8 +9,8 @@
 - **Total Python Modules**: `25`
 - **Total Classes**: `29`
 - **Total Top-Level Functions**: `45`
-- **Total Class Methods**: `157`
-- **Total Source Lines**: `3216`
+- **Total Class Methods**: `158`
+- **Total Source Lines**: `3227`
 
 ---
 
@@ -418,7 +418,7 @@
 ### [`tests/test_verifier.py`](tests/test_verifier.py)
 > *Unit tests for commercial license certificate verifier.*
 
-**Size**: `402` lines (`17540` bytes)
+**Size**: `413` lines (`18027` bytes)
 
 **Classes:**
 - `class TestVerifier` - *Test certificate verification, tamper detection, terms, and scope checking.*
@@ -441,6 +441,7 @@
   - Method `.test_perpetual_certificate_with_expiry_is_rejected()`
   - Method `.test_term_limited_certificate_without_expiry_is_rejected()`
   - Method `.test_malformed_field_types_are_invalid_not_a_crash()`
+  - Method `.test_null_allowances_is_invalid_not_coerced()`
   - Method `.test_project_scope_check_with_mixed_project_types_does_not_crash()`
   - Method `.test_missing_projects_defaults_to_every_project()`
   - Method `.test_a_non_hyphenated_expiry_is_invalid()`
