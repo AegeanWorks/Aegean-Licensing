@@ -42,6 +42,9 @@ def _build_parser() -> argparse.ArgumentParser:
 
 def _handle_verify(args: argparse.Namespace) -> int:
     # The signature is checked only by AegeanWorks' private `aegean-ops verify` (ADR-018).
+    if args.register is not None and not args.register.strip():
+        print("Error: --register requires a file path.", file=sys.stderr)
+        return 2
     if args.register and not Path(args.register).is_file():
         print(f"Error: register file not found: {args.register}", file=sys.stderr)
         return 1

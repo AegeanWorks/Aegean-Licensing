@@ -103,6 +103,15 @@ class TestCLI(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertIn("not checked", out)
 
+    def test_empty_register_path_is_a_usage_error(self):
+        cert = issue_certificate(licensee_name="EmptyReg", licensee_contact="e@example.com")
+        for empty in ("", "   "):
+            with self.subTest(register=repr(empty)):
+                code, out, err = self.run_cli("verify", str(self.write_cert(cert)),
+                                              "--register", empty)
+                self.assertEqual(code, 2)
+                self.assertIn("--register requires a file path", err)
+
     def test_an_explicitly_missing_register_is_an_error(self):
         cert = issue_certificate(licensee_name="Missing", licensee_contact="m@example.com")
         missing = self.temp_dir / "absent.json"
