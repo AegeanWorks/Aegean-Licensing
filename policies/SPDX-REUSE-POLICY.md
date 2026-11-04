@@ -19,7 +19,8 @@ metadata; `reuse lint` and SPDX tools remain the external verifier.
 
 The `LicenseRef-` prefix is deliberate: these are not OSI identifiers. An SPDX tool must find the
 text in `LICENSES/<identifier>.txt`, or in the project's existing `licenses/` directory when it
-already keeps its legal texts there (the two names are one directory on Windows).
+already keeps its legal texts there. (`LICENSES` and `licenses` are different names on every
+filesystem — the trailing `S` matters — so use exactly one directory per project.)
 
 ## 2. Generated files
 

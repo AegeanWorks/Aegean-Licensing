@@ -157,7 +157,7 @@ aegean-licensing/
 ├── REUSE.toml                <- SPDX/REUSE metadata for the license expression
 ├── CHANGELOG.md              <- version and draft change history
 ├── LICENSE                   <- Aegean License 1.1 (copy of licenses/AL-1.1.md)
-├── COMMERCIAL.md             <- Commercial licensing terms & Exhibit A
+├── COMMERCIAL.md             <- Commercial licensing terms (ACL-1.0; the old Exhibit A summary is retired)
 ├── README.md                 <- Architecture, quickstart, and commands
 ├── assets/
 ├── pyproject.toml            <- Packaging metadata and console entrypoints

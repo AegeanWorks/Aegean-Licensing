@@ -63,8 +63,8 @@ Before any repository migrates its active license from AGPL-3.0 to AL-1.1, the r
 - This guarantees full transparency and provides community users with permanent access to the last copyleft version.
 
 ### Step 3: License & Commercial File Swap
-- Replace root `LICENSE` with the approved text, copied from `licenses/AL-1.1.md` once that draft is finalized. Rename the approved file to `licenses/AL-1.1.md` in this repository at the same time.
-- Replace `COMMERCIAL.md` with the approved ACL-1.0 terms, promoted from `licenses/commercial/COMMERCIAL-LICENSE-TEMPLATE-DRAFT.md`, listing the tiers and stating that fees and payment are arranged privately by email.
+- Replace root `LICENSE` with the approved text (for personal-use projects: `licenses/AL-1.1.md`). Record the approval and its effective date in `.aikit/decisions.md` first (see the checklist above); the source text and the new root `LICENSE` must be byte-identical.
+- Record the commercial terms in `COMMERCIAL.md` from the approved `licenses/ACL-1.0.md`, listing the tiers and stating that fees and payment are arranged privately by email. `licenses/commercial/COMMERCIAL-LICENSE-TEMPLATE-DRAFT.md` is the per-order Order Form template — complete it per order; it is not the agreement text and must not replace `COMMERCIAL.md`.
 - Ensure `licenses/ASSET_POLICY.md` and `policies/BACKWARD-COMPATIBILITY-DRAFT.md` are committed.
 
 ### Step 4: Metadata and Package Specification Update

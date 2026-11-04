@@ -1,7 +1,7 @@
 # Aegean Commercial Licensing & Licensing Tiers
 
 > **Licensing model.** AegeanWorks software is free for personal use under the **Aegean License
-> 1.0 (AL-1.0)**. Every commercial or organizational use needs the paid **Aegean Commercial
+> 1.1 (AL-1.1)**. Every commercial or organizational use needs the paid **Aegean Commercial
 > License 1.0 (ACL-1.0)**. A project may later move to the **Restricted** tier and stop being
 > distributed. “Aegean-E” is a legacy brand alias for the same licensor.
 
@@ -9,13 +9,13 @@
 
 ## 1. The Three Tiers
 
-### Personal — AL-1.0, free (default)
-- **License:** [Aegean License 1.0](LICENSE), also in `licenses/AL-1.0.md`.
+### Personal — AL-1.1, free (default)
+- **License:** [Aegean License 1.1](LICENSE), also in `licenses/AL-1.1.md`.
 - **You may** download, run, study, and modify the software for your own private,
   non-commercial use as an individual: learning, coursework, hobby projects, personal research.
 - **You may not** use it for or on behalf of any company or organization, in paid or client
   work, in a hosted service, or in anything offered to others; redistribute it; train AI
-  models on it; or bypass its license checks. The binding definitions are in AL-1.0 Sections
+  models on it; or bypass its license checks. The binding definitions are in AL-1.1 Sections
   4 and 5.
 
 ### Commercial — ACL-1.0, paid
@@ -24,7 +24,7 @@
   use, closed-source products and SaaS, client deliverables, embedded redistribution, OEM.
 - **Required before** the commercial use begins.
 - **Try first:** each company may evaluate the software free for **28 days**, once per company
-  group, non-production only (AL-1.0 Section 4.3). After that it needs ACL-1.0 or must stop.
+  group, non-production only (AL-1.1 Section 4.3). After that it needs ACL-1.0 or must stop.
 
 ### Restricted — All Rights Reserved
 - **For** projects too valuable to distribute. Versions after the project's cutoff commit carry
@@ -37,7 +37,7 @@
 
 ## 2. Scope: Code and Assets
 
-- **Code** is AL-1.0 by default; ACL-1.0 is the commercial license.
+- **Code** is AL-1.1 by default (interactive games: AGL-1.1, non-commercial research: ASL-1.1); ACL-1.0 is the commercial license.
 - **Creative and domain assets** (3D models, textures, audio, clinical templates, datasets,
   model weights) are not licensed by ACL-1.0. They are proprietary, evaluation-only material
   under `licenses/ASSET_POLICY.md`, and require a separate written asset grant for any

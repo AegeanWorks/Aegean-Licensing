@@ -66,6 +66,24 @@ class TestWorkflowAssets(unittest.TestCase):
         self.assertIn("LicenseRef-AL-1.1", (REPO_ROOT / "REUSE.toml").read_text(encoding="utf-8"))
         self.assertTrue((REPO_ROOT / "licenses" / "LicenseRef-AL-1.1.txt").is_file())
 
+    def test_docs_name_the_operative_personal_license(self):
+        # ADR-022: new projects and entry docs use AL-1.1. AL-1.0 survives only in the
+        # archived 1.0 texts, CHANGELOG history, the CI wheel-content pin for archived
+        # files, and ACL-1.0's frozen definitions reference.
+        commercial = (REPO_ROOT / "COMMERCIAL.md").read_text(encoding="utf-8")
+        self.assertNotIn("AL-1.0", commercial)
+        self.assertIn("AL-1.1", commercial)
+        cla = (REPO_ROOT / "licenses" / "CONTRIBUTING_CLA.md").read_text(encoding="utf-8")
+        self.assertNotIn("AL-1.0", cla)
+        self.assertIn("AL-1.1", cla)
+        notice = (REPO_ROOT / "licenses" / "DUAL_LICENSE_NOTICE.txt").read_text(encoding="utf-8")
+        self.assertIn("AGL-1.1", notice)
+        self.assertIn("ASL-1.1", notice)
+        self.assertEqual(
+            (REPO_ROOT / "LICENSE").read_bytes(),
+            (REPO_ROOT / "licenses" / "AL-1.1.md").read_bytes(),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
