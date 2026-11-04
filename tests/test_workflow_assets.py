@@ -49,6 +49,15 @@ class TestWorkflowAssets(unittest.TestCase):
         for version in ('"3.10"', '"3.11"', '"3.12"', '"3.13"'):
             self.assertIn(version, workflow)
 
+    def test_ci_windows_job_is_a_pinned_single_version_smoke(self):
+        # The full 3.10-3.13 matrix runs on ubuntu; Windows is a platform smoke on one
+        # pinned version. If the Windows job gains a matrix, this test must be updated
+        # deliberately — the 1-version coverage is a locked cost decision, not an oversight.
+        workflow = (REPO_ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+        windows_job = workflow.split("test-windows:", 1)[1]
+        self.assertIn('python-version: "3.12"', windows_job)
+        self.assertNotIn("matrix:", windows_job)
+
     def test_manifest_covers_legal_documents(self):
         manifest = (REPO_ROOT / "MANIFEST.in").read_text(encoding="utf-8")
         for entry in (

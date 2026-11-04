@@ -28,13 +28,21 @@ class TestRegister(unittest.TestCase):
     def test_the_published_register_is_valid_and_holds_no_personal_data(self):
         path = REPO_ROOT / "licenses" / "issued.json"
         load_register(path)
-        data = json.loads(path.read_text(encoding="utf-8"))
+        text = path.read_text(encoding="utf-8")
+        data = json.loads(text)
         self.assertEqual(data["version"], 2)
         self.assertRegex(data["generated_at"], r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
         self.assertRegex(data["next_update"], r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
-        for entry in data["certificates"].values():
+        self.assertNotIn("@", text, "the public register must never hold email addresses")
+        allowed_keys = {"digest", "issued_at", "license_type", "status",
+                        "revoked_at", "reason", "reason_code", "invalidity_date"}
+        for cert_id, entry in data["certificates"].items():
             self.assertEqual(sorted(entry), ["digest", "issued_at", "license_type", "reason",
                                              "revoked_at", "status"])
+            self.assertTrue(set(entry) <= allowed_keys)
+            for value in entry.values():
+                self.assertNotIn("@", str(value))
+                self.assertNotIn("licensee", str(value).lower())
 
     def test_registered_unregistered_and_revoked(self):
         cert = self.issue()

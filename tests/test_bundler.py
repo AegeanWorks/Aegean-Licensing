@@ -40,6 +40,15 @@ class TestBundler(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             bundle_documents(empty, self.build)
 
+    def test_partial_repository_is_rejected_with_the_missing_sources(self):
+        partial = self.temp_dir / "partial"
+        (partial / "licenses").mkdir(parents=True)
+        (partial / "licenses" / "ACL-1.0.md").write_text("# ACL\n", encoding="utf-8")
+        with self.assertRaises(RuntimeError) as caught:
+            bundle_documents(partial, self.build)
+        self.assertIn("policies", str(caught.exception))
+        self.assertIn(".github/workflows/cla-check.yml", str(caught.exception))
+
 
 if __name__ == "__main__":
     unittest.main()

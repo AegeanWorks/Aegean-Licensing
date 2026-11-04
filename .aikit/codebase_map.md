@@ -8,9 +8,9 @@
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `25`
 - **Total Classes**: `29`
-- **Total Top-Level Functions**: `42`
-- **Total Class Methods**: `136`
-- **Total Source Lines**: `2895`
+- **Total Top-Level Functions**: `43`
+- **Total Class Methods**: `138`
+- **Total Source Lines**: `2935`
 
 ---
 
@@ -56,10 +56,11 @@
 ### [`aegean_licensing/bundler.py`](aegean_licensing/bundler.py)
 > *Bundle the repository's licensing documents into the built Python package.*
 
-**Size**: `38` lines (`1391` bytes)
+**Size**: `52` lines (`1938` bytes)
 
 **Functions:**
 - `def bundle_documents(repo_root, destination_root)` - *Copy legal documents under destination_root, returning the number of files copied.*
+- `def _has_files(directory)`
 - `def _iter_sources(repo_root)`
 
 ---
@@ -244,13 +245,14 @@
 ### [`tests/test_bundler.py`](tests/test_bundler.py)
 > *Unit tests for bundling licensing documents into the built package.*
 
-**Size**: `45` lines (`1920` bytes)
+**Size**: `54` lines (`2421` bytes)
 
 **Classes:**
 - `class TestBundler` - *Test document discovery and copy layout.*
   - Method `.setUp()`
   - Method `.test_documents_are_copied_into_package_resources()`
   - Method `.test_empty_repository_is_rejected()`
+  - Method `.test_partial_repository_is_rejected_with_the_missing_sources()`
 
 ---
 
@@ -342,7 +344,7 @@
 ### [`tests/test_register.py`](tests/test_register.py)
 > *Unit tests for reading the public certificate register (ADR-013, ADR-017).*
 
-**Size**: `294` lines (`15039` bytes)
+**Size**: `302` lines (`15525` bytes)
 
 **Classes:**
 - `class TestRegister` - *The register is the public proof of issuance and revocation.*
@@ -443,7 +445,7 @@
 ### [`tests/test_workflow_assets.py`](tests/test_workflow_assets.py)
 > *Asset tests for the CLA workflow, CI workflow, and packaging manifest.*
 
-**Size**: `89` lines (`4364` bytes)
+**Size**: `98` lines (`4968` bytes)
 
 **Classes:**
 - `class TestWorkflowAssets` - *Test the durable CLA register, workflow wiring, and manifest coverage.*
@@ -451,6 +453,7 @@
   - Method `.test_workflow_records_evidence_and_honours_revocation()`
   - Method `.test_cla_result_is_a_commit_status_the_comment_run_can_turn_green()`
   - Method `.test_ci_workflow_runs_tests_and_checks_the_wheel()`
+  - Method `.test_ci_windows_job_is_a_pinned_single_version_smoke()`
   - Method `.test_manifest_covers_legal_documents()`
   - Method `.test_docs_name_the_operative_personal_license()`
 
