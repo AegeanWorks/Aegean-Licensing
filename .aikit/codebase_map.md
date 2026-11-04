@@ -9,8 +9,8 @@
 - **Total Python Modules**: `25`
 - **Total Classes**: `29`
 - **Total Top-Level Functions**: `45`
-- **Total Class Methods**: `152`
-- **Total Source Lines**: `3149`
+- **Total Class Methods**: `153`
+- **Total Source Lines**: `3159`
 
 ---
 
@@ -70,7 +70,7 @@
 ### [`aegean_licensing/cert.py`](aegean_licensing/cert.py)
 > *License Certificate Data Model and Cryptographic Hashing.*
 
-**Size**: `187` lines (`7648` bytes)
+**Size**: `190` lines (`7851` bytes)
 
 **Classes:**
 - `class LicenseCertificate` - *Immutable data transfer object representing a granted commercial license.*
@@ -264,7 +264,7 @@
 ### [`tests/test_cert.py`](tests/test_cert.py)
 > *Unit tests for LicenseCertificate and cryptographic utilities.*
 
-**Size**: `103` lines (`3519` bytes)
+**Size**: `110` lines (`3977` bytes)
 
 **Classes:**
 - `class TestLicenseCertificate` - *Test certificate data transfer object and canonical hashing.*
@@ -276,6 +276,7 @@
   - Method `.test_to_and_from_dict_roundtrip()`
   - Method `.test_allowances_order_is_canonical()`
   - Method `.test_direct_allowances_string_is_one_allowance()`
+  - Method `.test_bool_canonicalizes_as_bool_not_int()`
 
 ---
 

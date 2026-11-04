@@ -7,7 +7,7 @@ import hashlib
 import hmac
 import json
 import math
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 from aegean_licensing.metadata import normalize_metadata_text
 
@@ -65,6 +65,9 @@ class LicenseCertificate:
 
 def _canonical_value(value: Any) -> Any:
     """Normalize a JSON value to the intersection of Python and JavaScript exact values."""
+    # bool is checked before int deliberately: isinstance(True, int) is True, so moving
+    # bool into or below the int branch would canonicalize True as 1 and silently
+    # change every certificate digest.
     if value is None or isinstance(value, (str, bool)):
         return value
     if isinstance(value, int):

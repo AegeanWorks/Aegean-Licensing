@@ -97,6 +97,13 @@ class TestLicenseCertificate(unittest.TestCase):
         )
         self.assertEqual(cert.allowances, ("ai-training",))
 
+    def test_bool_canonicalizes_as_bool_not_int(self):
+        # isinstance(True, int) is True: if the bool branch ever falls into the int
+        # branch, True hashes as 1 and every digest changes. Pin the distinction.
+        self.assertEqual(compute_canonical_payload({"f": True}), b'{"f":true}')
+        self.assertEqual(compute_canonical_payload({"f": False}), b'{"f":false}')
+        self.assertEqual(compute_canonical_payload({"f": 1}), b'{"f":1}')
+
 
 
 if __name__ == "__main__":
