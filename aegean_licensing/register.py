@@ -79,6 +79,8 @@ class RegisterDocument:
 
     def freshness(self, moment: datetime.datetime) -> Tuple[bool, str]:
         """Whether the register is fresh at `moment`; a missing window is not fresh."""
+        if getattr(moment, "tzinfo", None) is None:
+            raise ValueError("freshness moment must be a timezone-aware datetime")
         if not self.generated_at or not self.next_update:
             return False, "the register has no generated_at/next_update freshness metadata"
         generated = _parse_timestamp(self.generated_at, "generated_at")
@@ -109,7 +111,9 @@ def load_register_document(path: Union[str, Path]) -> RegisterDocument:
     if not target.is_file():
         return RegisterDocument(REGISTER_VERSION, "", "", {})
     data = load_bounded(target)
-    if not isinstance(data, dict) or data.get("version") not in SUPPORTED_REGISTER_VERSIONS:
+    # bool is an int subclass, so True/False must be rejected explicitly: True == 1 would
+    # otherwise load as register version 1.
+    if type(data.get("version")) is not int or data.get("version") not in SUPPORTED_REGISTER_VERSIONS:
         version = data.get("version") if isinstance(data, dict) else None
         raise ValueError(f"Unsupported register version {version!r} in {path}.")
     version = data["version"]
@@ -133,6 +137,8 @@ def load_register_document(path: Union[str, Path]) -> RegisterDocument:
         raise ValueError(f"{path} must hold a 'certificates' object.")
     entries: Dict[str, RegisterEntry] = {}
     for cert_id, fields in raw.items():
+        if not isinstance(cert_id, str) or not cert_id.strip():
+            raise ValueError(f"{path} has a malformed certificate entry id {cert_id!r}.")
         if not isinstance(fields, dict):
             raise ValueError(f"{path} has a malformed certificate entry for {cert_id}.")
         try:
@@ -144,6 +150,9 @@ def load_register_document(path: Union[str, Path]) -> RegisterDocument:
             raise ValueError(f"{path} gives certificate {cert_id} non-text {', '.join(non_text)}.")
         if not isinstance(entry.digest, str) or not _DIGEST.fullmatch(entry.digest):
             raise ValueError(f"{path} gives certificate {cert_id} an invalid digest.")
+        if not entry.license_type.strip():
+            raise ValueError(f"{path} gives certificate {cert_id} an empty license_type.")
+        _parse_date(entry.issued_at, f"issued_at for {cert_id}")
         if entry.status not in _STATUSES:
             raise ValueError(
                 f"{path} gives certificate {cert_id} an unknown status {entry.status!r}; "

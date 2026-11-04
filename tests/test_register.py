@@ -7,7 +7,11 @@ import unittest
 from pathlib import Path
 
 from aegean_licensing.cert import cert_from_dict, cert_to_dict, compute_digest
-from aegean_licensing.register import load_register, load_register_document
+from aegean_licensing.register import (
+    RegisterDocument,
+    load_register,
+    load_register_document,
+)
 from aegean_licensing.verifier import verify_certificate
 from tests.fixtures import day, issue_certificate, moment, write_register
 
@@ -117,6 +121,38 @@ class TestRegister(unittest.TestCase):
         self.assertEqual(result.status, "INVALID_FORMAT")
         self.assertIn("does not exist", result.reasons[0])
 
+    def test_register_rejects_malformed_issued_at(self):
+        cert = self.issue()
+        for issued_at in ("not-a-date", "2026-13-01", "2026-02-30", "", 123, None):
+            with self.subTest(issued_at=issued_at):
+                data = {"version": 2, "generated_at": moment(-1), "next_update": moment(30),
+                        "certificates": {cert.cert_id: {
+                            "digest": cert.digest, "license_type": cert.license_type,
+                            "issued_at": issued_at, "status": "valid"}}}
+                self.register.write_text(json.dumps(data), encoding="utf-8")
+                with self.assertRaises(ValueError):
+                    load_register(self.register)
+
+    def test_register_rejects_empty_license_type_and_cert_id(self):
+        cert = self.issue()
+        for cert_id, license_type in (("x", ""), ("x", "   "), ("", "ACL-1.0"),
+                                      ("   ", "ACL-1.0")):
+            with self.subTest(cert_id=cert_id, license_type=license_type):
+                data = {"version": 2, "generated_at": moment(-1), "next_update": moment(30),
+                        "certificates": {cert_id: {
+                            "digest": cert.digest, "license_type": license_type,
+                            "issued_at": cert.issued_at, "status": "valid"}}}
+                self.register.write_text(json.dumps(data), encoding="utf-8")
+                with self.assertRaises(ValueError):
+                    load_register(self.register)
+
+    def test_boolean_version_is_rejected_not_read_as_v1(self):
+        self.register.write_text(json.dumps({"version": True, "certificates": {}}),
+                                 encoding="utf-8")
+        with self.assertRaises(ValueError) as caught:
+            load_register(self.register)
+        self.assertIn("version", str(caught.exception))
+
 
 class TestRegisterVersionTwo(unittest.TestCase):
     """Freshness, typed revocation and as-of behavior (IDEA-935, IDEA-948)."""
@@ -176,6 +212,13 @@ class TestRegisterVersionTwo(unittest.TestCase):
         with self.assertRaises(ValueError) as caught:
             load_register_document(self.register)
         self.assertIn("longer than", str(caught.exception))
+
+    def test_freshness_with_a_naive_moment_is_an_error_not_a_crash(self):
+        import datetime
+        document = RegisterDocument(2, "2026-10-30T00:00:00Z", "2026-11-29T00:00:00Z", {})
+        with self.assertRaises(ValueError) as caught:
+            document.freshness(datetime.datetime(2026, 11, 1))
+        self.assertIn("timezone-aware", str(caught.exception))
 
     def test_version_one_rejects_version_two_entry_fields(self):
         cert = self.issue()

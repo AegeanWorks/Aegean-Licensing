@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import dataclasses
 import hashlib
+import re
 from pathlib import Path
 from typing import Dict, Optional
 
@@ -55,7 +56,9 @@ def load_registry() -> Dict[str, LicenseTerms]:
     """Return every registered license keyed by its canonical name."""
     data = _load_registry_document()
     version = data.get("version")
-    if version != REGISTRY_VERSION:
+    # bool is an int subclass, so True/False must be rejected explicitly: True == 1 would
+    # otherwise load as registry version 1.
+    if type(version) is not int or version != REGISTRY_VERSION:
         raise ValueError(
             f"Unsupported license registry version {version!r}; this tool reads version "
             f"{REGISTRY_VERSION}."
@@ -68,6 +71,21 @@ def load_registry() -> Dict[str, LicenseTerms]:
         if not isinstance(raw, dict):
             raise ValueError(f"License '{raw_key}' must be a JSON object.")
         key = str(raw_key).strip()
+        if not key:
+            raise ValueError("License registry holds a license with an empty key.")
+        document = str(raw.get("document", ""))
+        # Path('/etc/passwd').is_absolute() is False on Windows (drive-relative), so test
+        # the anchor instead: any rooted, absolute or drive-qualified path is outside the repo.
+        if document and (Path(document).anchor or ".." in Path(document).parts):
+            raise ValueError(
+                f"License '{key}' names a document outside the repository: {document!r}."
+            )
+        sha256 = str(raw.get("sha256", "")).lower()
+        if sha256 and not re.fullmatch(r"[0-9a-f]{64}", sha256):
+            raise ValueError(
+                f"License '{key}' has an invalid 'sha256'; it must be the lowercase hex "
+                f"digest of the agreement text."
+            )
         scopes = raw.get("scopes")
         tiers = raw.get("tiers", [])
         if not isinstance(scopes, list) or not scopes or not all(isinstance(s, str) for s in scopes):
@@ -80,9 +98,9 @@ def load_registry() -> Dict[str, LicenseTerms]:
         registry[key] = LicenseTerms(
             key=key,
             name=str(raw.get("name", key)),
-            document=str(raw.get("document", "")),
+            document=document,
             status=str(raw.get("status", "draft")),
-            sha256=str(raw.get("sha256", "")).lower(),
+            sha256=sha256,
             scopes=tuple(scopes),
             tiers=tuple(tiers),
             allowances=tuple(allowances),
@@ -127,6 +145,11 @@ def read_license_document(terms: LicenseTerms) -> str:
     """Read the operative agreement text from the checkout or the packaged resources."""
     if not terms.document:
         raise ValueError(f"License {terms.key} does not name a document.")
+    if Path(terms.document).anchor or ".." in Path(terms.document).parts:
+        raise ValueError(
+            f"License {terms.key} names a document outside the repository: "
+            f"{terms.document!r}."
+        )
     for candidate in _document_paths(terms.document):
         if candidate.is_file():
             with open(candidate, "r", encoding="utf-8") as handle:

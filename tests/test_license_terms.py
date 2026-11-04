@@ -43,6 +43,36 @@ class TestFrozenTerms(unittest.TestCase):
         terms = dataclasses.replace(load_registry()["ACL-1.0"], sha256="")
         self.assertEqual(terms_digest(terms), compute_terms_digest(read_license_document(terms)))
 
+    def test_boolean_registry_version_is_rejected(self):
+        with mock.patch.object(license_terms, "_load_registry_document",
+                              return_value={"version": True, "licenses": {}}):
+            with self.assertRaises(ValueError) as caught:
+                load_registry()
+        self.assertIn("version", str(caught.exception))
+
+    def test_document_outside_the_repository_is_rejected(self):
+        for document in ("/etc/passwd", "licenses/../../etc/passwd", "C:\\Windows\\x.md"):
+            with self.subTest(document=document):
+                body = {"version": 1, "licenses": {
+                    "ACL-1.0": {"scopes": ["x"], "document": document, "status": "operative"}}}
+                with mock.patch.object(license_terms, "_load_registry_document",
+                                      return_value=body):
+                    with self.assertRaises(ValueError) as caught:
+                        load_registry()
+                self.assertIn("outside the repository", str(caught.exception))
+
+    def test_sha256_must_be_hex_when_pinned(self):
+        for sha256 in ("zzz", "0" * 63, "G" * 64, " b71c\n"):
+            with self.subTest(sha256=sha256):
+                body = {"version": 1, "licenses": {
+                    "ACL-1.0": {"scopes": ["x"], "document": "licenses/ACL-1.0.md",
+                                "status": "operative", "sha256": sha256}}}
+                with mock.patch.object(license_terms, "_load_registry_document",
+                                      return_value=body):
+                    with self.assertRaises(ValueError) as caught:
+                        load_registry()
+                self.assertIn("sha256", str(caught.exception))
+
 
 if __name__ == "__main__":
     unittest.main()

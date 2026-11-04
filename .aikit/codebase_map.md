@@ -9,8 +9,8 @@
 - **Total Python Modules**: `25`
 - **Total Classes**: `29`
 - **Total Top-Level Functions**: `43`
-- **Total Class Methods**: `138`
-- **Total Source Lines**: `2935`
+- **Total Class Methods**: `145`
+- **Total Source Lines**: `3040`
 
 ---
 
@@ -116,7 +116,7 @@
 ### [`aegean_licensing/license_terms.py`](aegean_licensing/license_terms.py)
 > *Canonical license registry: the types, scopes, tiers, and term digests a certificate may cite.*
 
-**Size**: `152` lines (`6018` bytes)
+**Size**: `175` lines (`7217` bytes)
 
 **Classes:**
 - `class LicenseTerms` - *One operative license agreement and the vocabulary its certificates may use.*
@@ -152,7 +152,7 @@
 ### [`aegean_licensing/register.py`](aegean_licensing/register.py)
 > *Public certificate register: which certificates AegeanWorks issued, and which it revoked (ADR-013).*
 
-**Size**: `190` lines (`9217` bytes)
+**Size**: `199` lines (`9849` bytes)
 
 **Classes:**
 - `class RegisterEntry` - *One issued certificate, as the public may see it.*
@@ -314,13 +314,16 @@
 ### [`tests/test_license_terms.py`](tests/test_license_terms.py)
 > *Unit tests for the frozen text of operative agreements (ADR-013).*
 
-**Size**: `48` lines (`2104` bytes)
+**Size**: `78` lines (`3817` bytes)
 
 **Classes:**
 - `class TestFrozenTerms` - *A certificate cites an agreement's digest, so an issued agreement's text must never change.*
   - Method `.test_every_operative_agreement_pins_its_text()`
   - Method `.test_an_edited_agreement_is_refused_and_fails_verification()`
   - Method `.test_an_unpinned_agreement_still_yields_its_digest()`
+  - Method `.test_boolean_registry_version_is_rejected()`
+  - Method `.test_document_outside_the_repository_is_rejected()`
+  - Method `.test_sha256_must_be_hex_when_pinned()`
 
 ---
 
@@ -344,7 +347,7 @@
 ### [`tests/test_register.py`](tests/test_register.py)
 > *Unit tests for reading the public certificate register (ADR-013, ADR-017).*
 
-**Size**: `302` lines (`15525` bytes)
+**Size**: `345` lines (`17782` bytes)
 
 **Classes:**
 - `class TestRegister` - *The register is the public proof of issuance and revocation.*
@@ -358,6 +361,9 @@
   - Method `.test_a_non_text_digest_is_refused_instead_of_crashing_compare_digest()`
   - Method `.test_a_missing_register_is_empty()`
   - Method `.test_verifying_against_a_missing_register_is_an_error()`
+  - Method `.test_register_rejects_malformed_issued_at()`
+  - Method `.test_register_rejects_empty_license_type_and_cert_id()`
+  - Method `.test_boolean_version_is_rejected_not_read_as_v1()`
 - `class TestRegisterVersionTwo` - *Freshness, typed revocation and as-of behavior (IDEA-935, IDEA-948).*
   - Method `.setUp()`
   - Method `.issue(name)`
@@ -366,6 +372,7 @@
   - Method `.test_a_future_generated_at_is_refused()`
   - Method `.test_version_two_requires_freshness_metadata()`
   - Method `.test_freshness_window_is_bounded()`
+  - Method `.test_freshness_with_a_naive_moment_is_an_error_not_a_crash()`
   - Method `.test_version_one_rejects_version_two_entry_fields()`
   - Method `.test_an_unknown_reason_code_is_refused()`
   - Method `.test_invalidity_date_requires_a_retroactive_code()`
