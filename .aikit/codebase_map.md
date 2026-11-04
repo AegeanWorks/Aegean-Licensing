@@ -8,9 +8,9 @@
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `25`
 - **Total Classes**: `29`
-- **Total Top-Level Functions**: `43`
-- **Total Class Methods**: `145`
-- **Total Source Lines**: `3040`
+- **Total Top-Level Functions**: `45`
+- **Total Class Methods**: `148`
+- **Total Source Lines**: `3082`
 
 ---
 
@@ -33,7 +33,7 @@
 ### [`aegean_licensing/bounded_json.py`](aegean_licensing/bounded_json.py)
 > *Bounded JSON loading for files that cross an untrusted boundary.*
 
-**Size**: `137` lines (`5066` bytes)
+**Size**: `158` lines (`5906` bytes)
 
 **Classes:**
 - `class ParseLimits`
@@ -46,6 +46,8 @@
 - `class ConfigError` - *A configured parse limit is not a positive byte count with an optional MB/GB suffix.*
 
 **Functions:**
+- `def _reject_constant(value)` - *Refuse NaN/Infinity/-Infinity: strict JSON has no non-finite numbers.*
+- `def _reject_duplicate_object(pairs)` - *Refuse duplicate object keys: last-wins would hide a tamper or merge artifact.*
 - `def parse_limit(raw, *, default, variable)` - *Resolve one limit, accepting plain bytes or the binary suffixes MB and GB.*
 - `def limits_from_env(environ)` - *Read the three limits from the environment, validating each value at startup.*
 - `def _guard_structure(text, limits)` - *Reject depth and node bombs before json.loads can recurse or allocate freely.*
@@ -220,7 +222,7 @@
 ### [`tests/test_bounded_json.py`](tests/test_bounded_json.py)
 > *Unit tests for bounded JSON loading (IDEA-118).*
 
-**Size**: `115` lines (`4768` bytes)
+**Size**: `136` lines (`5786` bytes)
 
 **Classes:**
 - `class TestParseLimits`
@@ -237,6 +239,9 @@
   - Method `.test_utf8_bom_is_accepted()`
   - Method `.test_environment_limits_are_honored_by_default()`
   - Method `.test_corrupt_json_under_the_cap_raises_a_value_error()`
+  - Method `.test_non_standard_constants_are_rejected()`
+  - Method `.test_duplicate_object_keys_are_rejected()`
+  - Method `.test_directory_is_a_value_error_not_an_os_error()`
   - Method `.test_register_loader_uses_the_bounded_path()`
   - Method `.test_verifier_file_loader_uses_the_bounded_path()`
 

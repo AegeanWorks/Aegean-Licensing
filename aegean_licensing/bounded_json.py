@@ -64,6 +64,23 @@ class ConfigError(ValueError):
     """A configured parse limit is not a positive byte count with an optional MB/GB suffix."""
 
 
+def _reject_constant(value: str) -> Any:
+    """Refuse NaN/Infinity/-Infinity: strict JSON has no non-finite numbers."""
+    raise ValueError(
+        f"Non-standard JSON constant {value!r} is not accepted; use null instead."
+    )
+
+
+def _reject_duplicate_object(pairs: list) -> dict:
+    """Refuse duplicate object keys: last-wins would hide a tamper or merge artifact."""
+    seen: dict = {}
+    for key, value in pairs:
+        if key in seen:
+            raise ValueError(f"Duplicate JSON object key {key!r} is not accepted.")
+        seen[key] = value
+    return seen
+
+
 def parse_limit(raw: Optional[Union[str, int]], *, default: int, variable: str) -> int:
     """Resolve one limit, accepting plain bytes or the binary suffixes MB and GB."""
     if raw is None or str(raw).strip() == "":
@@ -125,13 +142,17 @@ def load_bounded(path: Union[str, Path], limits: Optional[ParseLimits] = None) -
     """Read and parse one JSON file under byte, depth and node limits."""
     target = Path(path)
     limits = limits or limits_from_env()
-    with open(target, "rb") as handle:
-        observed = os.fstat(handle.fileno()).st_size
-        if observed > limits.max_bytes:
-            raise TooLarge(observed, limits.max_bytes)
-        raw = handle.read(limits.max_bytes + 1)
+    try:
+        with open(target, "rb") as handle:
+            observed = os.fstat(handle.fileno()).st_size
+            if observed > limits.max_bytes:
+                raise TooLarge(observed, limits.max_bytes)
+            raw = handle.read(limits.max_bytes + 1)
+    except (IsADirectoryError, PermissionError) as exc:
+        raise ValueError(f"Cannot read {target}: not a readable file.") from exc
     if len(raw) > limits.max_bytes:
         raise TooLarge(len(raw), limits.max_bytes)
     text = raw.decode("utf-8-sig")
     _guard_structure(text, limits)
-    return json.loads(text)
+    return json.loads(text, parse_constant=_reject_constant,
+                      object_pairs_hook=_reject_duplicate_object)

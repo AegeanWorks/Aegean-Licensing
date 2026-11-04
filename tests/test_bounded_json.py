@@ -94,6 +94,27 @@ class TestLoadBounded(unittest.TestCase):
         with self.assertRaises(ValueError):
             load_bounded(path)
 
+    def test_non_standard_constants_are_rejected(self):
+        for body in (b'{"n": NaN}', b'{"n": Infinity}', b'{"n": -Infinity}'):
+            with self.subTest(body=body):
+                path = self.write("constant.json", body)
+                with self.assertRaises(ValueError) as caught:
+                    load_bounded(path)
+                self.assertIn("not accepted", str(caught.exception))
+
+    def test_duplicate_object_keys_are_rejected(self):
+        for body in (b'{"a": 1, "a": 2}', b'{"o": {"x": 1, "x": 2}}'):
+            with self.subTest(body=body):
+                path = self.write("dup.json", body)
+                with self.assertRaises(ValueError) as caught:
+                    load_bounded(path)
+                self.assertIn("Duplicate", str(caught.exception))
+
+    def test_directory_is_a_value_error_not_an_os_error(self):
+        with self.assertRaises(ValueError) as caught:
+            load_bounded(self.temp_dir)
+        self.assertIn("not a readable file", str(caught.exception))
+
     def test_register_loader_uses_the_bounded_path(self):
         path = self.write("register.json", b"{}")
         with mock.patch("aegean_licensing.register.load_bounded",
