@@ -345,6 +345,24 @@ class TestCertificateFormat(unittest.TestCase):
                 data["digest"] = compute_digest(data)
                 self.assertEqual(verify_certificate(data).status, "INVALID_FORMAT")
 
+    def test_malformed_as_of_and_reference_date_are_invalid_not_a_crash(self):
+        data = cert_to_dict(issue_certificate(licensee_name="A", licensee_contact="a@example.com"))
+        for kw in ({"as_of": "2026/10/25"}, {"as_of": "not-a-date"}, {"as_of": "2026-02-30"},
+                   {"reference_date": "Oct 25 2026"}, {"reference_date": "2026-13-01"}):
+            with self.subTest(kw=kw):
+                result = verify_certificate(dict(data), **kw)
+                self.assertFalse(result.is_valid)
+                self.assertEqual(result.status, "INVALID_FORMAT")
+
+    def test_float_format_is_unsupported(self):
+        data = cert_to_dict(issue_certificate(licensee_name="A", licensee_contact="a@example.com"))
+        data["format"] = 2.0
+        data["digest"] = compute_digest(data)
+        data["signature"] = ""
+        result = verify_certificate(data)
+        self.assertFalse(result.is_valid)
+        self.assertEqual(result.status, "UNSUPPORTED_FORMAT")
+
 
 if __name__ == "__main__":
     unittest.main()

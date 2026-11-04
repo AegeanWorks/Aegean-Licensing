@@ -9,8 +9,8 @@
 - **Total Python Modules**: `25`
 - **Total Classes**: `29`
 - **Total Top-Level Functions**: `42`
-- **Total Class Methods**: `130`
-- **Total Source Lines**: `2815`
+- **Total Class Methods**: `135`
+- **Total Source Lines**: `2877`
 
 ---
 
@@ -67,7 +67,7 @@
 ### [`aegean_licensing/cert.py`](aegean_licensing/cert.py)
 > *License Certificate Data Model and Cryptographic Hashing.*
 
-**Size**: `182` lines (`7357` bytes)
+**Size**: `187` lines (`7648` bytes)
 
 **Classes:**
 - `class LicenseCertificate` - *Immutable data transfer object representing a granted commercial license.*
@@ -88,7 +88,7 @@
 ### [`aegean_licensing/cli.py`](aegean_licensing/cli.py)
 > *Aegean License Certificate verification command line (`aegean-license verify`).*
 
-**Size**: `112` lines (`4854` bytes)
+**Size**: `117` lines (`5019` bytes)
 
 **Functions:**
 - `def _build_parser()`
@@ -170,7 +170,7 @@
 ### [`aegean_licensing/verifier.py`](aegean_licensing/verifier.py)
 > *Commercial License Certificate Verification Module.*
 
-**Size**: `441` lines (`19394` bytes)
+**Size**: `449` lines (`19717` bytes)
 
 **Classes:**
 - `class VerificationResult` - *Outcome of validating a License Grant Certificate.*
@@ -206,7 +206,7 @@
 ### [`tests/fixtures.py`](tests/fixtures.py)
 > *Test-only certificate builder (ADR-017).*
 
-**Size**: `91` lines (`3812` bytes)
+**Size**: `95` lines (`3948` bytes)
 
 **Functions:**
 - `def day(offset)` - *The ISO date `offset` days from today; negative offsets are in the past.*
@@ -257,7 +257,7 @@
 ### [`tests/test_cert.py`](tests/test_cert.py)
 > *Unit tests for LicenseCertificate and cryptographic utilities.*
 
-**Size**: `89` lines (`3005` bytes)
+**Size**: `103` lines (`3519` bytes)
 
 **Classes:**
 - `class TestLicenseCertificate` - *Test certificate data transfer object and canonical hashing.*
@@ -267,13 +267,15 @@
   - Method `.test_format_2_binds_digest_and_signature_to_their_own_domains()`
   - Method `.test_signature_computation()`
   - Method `.test_to_and_from_dict_roundtrip()`
+  - Method `.test_allowances_order_is_canonical()`
+  - Method `.test_direct_allowances_string_is_one_allowance()`
 
 ---
 
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for the public verification command line.*
 
-**Size**: `117` lines (`5345` bytes)
+**Size**: `125` lines (`5754` bytes)
 
 **Classes:**
 - `class TestCLI` - *The public CLI verifies; issuing and revoking are private (ADR-017).*
@@ -286,6 +288,7 @@
   - Method `.test_as_of_reports_a_historical_key_compromise_as_valid()`
   - Method `.test_a_malformed_as_of_date_is_a_clean_error()`
   - Method `.test_unregistered_certificate_fails_with_the_register()`
+  - Method `.test_verify_without_register_reports_not_checked()`
   - Method `.test_an_explicitly_missing_register_is_an_error()`
   - Method `.test_the_public_cli_has_no_signing_key_option()`
 
@@ -397,7 +400,7 @@
 ### [`tests/test_verifier.py`](tests/test_verifier.py)
 > *Unit tests for commercial license certificate verifier.*
 
-**Size**: `350` lines (`14738` bytes)
+**Size**: `368` lines (`15718` bytes)
 
 **Classes:**
 - `class TestVerifier` - *Test certificate verification, tamper detection, terms, and scope checking.*
@@ -432,6 +435,8 @@
   - Method `.test_a_format_1_certificate_is_rejected_even_when_self_consistent()`
   - Method `.test_a_relabelled_format_1_certificate_is_tampered()`
   - Method `.test_a_bad_serial_is_invalid()`
+  - Method `.test_malformed_as_of_and_reference_date_are_invalid_not_a_crash()`
+  - Method `.test_float_format_is_unsupported()`
 
 ---
 

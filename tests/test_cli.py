@@ -84,8 +84,9 @@ class TestCLI(unittest.TestCase):
         code, out, err = self.run_cli("verify", str(self.write_cert(cert)),
                                       "--register", str(register), "--as-of", "not-a-date")
         self.assertEqual(code, 1)
-        self.assertIn("YYYY-MM-DD", err)
-        self.assertEqual(out, "")
+        self.assertIn("INVALID_FORMAT", out)
+        self.assertIn("YYYY-MM-DD", out)
+        self.assertEqual(err, "")
 
     def test_unregistered_certificate_fails_with_the_register(self):
         cert = issue_certificate(licensee_name="Forger", licensee_contact="f@example.com")
@@ -94,6 +95,13 @@ class TestCLI(unittest.TestCase):
         code, out, _ = self.run_cli("verify", str(self.write_cert(cert)), "--register", str(register))
         self.assertEqual(code, 1)
         self.assertIn("UNREGISTERED", out)
+        self.assertIn("not in the supplied register", out)
+
+    def test_verify_without_register_reports_not_checked(self):
+        cert = issue_certificate(licensee_name="NoReg", licensee_contact="n@example.com")
+        code, out, _ = self.run_cli("verify", str(self.write_cert(cert)))
+        self.assertEqual(code, 0)
+        self.assertIn("not checked", out)
 
     def test_an_explicitly_missing_register_is_an_error(self):
         cert = issue_certificate(licensee_name="Missing", licensee_contact="m@example.com")

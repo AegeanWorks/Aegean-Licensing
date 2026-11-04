@@ -114,19 +114,27 @@ def verify_certificate(
     if as_of and reference_date:
         raise ValueError("Use either as_of or reference_date, not both.")
     reasons: List[str] = []
-    verification_moment = (
-        _date_moment(as_of) if as_of
-        else _date_moment(reference_date) if reference_date
-        else datetime.datetime.now(datetime.timezone.utc)
-    )
-    # Register freshness is a property of the register file against the clock, not of the date the
-    # caller asked about: a register published yesterday is the current one, and it is the best
-    # evidence available for a question about last week. Judging it at `as_of` made every
-    # historical query before the register's generation date fail as STALE_REGISTER.
-    freshness_moment = (
-        _date_moment(reference_date) if reference_date
-        else datetime.datetime.now(datetime.timezone.utc)
-    )
+    try:
+        verification_moment = (
+            _date_moment(as_of) if as_of
+            else _date_moment(reference_date) if reference_date
+            else datetime.datetime.now(datetime.timezone.utc)
+        )
+        # Register freshness is a property of the register file against the clock, not of the date the
+        # caller asked about: a register published yesterday is the current one, and it is the best
+        # evidence available for a question about last week. Judging it at `as_of` made every
+        # historical query before the register's generation date fail as STALE_REGISTER.
+        freshness_moment = (
+            _date_moment(reference_date) if reference_date
+            else datetime.datetime.now(datetime.timezone.utc)
+        )
+    except ValueError as exc:
+        return VerificationResult(
+            is_valid=False,
+            status="INVALID_FORMAT",
+            reasons=(f"Invalid date: {exc}",),
+            historical=bool(as_of),
+        )
 
     if isinstance(target, (str, Path)):
         file_path = Path(target)
@@ -162,7 +170,7 @@ def verify_certificate(
 
     # 0. Format: only format 2 verifies; format 1, from the issuer published before ADR-018, never does
     certificate_format = data.get("format", 1)
-    if certificate_format != CERT_FORMAT:
+    if type(certificate_format) is not int or certificate_format != CERT_FORMAT:
         return VerificationResult(
             is_valid=False,
             status="UNSUPPORTED_FORMAT",

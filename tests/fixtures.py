@@ -35,6 +35,10 @@ def issue_certificate(licensee_name, licensee_contact, license_type="ACL-1.0", p
                       expires_at=None, notes="", secret_key=None, cert_id=None,
                       issued_at="2026-10-25", tier="", allowances=()):
     terms = resolve_license(license_type)
+    if isinstance(projects, str):
+        projects = (projects,)
+    if isinstance(allowances, str):
+        allowances = (allowances,)
     data = {
         "cert_id": cert_id or str(uuid.uuid4()),
         "licensee_name": licensee_name,

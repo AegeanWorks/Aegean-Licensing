@@ -77,7 +77,12 @@ def _handle_verify(args: argparse.Namespace) -> int:
         print(f"Allow  : {', '.join(result.cert.allowances) or 'none'}")
         print(f"Covered: {', '.join(result.cert.projects)}")
         print(f"Terms  : {terms_state}")
-        print(f"Listed : {'yes, in the public register' if result.registered else 'not checked'}")
+        if result.registered:
+            print("Listed : yes, in the public register")
+        elif not args.register:
+            print("Listed : not checked (no --register supplied)")
+        else:
+            print("Listed : no, not in the supplied register")
         if result.register_generated_at:
             print(f"Register: generated {result.register_generated_at}, "
                   f"next update {result.register_next_update}")

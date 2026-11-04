@@ -57,7 +57,10 @@ class LicenseCertificate:
             object.__setattr__(self, "projects", tuple(sorted(self.projects)))
         elif isinstance(self.projects, str):
             object.__setattr__(self, "projects", (self.projects,))
-        object.__setattr__(self, "allowances", tuple(sorted(self.allowances)))
+        if isinstance(self.allowances, str):
+            object.__setattr__(self, "allowances", (self.allowances,))
+        else:
+            object.__setattr__(self, "allowances", tuple(sorted(self.allowances)))
 
 
 def _canonical_value(value: Any) -> Any:
@@ -96,6 +99,8 @@ def compute_canonical_payload(data: Dict[str, Any]) -> bytes:
     # Ensure lists/tuples are sorted if appropriate or consistently ordered
     if "projects" in filtered and isinstance(filtered["projects"], (list, tuple)):
         filtered["projects"] = sorted(list(filtered["projects"]))
+    if "allowances" in filtered and isinstance(filtered["allowances"], (list, tuple)):
+        filtered["allowances"] = sorted(list(filtered["allowances"]))
     normalized = _canonical_value(filtered)
     return json.dumps(normalized, sort_keys=True, separators=(",", ":"),
                       ensure_ascii=True, allow_nan=False).encode("utf-8")

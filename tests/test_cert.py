@@ -83,6 +83,20 @@ class TestLicenseCertificate(unittest.TestCase):
         reconstructed = cert_from_dict(d)
         self.assertEqual(cert, reconstructed)
 
+    def test_allowances_order_is_canonical(self):
+        d1 = {"allowances": ["b", "a"]}
+        d2 = {"allowances": ["a", "b"]}
+        self.assertEqual(compute_canonical_payload(d1), compute_canonical_payload(d2))
+
+    def test_direct_allowances_string_is_one_allowance(self):
+        cert = LicenseCertificate(
+            cert_id="x",
+            licensee_name="A",
+            licensee_contact="c",
+            allowances="ai-training",
+        )
+        self.assertEqual(cert.allowances, ("ai-training",))
+
 
 
 if __name__ == "__main__":
