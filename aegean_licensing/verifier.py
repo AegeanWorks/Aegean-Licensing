@@ -244,7 +244,7 @@ def verify_certificate(
     terms_verified = False
     if cert.license_type:
         try:
-            terms = resolve_license(cert.license_type, require_operative=False)
+            terms = resolve_license(cert.license_type, require_operative=True)
         except ValueError as exc:
             reasons.append(str(exc))
             return VerificationResult(
@@ -460,7 +460,7 @@ def verify_certificate(
                 cert=cert,
             )
 
-    status = "VALID_AS_OF" if as_of and registered else (
+    status = "VALID_AS_OF" if as_of and (registered or signature_verified) else (
         "VALID" if signature_verified or registered else "VALID_UNVERIFIED")
     return VerificationResult(
         is_valid=True,

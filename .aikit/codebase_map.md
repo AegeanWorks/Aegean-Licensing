@@ -9,8 +9,8 @@
 - **Total Python Modules**: `25`
 - **Total Classes**: `29`
 - **Total Top-Level Functions**: `45`
-- **Total Class Methods**: `158`
-- **Total Source Lines**: `3227`
+- **Total Class Methods**: `160`
+- **Total Source Lines**: `3257`
 
 ---
 
@@ -173,7 +173,7 @@
 ### [`aegean_licensing/verifier.py`](aegean_licensing/verifier.py)
 > *Commercial License Certificate Verification Module.*
 
-**Size**: `476` lines (`20861` bytes)
+**Size**: `476` lines (`20884` bytes)
 
 **Classes:**
 - `class VerificationResult` - *Outcome of validating a License Grant Certificate.*
@@ -418,7 +418,7 @@
 ### [`tests/test_verifier.py`](tests/test_verifier.py)
 > *Unit tests for commercial license certificate verifier.*
 
-**Size**: `413` lines (`18027` bytes)
+**Size**: `443` lines (`19584` bytes)
 
 **Classes:**
 - `class TestVerifier` - *Test certificate verification, tamper detection, terms, and scope checking.*
@@ -459,6 +459,8 @@
   - Method `.test_deeply_nested_or_circular_target_is_invalid_not_a_crash()`
   - Method `.test_non_string_check_project_is_invalid_not_a_crash()`
   - Method `.test_empty_check_project_is_invalid_not_valid()`
+  - Method `.test_a_non_operative_license_is_refused()`
+  - Method `.test_a_historical_signature_without_register_is_valid_as_of()`
 
 ---
 

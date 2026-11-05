@@ -408,6 +408,36 @@ class TestCertificateFormat(unittest.TestCase):
                 self.assertFalse(result.is_valid)
                 self.assertEqual(result.status, "INVALID_FORMAT")
 
+    def test_a_non_operative_license_is_refused(self):
+        from unittest import mock
+        from aegean_licensing.license_terms import LicenseTerms
+        draft = LicenseTerms(key="DRAFT-1.0", name="Draft", document="",
+                             status="draft", sha256="",
+                             scopes=("proprietary-saas-and-redistribution",),
+                             tiers=(), allowances=())
+        data = cert_to_dict(issue_certificate(
+            licensee_name="A", licensee_contact="a@example.com"))
+        data["license_type"] = "DRAFT-1.0"
+        from aegean_licensing.cert import compute_digest as _digest
+        data["digest"] = _digest(data)
+        with mock.patch("aegean_licensing.license_terms.load_registry",
+                        return_value={"DRAFT-1.0": draft}):
+            result = verify_certificate(dict(data))
+        self.assertFalse(result.is_valid)
+        self.assertEqual(result.status, "INVALID_FORMAT")
+        self.assertIn("not operative", result.reasons[0])
+
+    def test_a_historical_signature_without_register_is_valid_as_of(self):
+        cert = issue_certificate(
+            licensee_name="Hist", licensee_contact="h@example.com",
+            secret_key="hist-key", issued_at="2026-10-20")
+        data = cert_to_dict(cert)
+        result = verify_certificate(dict(data), secret_key="hist-key",
+                                    as_of="2026-10-25")
+        self.assertTrue(result.is_valid)
+        self.assertEqual(result.status, "VALID_AS_OF")
+        self.assertTrue(result.historical)
+
 
 if __name__ == "__main__":
     unittest.main()
